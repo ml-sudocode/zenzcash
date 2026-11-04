@@ -82,6 +82,8 @@ try {
   const {targetId}=await send("Target.createTarget",{url:"about:blank"},true);
   session=(await send("Target.attachToTarget",{targetId,flatten:true},true)).sessionId;
   await send("Runtime.enable");await send("Page.enable");
+  // Content Security Policy violations become console errors, so every errors check covers them.
+  await send("Page.addScriptToEvaluateOnNewDocument",{source:"document.addEventListener('securitypolicyviolation',event=>console.error(`CSP violation: ${event.effectiveDirective} blocked ${event.blockedURI}`))"});
   await send("Browser.setDownloadBehavior",{behavior:"allow",downloadPath:downloads},true);
   const evaluate=async expression=>{
     const result=await send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});
@@ -441,7 +443,12 @@ try {
     assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);await capture('privacy-original-mobile.png');
     assert.deepEqual(errors,[]);
   }
-  console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
+  // The served policy is live: Trusted Types refuses a string at an HTML sink and the refusal
+  // is reported, which also proves the violation listener above would catch a real one.
+  assert.equal(await evaluate("(()=>{try{document.createElement('div').innerHTML='<b>x</b>';return 'assigned';}catch(error){return error.name;}})()"),"TypeError");
+  for(let attempt=0;attempt<50&&errors.length===0;attempt++) await delay();
+  assert.deepEqual(errors,["CSP violation: require-trusted-types-for blocked trusted-types-sink"]);
+  console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation, no console errors or CSP violations, and enforced Trusted Types.`);
   }
   await send("Browser.close", {}, true);
 } catch(error) {

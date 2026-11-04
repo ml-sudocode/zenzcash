@@ -191,6 +191,11 @@ account-linked feedback, not anonymous feedback.
 - **The page** is static HTML and JavaScript with no build step. It renders forum text only
   as text, never as markup. The Rust server serves the page and SQLite-backed account,
   content, rating and feedback APIs. Ordinary page reads and personal actions never run AI.
+  Only `site/js/dom.js` creates elements or sets attributes; a gate test rejects HTML,
+  eval and navigation sinks anywhere in the page code (D-126). Every server response
+  carries one Content-Security-Policy header: same-origin scripts, styles and connections
+  only, no framing, and Trusted Types, so supporting browsers also refuse HTML strings
+  and `javascript:` navigation at runtime.
 
 ## 9. Deliberately excluded
 - **No filter for individual accounts.** People would mute those they dislike, argue from

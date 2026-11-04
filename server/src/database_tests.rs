@@ -436,6 +436,43 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
     std::fs::remove_dir_all(directory).unwrap();
 }
 
+#[tokio::test]
+async fn every_response_carries_the_content_security_policy_and_nosniff() {
+    let directory = std::env::temp_dir().join(format!("zforum-headers-{}", database::secret()));
+    std::fs::create_dir_all(directory.join("js")).unwrap();
+    std::fs::write(directory.join("index.html"), "<!doctype html>").unwrap();
+    std::fs::write(directory.join("js/app.js"), "export {};").unwrap();
+    let state = Arc::new(Mutex::new(App {
+        proxy: proxy::Proxy::Direct,
+        db: db(),
+        auth: Auth::new("http://localhost:8000", "localhost", PathBuf::from("missing")).unwrap(),
+        contract: json!({}),
+    }));
+    let app = router(state, &directory);
+    let policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types 'none'";
+    for (method, path, status, cache) in [
+        ("GET", "/", StatusCode::OK, None),
+        ("GET", "/js/app.js", StatusCode::OK, None),
+        ("GET", "/js/missing.js", StatusCode::NOT_FOUND, None),
+        ("GET", "/no-such-page", StatusCode::NOT_FOUND, Some("no-store")),
+        ("GET", "/api/me", StatusCode::OK, Some("no-store")),
+        // Refused by the origin check before it sets no-store; the security layer still applies.
+        ("POST", "/api/account/visit", StatusCode::FORBIDDEN, None),
+    ] {
+        let response = app
+            .clone()
+            .oneshot(Request::builder().method(method).uri(path).body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(response.status(), status, "{method} {path}");
+        let headers = response.headers();
+        assert_eq!(headers.get_all(header::CONTENT_SECURITY_POLICY).iter().collect::<Vec<_>>(), [policy], "{method} {path}");
+        assert_eq!(headers.get_all(header::X_CONTENT_TYPE_OPTIONS).iter().collect::<Vec<_>>(), ["nosniff"], "{method} {path}");
+        assert_eq!(headers.get(header::CACHE_CONTROL).map(|value| value.to_str().unwrap()), cache, "{method} {path}");
+    }
+    std::fs::remove_dir_all(directory).unwrap();
+}
+
 #[test]
 fn successful_pull_metadata_is_separate_from_publication_and_survives_rollback() {
     let mut db = db();

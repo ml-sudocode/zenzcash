@@ -1,4 +1,5 @@
 use super::*;
+use axum::http::HeaderValue;
 #[path = "auth_routes.rs"]
 mod auth_routes;
 use auth_routes::{start_auth, finish_auth, control};
@@ -45,10 +46,18 @@ async fn protect(State(shared): State<Shared>, request: Request, next: Next) -> 
         header::CACHE_CONTROL,
         "no-store".parse().expect("static header"),
     );
-    response.headers_mut().insert(
-        "x-content-type-options",
-        "nosniff".parse().expect("static header"),
-    );
+    response
+}
+// The page's only policy. Scripts, styles, connections and images come from this origin
+// (images also from data: URLs); nothing may frame the page, submit forms or change the
+// base URL. Trusted Types makes supporting browsers reject strings at HTML-parsing sinks
+// and javascript: navigation, backing up tests/dom-safety.test.mjs at runtime.
+const CONTENT_SECURITY_POLICY: &str = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types 'none'";
+async fn security_headers(request: Request, next: Next) -> Response {
+    let mut response = next.run(request).await;
+    let headers = response.headers_mut();
+    headers.insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static(CONTENT_SECURITY_POLICY));
+    headers.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
     response
 }
 async fn data(State(state): State<Shared>, Path(file): Path<String>) -> ApiResult {
@@ -296,4 +305,6 @@ pub(super) fn router(state: Shared, site: &FsPath) -> Router {
         .route_service("/style.css", tower_http::services::ServeFile::new(site.join("style.css")))
         .route_service("/prompt.md", tower_http::services::ServeFile::new(site.join("prompt.md")))
         .route_service("/topic-curation.json", tower_http::services::ServeFile::new(site.join("topic-curation.json")))
+        // Last, so it wraps every route above, the static files and the not-found fallback.
+        .layer(middleware::from_fn(security_headers))
 }
