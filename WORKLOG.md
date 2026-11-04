@@ -2563,3 +2563,9 @@ Implementation in progress; user verification remains pending.
   release their blob URL on a later task, like exports; the passkey browser test verifies
   the downloaded file byte for byte. Not run: the Docker image build (it pulls base images
   over the network) and any non-Chromium browser. Deployment needs explicit authorization.
+- **D-128 — Branch xss-protections is committed under the user's identity.** The user
+  asked that this branch's commits be authored and committed as
+  Taylor Hornby <taylor@defuse.ca> (GitHub @defuse), not sudo_ml, and the branch
+  force-pushed. This is a one-off for this branch only: the CLAUDE.md git identity rule
+  is unchanged for other work, and this clone's local git config stays sudo_ml. The
+  rewrite changed only identities and the commit hashes cited in F-140 and HANDOFF.
