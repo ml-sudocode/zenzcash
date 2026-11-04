@@ -2544,3 +2544,22 @@ Implementation in progress; user verification remains pending.
   min-release-age=14 (npm 12.2.1, days). The project installs no npm packages. Cargo
   has no equivalent setting, so agent cargo runs use --locked --offline: only the
   committed lockfile and already-cached crates, never a fresh download.
+- **F-140 — D-126 implemented and verified on branch xss-protections; not deployed.**
+  Commits 4b0d8d7 (DOM chokepoint gate) and a1c12eb (CSP header). Baseline first: the
+  ignored crawl and work/accounts.json were copied read-only from the operator's original
+  checkout so the full gate could run in this clone; the rebuilt site/data/zcg.json was
+  byte-identical to the original, and 180 Node tests plus both browser modes passed.
+  After: 192 Node tests (12 new), 45 Rust tests (1 new), Clippy -D warnings, release and
+  verifier builds (cargo --locked --offline), runtime smoke, and browser default and
+  passkey modes all pass, with no CSP violations; the Trusted Types control returned
+  TypeError plus exactly one require-trusted-types-for report. Sensitivity measured: the
+  sink scan run on main's code flags exactly the 15 replaced sites; the header test fails
+  at GET / when the layer is moved above the static routes; the safeHref property ran
+  20,000 seeded inputs (15,066 distinct; 18,256 rejected, 1,067 forum paths, 677 absolute)
+  and the three broken sanitizers produce 4,695, 828 and 3,589 violations. Observed while
+  pinning headers: unknown-path 404s already carried no-store (the protect layer wraps the
+  fallback) and the origin check's early 403 still has no Cache-Control; both pre-existing
+  and unchanged, and both now carry the policy and nosniff. Recovery-code downloads now
+  release their blob URL on a later task, like exports; the passkey browser test verifies
+  the downloaded file byte for byte. Not run: the Docker image build (it pulls base images
+  over the network) and any non-Chromium browser. Deployment needs explicit authorization.

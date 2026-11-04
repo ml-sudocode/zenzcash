@@ -2,6 +2,16 @@
 
 Updated 2026-11-04 05:57 UTC: reviewed content is deployed; performance CPU active.
 
+## Pending review: branch xss-protections (D-126, D-127; not merged or deployed)
+
+- 4b0d8d7 enforces the DOM chokepoint (tests/dom-safety.test.mjs bans HTML, eval and
+  navigation sinks and bypasses of site/js/dom.js); a1c12eb serves one strict CSP header,
+  with frame-ancestors 'none' and Trusted Types, on every Rust-server response. Results
+  and sensitivity checks: WORKLOG F-140. User review pending; deploying needs explicit
+  authorization like any production change.
+- D-127: never install packages younger than 14 days. The host's npm user config sets
+  min-release-age=14; run cargo with --locked --offline so no crate is downloaded.
+
 ## Current production state — supersedes pending-deployment notes below
 
 - D-124/D-125 authorized deployment, atomic publication, GitHub push and the CPU
