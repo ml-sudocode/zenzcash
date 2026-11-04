@@ -2508,3 +2508,39 @@ Implementation in progress; user verification remains pending.
   GitHub application push to 53986a3 succeeded; final CPU/docs push follows. Reviewed
   67b7f7c/b374b8e documentation and 73d5ce7 config/tests: no secrets, new network access,
   authentication/database changes or security issue. User verification remains pending.
+
+## 2026-11-04 — Structural XSS protections
+
+- **F-139 — XSS review: no vulnerability; the guarantee is structural but unenforced.**
+  site/js contains no HTML-parsing, eval or navigation sinks. Every node goes through
+  dom.js h(): strings become text nodes, attributes are allowlisted, href must start
+  with "#/". External links pass safeHref (http(s), or paths on the forum); 17 known
+  bypass inputs were rejected or safely normalized. Markdown becomes a tree, never HTML,
+  so prompt-injected model output also renders as text. The server emits no HTML;
+  errors are JSON; API responses carry nosniff. Gaps: no test or lint fails if a sink
+  is added (the test DOM accepts innerHTML silently, and four elements are already
+  created outside dom.js); h() and safeHref guards have no rejection or property
+  tests; the CSP is only a meta tag that no test checks, static files are registered
+  after the header middleware, and a meta CSP cannot carry frame-ancestors.
+- **D-126 — Enforce the DOM chokepoint and serve a strict CSP header.** User asked to
+  implement every F-139 recommendation on branch xss-protections. (1) One server
+  constant defines the CSP, sent as a header on every Rust-server response including
+  static files; the index.html meta copy is removed. Add frame-ancestors 'none' and
+  Trusted Types (require-trusted-types-for 'script'; trusted-types 'none') so
+  supporting browsers reject string HTML sinks and javascript: navigation. nosniff
+  moves to the same global layer. A Rust test pins the exact header on the page, a
+  script and an API response. (2) A Node gate test bans HTML, eval and navigation
+  sinks in site/js, and element creation, setAttribute and href assignment outside
+  dom.js. dom.js gains updateAttribute (same allowlist as h) and downloadText (closed
+  set of text media types), replacing the direct calls. The test DOM throws on HTML
+  sinks. (3) Tests for the h()/updateAttribute/link/downloadText guards, and a seeded
+  safeHref property test that also proves it detects plausible broken sanitizers.
+  (4) The browser test reports CSP violations as console errors and proves Trusted
+  Types enforcement with a positive control. The maintenance-mode Node server
+  (ZFORUM_BOOTSTRAP=1) serves only a JSON 503/health body and is unchanged. Browsers
+  without Trusted Types ignore those directives; the sink-ban test covers them.
+- **D-127 — Supply-chain age gate for package installs.** User requires that no package
+  newer than 14 days is installed. The host's user npm config now sets
+  min-release-age=14 (npm 12.2.1, days). The project installs no npm packages. Cargo
+  has no equivalent setting, so agent cargo runs use --locked --offline: only the
+  committed lockfile and already-cached crates, never a fresh download.
