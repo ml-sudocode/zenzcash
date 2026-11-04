@@ -1,7 +1,7 @@
 // Entry point: loads the site data, keeps the reader's state, talks to the ratings and
 // feedback API, and routes between the home board (#/) and the topic page (#/topic/zcg).
 
-import { replaceContent, h } from "./dom.js";
+import { replaceContent, h, downloadText } from "./dom.js";
 import { themeControl } from "./theme.js";
 import { renderTopics } from "./home.js";
 import { parseCuration } from "./topic-directory.js";
@@ -29,9 +29,9 @@ const main = document.getElementById("main");
 history.scrollRestoration = "manual";
 let renderedHash = null;
 let directoryPosition = { x: 0, y: 0, focusedId: "" };
-const listening = document.createElement("aside");
+const listening = h("aside");
 document.body.append(listening);
-const companion = document.createElement("aside");
+const companion = h("aside");
 document.body.append(companion);
 let listeningVersion = "neutral";
 const listeningIdentity = () => JSON.stringify([state.data.snapshot_at, state.data.feedback_version, state.settings.anonymous]);
@@ -315,9 +315,7 @@ function savedPosts() {
 }
 function saveCodes() {
   const text = `Zenzcash recovery codes for ${location.origin}\nEach code works once. Keep these private.\n\n${state.account.recovery_codes.join("\n")}\n`;
-  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-  const link = document.createElement("a"); link.href = url; link.download = "zenzcash-recovery-codes.txt"; document.body.append(link);
-  try { link.click(); } finally { link.remove(); URL.revokeObjectURL(url); }
+  downloadText(text, "zenzcash-recovery-codes.txt", "text/plain");
 }
 const passkeys = passkeyRequest({
   start: (mode, code, signal) => putJson("api/auth/start", { mode, code }, "starting passkey verification", "POST", signal),

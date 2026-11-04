@@ -4,7 +4,7 @@
 // updates itself in place, so a click never redraws the page and keyboard focus stays put
 // (D-51).
 
-import { h, link, replaceContent, renderBlocks } from "./dom.js";
+import { h, link, replaceContent, renderBlocks, updateAttribute } from "./dom.js";
 import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate, relativeDate } from "./logic.js";
 import { parseBlocks } from "./markdown.js";
 import { FEEDBACK, REACTIONS, MOODS, RATINGS } from "./vocab.js";
@@ -102,7 +102,7 @@ function versions(post, view) {
     // A citation explicitly selects the original; otherwise the reader’s default applies.
     const chosen = view.state.versions.get(post.key) ?? view.state.settings.preferredVersion;
     const current = VERSIONS.find((version) => version.id === chosen);
-    VERSIONS.forEach((version, index) => tabs[index].setAttribute("aria-selected", String(version === current)));
+    VERSIONS.forEach((version, index) => updateAttribute(tabs[index], "aria-selected", String(version === current)));
     panel.className = `version version-${current.id}`;
     replaceContent(panel, [
       h("p", { class: "version-label zf" }, current.label),
@@ -127,7 +127,7 @@ function ratingsRow(post, view) {
     rating.label,
   ));
   const sync = () => {
-    RATINGS.forEach((rating, index) => buttons[index].setAttribute("aria-pressed", String(mine() === rating.id)));
+    RATINGS.forEach((rating, index) => updateAttribute(buttons[index], "aria-pressed", String(mine() === rating.id)));
     const result = ratingSummary(view.state.ratings.posts[post.key] ?? {});
     replaceContent(summary, result.total === 0
       ? "No ratings yet."
@@ -143,7 +143,7 @@ function reactionGroup(label, options, read, save) {
     try { await save(read() === score ? null : score); }
     finally { sync(); buttons.forEach((button) => { button.disabled = false; }); }
   } } }, h("span", { "aria-hidden": "true" }, text), h("span", { class: "hover-tip" }, meaning)));
-  const sync = () => options.forEach(({ score }, index) => buttons[index].setAttribute("aria-pressed", String(read() === score)));
+  const sync = () => options.forEach(({ score }, index) => updateAttribute(buttons[index], "aria-pressed", String(read() === score)));
   sync();
   return h("span", { class: "reaction-group", role: "group", "aria-label": label }, buttons);
 }
@@ -191,7 +191,7 @@ export function renderPost(post, view) {
     content.hidden = !expanded;
     expansion.textContent = expanded ? "Collapse post" : "Expand post";
     expansion.title = expansion.textContent;
-    expansion.setAttribute("aria-expanded", String(expanded));
+    updateAttribute(expansion, "aria-expanded", String(expanded));
     if (expanded && !rendered) {
       const footer = [feedbackBox(post, view)].filter((part) => part !== null);
       replaceContent(content, [versions(post, view), postAssessment(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);

@@ -1,4 +1,4 @@
-import { h } from "./dom.js";
+import { h, updateAttribute } from "./dom.js";
 
 // Hover/focus previews the explanation; clicking pins it across page redraws.
 export function filterInfo(key, label, text, view) {
@@ -8,7 +8,7 @@ export function filterInfo(key, label, text, view) {
   const set = (open) => {
     view.actions.setOpen("infos", key, open);
     wrapper.classList.toggle("is-open", open);
-    button.setAttribute("aria-expanded", String(open));
+    updateAttribute(button, "aria-expanded", String(open));
   };
   const button = h("button", { id: `${id}-button`, type: "button", class: "info-button", "aria-label": `About ${label}`, "aria-controls": id, "aria-expanded": String(pinned), on: {
     click: () => { wrapper.classList.remove("is-dismissed"); set(!view.state.open.infos.has(key)); },

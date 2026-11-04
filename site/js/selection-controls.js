@@ -1,4 +1,4 @@
-import { h } from "./dom.js";
+import { h, downloadText, updateAttribute } from "./dom.js";
 import { EXPORT_FILENAME, selectionLinks, selectionMarkdown, selectionDocuments, scopeSelection } from "./selection.js";
 
 async function summaryPrompt() {
@@ -7,14 +7,6 @@ async function summaryPrompt() {
   const prompt = await response.text();
   if (!prompt.trim()) throw new Error("the summary prompt is empty");
   return prompt;
-}
-function downloadMarkdown(text, filename = EXPORT_FILENAME) {
-  const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.append(anchor);
-  try { anchor.click(); } finally { anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 0); }
 }
 export function selectionBar(view) {
   const count = h("strong", { "aria-live": "polite" });
@@ -37,15 +29,15 @@ export function selectionBar(view) {
       try {
         const text = await prepare(selected);
         if (download) {
-          if (text.length === 1 && !text[0].oversized) downloadMarkdown(text[0].text);
+          if (text.length === 1 && !text[0].oversized) downloadText(text[0].text, EXPORT_FILENAME, "text/markdown");
           else {
-            for (const file of text) files.append(h("button", { class: "chip", on: { click: () => downloadMarkdown(file.text, file.filename) } }, `Download ${file.filename} (${(file.bytes / 1024 / 1024).toFixed(2)} MiB)${file.oversized ? " · exceeds the 2 MiB target; whole posts preserved" : ""}`));
+            for (const file of text) files.append(h("button", { class: "chip", on: { click: () => downloadText(file.text, file.filename, "text/markdown") } }, `Download ${file.filename} (${(file.bytes / 1024 / 1024).toFixed(2)} MiB)${file.oversized ? " · exceeds the 2 MiB target; whole posts preserved" : ""}`));
             status.textContent = `Large selection: download all ${text.length} numbered files below in order. Nothing was truncated. Attach all parts to your AI or upload each as a notebook source. Each part repeats its instructions and coverage.`;
             return;
           }
         }
         else {
-          output.value = text; output.setAttribute("aria-label", label); output.hidden = false;
+          output.value = text; updateAttribute(output, "aria-label", label); output.hidden = false;
           try { await navigator.clipboard.writeText(text); }
           catch (error) { status.textContent = `Clipboard unavailable (${error.message}). Copy the text from the box below. ${success}`; output.focus(); output.select(); return; }
         }

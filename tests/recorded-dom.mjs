@@ -1,4 +1,6 @@
 // Structural/event checks only; this DOM does not measure browser layout or accessibility.
+// HTML-parsing sinks throw, so page code that reaches one fails its unit test.
+const forbiddenSink = (name) => { throw new Error(`${name} is forbidden: build nodes with site/js/dom.js`); };
 export class RecordedNode extends EventTarget {
   constructor(tag = null, text = "") {
     super();
@@ -30,6 +32,11 @@ export class RecordedNode extends EventTarget {
   set className(value) { this.attributes.set("class", value); }
   get id() { return this.attributes.get("id"); }
   set id(value) { this.attributes.set("id", value); }
+  get innerHTML() { return forbiddenSink("innerHTML"); }
+  set innerHTML(value) { forbiddenSink("innerHTML"); }
+  get outerHTML() { return forbiddenSink("outerHTML"); }
+  set outerHTML(value) { forbiddenSink("outerHTML"); }
+  insertAdjacentHTML() { forbiddenSink("insertAdjacentHTML"); }
   querySelector(tag) { return descendants(this).find((node) => node.tag === tag) ?? null; }
   focus(options) { document.activeElement = this; this.focusOptions = options; }
   scrollIntoView(options) { this.scrollOptions = options; }
@@ -45,6 +52,8 @@ export function installDom(t) {
     activeElement: null,
     createElement: (tag) => new RecordedNode(tag),
     createTextNode: (text) => new RecordedNode(null, text),
+    write: () => forbiddenSink("document.write"),
+    writeln: () => forbiddenSink("document.writeln"),
   };
   globalThis.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
   t.after(() => {

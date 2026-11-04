@@ -1,4 +1,4 @@
-import { h } from "./dom.js";
+import { h, updateAttribute } from "./dom.js";
 
 const THEME_KEY = "zforum.theme.v1";
 
@@ -20,10 +20,10 @@ export function themeControl(root, media, read, write) {
   const current = () => preference ?? (media.matches ? "dark" : "light");
   function update() {
     const theme = current();
-    root.setAttribute("data-theme", theme);
+    updateAttribute(root, "data-theme", theme);
     const action = `Switch to ${theme === "dark" ? "light" : "dark"} mode`;
-    button.setAttribute("aria-label", action);
-    button.setAttribute("title", action);
+    updateAttribute(button, "aria-label", action);
+    updateAttribute(button, "title", action);
     icon.textContent = theme === "dark" ? "☀" : "☾";
     notice.textContent = problem ?? "";
     notice.hidden = problem === null;

@@ -1,31 +1,59 @@
-// The single place that creates DOM nodes. Strings always become text nodes; there is no
-// innerHTML anywhere in the site. Link targets from content pass through safeHref.
+// The single place that creates DOM nodes and sets attributes. Strings always become text
+// nodes; there is no innerHTML anywhere in the site. Link targets from content pass through
+// safeHref. tests/dom-safety.test.mjs fails the gate when another module bypasses this one.
 // (From archive/research-prototype/site/js/dom.js, plus a text transform for anonymous mode.)
 
 import { safeHref } from "./markdown.js";
 
-const ALLOWED_ATTRIBUTES = new Set(["class", "id", "title", "type", "value", "min", "max", "step", "start", "aria-label", "aria-pressed", "aria-selected", "aria-expanded", "aria-controls", "aria-hidden", "aria-live", "role", "for", "name", "checked", "selected", "disabled", "open"]);
+const ALLOWED_ATTRIBUTES = new Set(["class", "id", "title", "type", "value", "min", "max", "step", "start", "aria-label", "aria-pressed", "aria-selected", "aria-expanded", "aria-controls", "aria-hidden", "aria-live", "role", "for", "name", "checked", "selected", "disabled", "open", "data-theme"]);
+
+// `href` set through h() or updateAttribute() is for internal navigation only and must
+// start with "#/"; external links go through link().
+function checkAttribute(caller, name, value) {
+  if (name === "href") {
+    if (typeof value !== "string" || !value.startsWith("#/")) throw new Error(`${caller}(): internal href must start with "#/", got ${JSON.stringify(value)}`);
+  } else if (!ALLOWED_ATTRIBUTES.has(name)) {
+    throw new Error(`${caller}(): attribute ${JSON.stringify(name)} is not allowed`);
+  }
+}
 
 // h("div", {class: "x", on: {click: fn}, href: "#/topic/zcg"}, "text", childNode, [more])
-// `href` here is for internal navigation only and must start with "#/"; external links go
-// through link().
 export function h(tag, attributes = {}, ...children) {
   const element = document.createElement(tag);
   for (const [name, value] of Object.entries(attributes)) {
     if (value === null || value === undefined || value === false) continue;
     if (name === "on") {
       for (const [event, handler] of Object.entries(value)) element.addEventListener(event, handler);
-    } else if (name === "href") {
-      if (typeof value !== "string" || !value.startsWith("#/")) throw new Error(`h(): internal href must start with "#/", got ${JSON.stringify(value)}`);
-      element.setAttribute("href", value);
-    } else if (ALLOWED_ATTRIBUTES.has(name)) {
-      element.setAttribute(name, value === true ? "" : String(value));
-    } else {
-      throw new Error(`h(): attribute ${JSON.stringify(name)} is not allowed`);
+      continue;
     }
+    checkAttribute("h", name, value);
+    element.setAttribute(name, value === true ? "" : String(value));
   }
   append(element, children);
   return element;
+}
+
+// Changes an attribute on an existing element under the same rules as h().
+export function updateAttribute(element, name, value) {
+  checkAttribute("updateAttribute", name, value);
+  if (typeof value !== "string") throw new Error(`updateAttribute(): ${JSON.stringify(name)} value must be a string, got ${JSON.stringify(value)}`);
+  element.setAttribute(name, value);
+}
+
+// A blob URL inherits this page's origin, so a downloadable HTML blob opened as a page would
+// run with the site's privileges. Downloads are therefore plain text only.
+const DOWNLOAD_MEDIA_TYPES = new Set(["text/plain", "text/markdown"]);
+
+// Saves `text` as a UTF-8 file named `filename`. The URL is released on a later task
+// because the browser starts the download asynchronously after click().
+export function downloadText(text, filename, mediaType) {
+  if (!DOWNLOAD_MEDIA_TYPES.has(mediaType)) throw new Error(`downloadText(): media type ${JSON.stringify(mediaType)} is not allowed`);
+  const url = URL.createObjectURL(new Blob([text], { type: `${mediaType};charset=utf-8` }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  try { anchor.click(); } finally { anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 0); }
 }
 
 // `children` is one child or a nested array of them; null, undefined and false are skipped.
