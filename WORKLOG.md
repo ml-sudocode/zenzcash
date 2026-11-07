@@ -3637,3 +3637,47 @@ Implementation in progress; user verification remains pending.
   Preserve the general Git identity rule and machine-path redactions. Push the
   merge to main and inspect the resulting GitHub Actions run. No deployment,
   forum analysis, PR comment or additional browser/Docker CI jobs are requested.
+- **D-165 — Add a rudimentary GitHub Actions gate and Dependabot config.** Imported
+  from alchemyDC's PR #9 as D-165 (originally D-158) to avoid a ledger collision.
+  The original decision follows. User requests
+  basic CI and Dependabot. CI runs the existing gate only: scripts/check.sh then
+  scripts/build-auth.sh on ubuntu-24.04, for pushes to main and pull requests, with
+  read-only contents permission. No browser job and no Docker build job. Node 22 is set
+  explicitly through actions/setup-node to match the production node:22 image (maintenance
+  LTS until April 2027), so a runner default moving to 24 cannot change CI silently. Rust
+  is the current stable via the runner's rustup plus clippy, matching the Dockerfile's
+  rust:1 policy. The only new dependencies are actions/checkout and actions/setup-node,
+  pinned by full commit SHA. Dependabot covers cargo (server and server/webauthn),
+  github-actions and docker weekly with a 7-day cooldown; Node major image bumps are
+  ignored because Node 22 is a decision, not drift. Invariant: the CI Node major equals
+  the Dockerfile node image major, enforced by tests/deployment.test.mjs. Local gate was
+  rerun on Rust 1.99.1 (the runner's stable) before adding CI. No push requested.
+- **F-188 — CI gate and Dependabot config added.** Imported from alchemyDC's
+  PR #9 as F-188 (originally F-183); the following verification is the contributor's
+  original report. .github/workflows/ci.yml runs
+  scripts/check.sh then scripts/build-auth.sh on ubuntu-24.04 with Node 22 and Rust
+  stable plus clippy; actions/checkout v7.0.1 (3d3c42e5) and actions/setup-node v7.1.0
+  (949feb24) are SHA-pinned, permissions are contents: read, persist-credentials is
+  false, and superseded runs are cancelled for pull requests only. .github/dependabot.yml
+  covers cargo (both crates), github-actions and docker weekly with a 7-day cooldown and
+  ignores node image majors. tests/deployment.test.mjs asserts the CI Node major equals
+  the Dockerfile node major and that CI runs exactly the two gate scripts; it fails when
+  either Node major changes alone or build-auth.sh is dropped. Local gate on rustc 1.99.1
+  and Node 24.18.0: 61 server cargo tests and 229 node tests pass, clippy -D warnings
+  clean for both crates; actionlint 1.7.12 clean. Node 22 and the runner environment are
+  unproven until the first Actions run. Security review of the diff: no secrets, no
+  pull_request_target, no untrusted expression interpolation in run steps. Not pushed.
+- **F-189 — PR #9 merge validated locally.** Resolved the worklog-only conflict,
+  retaining both histories and importing the contributor's entries as D-165/F-188.
+  Updated the Dependabot comment to D-165; workflow and test code match the PR.
+  Official GitHub API lookups confirm both pinned action commits. On Node 22.22.1
+  and Rust 1.99.1, scripts/check.sh and scripts/build-auth.sh pass: 229 Node tests,
+  61 server tests, Clippy and debug/release builds; the auth helper has zero unit
+  tests, and its Clippy/build checks pass. The initial sandboxed run failed two
+  child-process tests with EPERM; the unchanged scripts passed outside the sandbox.
+  Gate evidence is retained locally in work/pr9-merge-gate.log. Whitespace checks
+  pass. Security review: read-only workflow permissions, SHA-pinned official actions,
+  no persisted checkout credentials, no secrets or untrusted shell interpolation.
+  Existing general identity instructions and machine-path redactions are unchanged.
+  GitHub has no prior checks for this PR head; inspect the first run after pushing.
+  No application code change, deployment, analysis spending or PR comment.
