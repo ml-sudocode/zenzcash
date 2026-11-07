@@ -12,7 +12,7 @@ serde_json = { version = "1.0.151", features = ["float_roundtrip"] }
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "signal", "process", "io-util", "sync", "time"] }
 tower-http = { version = "0.6.11", features = ["fs"] }
 rusqlite = { version = "0.37.0", features = ["bundled", "backup"] }
-rand = "0.8.5"
+rand = "0.10.3"
 sha2 = "0.10.9"
 url = "2.5.8"
 uuid = { version = "1.23.0", features = ["v4"] }
