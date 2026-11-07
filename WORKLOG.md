@@ -3628,3 +3628,12 @@ Implementation in progress; user verification remains pending.
   needed. Review found no remaining local home-directory path in either document.
   Older published revisions still contain historical paths; no published history
   rewrite, PR comment or deployment is part of this correction.
+- **D-164 — Merge alchemyDC's CI and Dependabot PR #9.** User approves merging
+  the reviewed workflow, dependency-update configuration and deployment test from
+  PR head 01ccdce2c794baead5cd8cea85612444afd8ccef. Verify the pinned actions and run
+  scripts/check.sh plus scripts/build-auth.sh before committing the merge. Resolve
+  the append-only worklog conflict by preserving both histories, importing the PR's
+  D-158/F-183 as D-165/F-188 and updating its configuration comment accordingly.
+  Preserve the general Git identity rule and machine-path redactions. Push the
+  merge to main and inspect the resulting GitHub Actions run. No deployment,
+  forum analysis, PR comment or additional browser/Docker CI jobs are requested.
