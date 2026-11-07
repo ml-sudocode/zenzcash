@@ -351,10 +351,14 @@ separate controls. Never manufacture either kind of approval.
 - A ruling or plan change that arrives in chat is written to `WORKLOG.md` and committed
   before it is executed.
 
-**Git identity.** Commit under the identity and signing setup already configured by the
-person running the session. Never set or override `user.name`, `user.email` or signing
-settings, locally or globally, and never commit under another person's name. After each
-commit, check `git log -1 --format='%an <%ae> | %cn <%ce> | %G?'` against
+**Git identity.** Use the Git commit identity already configured for the current
+checkout. Do not guess someone's identity from the conversation or the repository
+owner. Git configuration tells us how commits are attributed, not who is speaking.
+
+Keep the existing signing settings. Do not change another contributor's identity
+or signing settings. Do not set or override `user.name`, `user.email` or signing
+settings, locally or globally. After each commit, check
+`git log -1 --format='%an <%ae> | %cn <%ce> | %G?'` against
 `git config user.name` and `git config user.email`.
 
 **Languages, and how types are enforced** (revised 2026-10-31 for the design prototype,

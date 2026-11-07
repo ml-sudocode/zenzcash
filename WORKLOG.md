@@ -1458,7 +1458,7 @@ Implementation in progress; user verification remains pending.
 
 - **D-89 — Restore the transfer and select Fly.io.** The user asks to inspect the
   repository and ZIP handoff, extract the transfer, and continue development in
-  `/home/zenzcash/zforum`, with future deployment to Fly.io from this environment.
+  the local checkout, with future deployment to Fly.io from this environment.
   This supersedes the earlier hosting-not-selected status. Inspect and verify the
   archive before restoring its missing private work data and generated site data;
   preserve existing source and never overwrite an existing database. Keep transfer
@@ -2550,8 +2550,8 @@ Implementation in progress; user verification remains pending.
 - **D-130 — First audit pass uses Cloudflare quick profile.** As explained to the
   user, use four reconnaissance assignments, one hunter wave, one final coverage
   critic and independent candidate verification. This is explicitly partial coverage,
-  not a comprehensive security certification. Pinned files/source/report workspace:
-  /home/zenzcash/security-audit-zforum-20261105. Source snapshot is a289384; 178
+  not a comprehensive security certification. Pinned files/source/report workspace
+  is outside the repository (local path redacted). Source snapshot is a289384; 178
   tracked files included, archived prototype and binary/database artifacts excluded.
   Hunters inspect source only; validators use a no-network read-only bubblewrap
   environment with bounded CPU, address space, process count and wall time. Initial
@@ -2559,8 +2559,8 @@ Implementation in progress; user verification remains pending.
   applying the same limit inside the new namespace succeeds. No limits relaxed.
   Reviewed a289384 authorization-only diff: no credentials or executable changes.
 - **F-140 — Pinned Cloudflare quick source audit reported.** Saved direct upstream
-  reference and clean a289384 source snapshot outside repo at
-  /home/zenzcash/security-audit-zforum-20261105, with verified SHA256 manifests.
+  reference and clean a289384 source snapshot outside repo (local path redacted),
+  with verified SHA256 manifests.
   Four recon reviewers, five hunters, final coverage critic and fresh candidate
   verifier produced 31 source checks across 65 files. Ledger: 13 covered, one
   independently disposed candidate, three deferred units. No application runtime
@@ -2591,7 +2591,7 @@ Implementation in progress; user verification remains pending.
   or hardening improvements, dependency maintenance and unverified live facts.
 - **F-141 — Standard source/local security audit reported for owner review.**
   Pinned Cloudflare reference c1c8a8c1471069fb0e188eeaff69b8e8db6564a8; reviewed
-  immutable source 70188e0 at /home/zenzcash/security-audit-zforum-20261105/source-2.
+  immutable source 70188e0 in the external audit workspace (local path redacted).
   All 178 source hashes and reference hashes verified unchanged. Run-2 REPORT.md,
   FINDINGS-DETAIL.md, NEEDS-VALIDATION.md, findings/coverage/dependency JSON and metadata
   retain the evidence. Standard workflow used 21 invocations with no strict budget:
@@ -3510,7 +3510,85 @@ Implementation in progress; user verification remains pending.
   changed; Docker image build was not run because Docker is unavailable locally.
   Reviewed decision and implementation diffs: no new dependency, secret or permission
   change. No push or deployment performed.
-- **D-159 — Commit under the session owner's own git identity.** The CLAUDE.md rule
+- **D-158 — Deploy current code after the other-computer pull.** User authorizes
+  deploying current application revision df9561b, including the shared canonical
+  timestamp helper and last forum-pull cutoff on the topics page. Run the full
+  deployment gate and existing Fly deployment workflow, verify production health,
+  served assets and cutoff, and retain the configured 3 GiB RAM. Existing startup
+  backup must succeed before the new server starts. This is code deployment only:
+  no forum fetch, model analysis, content publication, review waiver or Git push.
+- **F-183 — Current code deployed and live cutoff display verified.** Deployed
+  application df9561b with authorization-only ledger commit 998858e using
+  scripts/fly-deploy. Full gate passes: 228 Node tests, 61 Rust tests, builds/Clippy,
+  runtime smoke, browser/cache checks and real passkey flows. Deployment image
+  deployment-01M6RVC3FVMB8MCHDE93JQB13S has digest
+  sha256:782df19aa0121885e0e83187588fccb10d0cb88922c7c31df3b8b0868fd3d14e.
+  Machine e823213f175598 is started with 3,072 MiB RAM and passing health checks.
+  Startup Tigris backup completed 2026-11-06T16:37:39.878Z, object
+  zforum/2026-11-06T16-36-47.385Z-cb1bd380-bc46-40db-8a99-2f1a30e08680.tar.gz,
+  SHA 8c7de4e58b5e01d9d38e5b1021d05ffd3439746a438ef247433b9e193d308dc4;
+  schema 11, 122 topics, 12,064 records and six accounts. Public catalog validates
+  with last_pull_cutoff 2026-11-06T03:51:56.235Z; all 122 release IDs and unavailable
+  entries exactly match the predeployment snapshot. Live home/catalog/logic modules
+  match the tested files under asset revision
+  9dd9627d5bc960b0c6a03a0160a0cb7a48b00cf7962838096efe9339d3029c04.
+  Inspected both local and live Chrome screenshots: cutoff appears beneath the
+  introduction, formatted Nov 5, 2026, 07:51 PM PST in this browser. Evidence:
+  work/cutoff-deploy.log, cutoff-deploy-live-verification.json,
+  cutoff-deploy-machines-after.json, cutoff-deploy-startup-backup.json and
+  screenshots/cutoff-deploy-live.png. Reviewed the application/authorization diffs:
+  fixed read-only SQL, canonical timestamp validation and DOM text rendering; no new
+  security issue found. No forum fetch, AI analysis, content publication or Git push.
+  User verification remains pending; HANDOFF.md remains retired.
+- **D-159 — Preserve the session owner's Git identity and signing setup.** User
+  approves alchemyDC's recommendation in PR #10:
+  https://github.com/ml-sudocode/zenzcash/pull/10. Replace the rule that forces every
+  author and committer to use the upstream maintainer's identity with the proposed
+  rule preserving the session owner's configured identity and signing settings.
+  Verify author, committer and signature status after each commit against the
+  configured name and email. Preserve existing configuration and commit history.
+  Apply the documentation fix locally; the separate CI/Dependabot PR #9 is outside
+  this change. No GitHub merge, push or deployment is requested.
+- **F-184 — Adopted alchemyDC's Git identity rule from PR #10.** CLAUDE.md now
+  preserves the session owner's configured identity and signing setup, prohibits
+  overriding those settings, and checks author, committer and signature status after
+  commits. Compared the replacement paragraph with GitHub's PR diff: exact match.
+  git diff --check passes. This is documentation only; no runtime tests are needed.
+  Reviewed the decision commit and implementation diff: no credential exposure,
+  runtime changes or new dependencies. Existing local identity remains sudo_ml;
+  no Git configuration or historical commits were changed. No push, GitHub merge
+  or deployment performed. User verification remains pending.
+- **D-160 — Clarify configured identity and this checkout's attribution.** User
+  approves plain-language instructions: use the current checkout's configured Git
+  identity; do not infer personal identity from conversation or repository ownership.
+  For the current checkout, the user explicitly instructs
+  continued attribution to ml-sudocode using its existing configuration. This is
+  checkout-specific authorization, not proof of the speaker's identity or a rule
+  for contributors' checkouts. Preserve other contributors' configured identities
+  and existing signing settings. Update CLAUDE.md; no configuration change, history
+  rewrite, push or deployment is needed.
+- **F-185 — Clarified Git attribution in plain language.** CLAUDE.md distinguishes
+  configured commit attribution from the speaker's personal identity, records the
+  user's ml-sudocode instruction for the current checkout, and preserves other
+  contributors' configured identities. The prohibition on changing identity/signing
+  settings and the post-commit verification remain. Reviewed the documentation diff
+  for scope and security: no new issue found. git diff --check passes; no runtime
+  code changed, so no runtime tests were run. Existing Git configuration is unchanged.
+  No history rewrite, push or deployment. User verification remains pending.
+- **D-161 — Merge PR #10, then push the local wording clarification.** User
+  authorizes merging alchemyDC's original PR without posting a comment, followed
+  by pushing our checkout-specific wording. First merge the reviewed PR head
+  1420e2351202ad70988142ece9f7ecd0d3b5fece into origin/main in an isolated checkout
+  and push that merge. Then reconcile it with local main, retaining the local
+  clarification and existing ledger entries, and push the follow-up. Preserve
+  alchemyDC's original commits and authorship. Import his conflicting D-159 ledger
+  entry under a free ID with its source identified. The local pending commits also
+  contain the already-completed deployment ledger; they change no runtime code.
+  No PR comment, PR #9 change or deployment is authorized by this operation.
+- **D-162 — Commit under the session owner's own git identity.** Imported from
+  alchemyDC's PR #10, originally D-159; renumbered to avoid the local D-159 collision.
+  The original entry follows, with its historical numbering explanation retained.
+  The CLAUDE.md rule
   requiring every commit to be authored as the upstream maintainer was a bug: in a fork
   it made an agent set that identity with git config --local, so another developer's
   signed commits were attributed to the maintainer and GitHub marked them unverified
@@ -3519,3 +3597,34 @@ Implementation in progress; user verification remains pending.
   session; never set or override user.name, user.email or signing settings, and never
   commit under another person's name. Numbered D-159 because D-158 is pending on the
   separate CI branch.
+- **F-186 — Merged PR #10 and prepared the wording follow-up.** Pushed merge
+  e18745f containing alchemyDC's original commits; GitHub confirms PR #10 is merged.
+  Reconciled local main with that merge, preserving the approved checkout-specific
+  CLAUDE.md wording and every existing local ledger entry. Imported the PR's ledger
+  entry as D-162 with its original number documented. The follow-up changes only
+  CLAUDE.md and WORKLOG.md relative to the published merge. Whitespace and content
+  preservation checks pass; runtime tests are unnecessary for these documentation
+  changes. Security review found no new issue. No PR comment or deployment.
+- **D-163 — Remove machine details from the identity follow-up.** User approves
+  removing the local computer path from CLAUDE.md and WORKLOG.md and checking the
+  interrupted push. Remote main remains at e18745f: the wording follow-up was not
+  published. An older D-89 entry already publishes the same path. Redact that path
+  from the current documents, including historical ledger text as an explicit
+  privacy correction, and use a general configured-identity rule. Preserve the
+  existing local Git identity and signing settings. Prepare a clean follow-up on
+  the published PR merge rather than pushing the unpublished path-bearing commits;
+  retain those commits on a local-only backup branch. Preserve all other worklog
+  content. Push the corrected follow-up without a PR comment. Do not rewrite
+  published Git history; the older path remains in historical revisions.
+- **F-187 — Prepared a general identity rule without machine paths.** Removed the
+  checkout-specific paragraph from CLAUDE.md and redacted local home-directory
+  paths from D-89, D-130, F-140, F-141, D-160 and F-185. The general rule preserves
+  each checkout's configured identity and signing settings without inferring who
+  is speaking. Existing Git configuration remains unchanged. The interrupted push
+  did not publish the earlier wording. Prepared the corrected documents directly
+  on the published PR #10 merge, excluding the unpublished path-bearing commits
+  from the follow-up's ancestry; originals remain backed up locally. Content and
+  whitespace checks pass; only documentation changes, so runtime tests are not
+  needed. Review found no remaining local home-directory path in either document.
+  Older published revisions still contain historical paths; no published history
+  rewrite, PR comment or deployment is part of this correction.
