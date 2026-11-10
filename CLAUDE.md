@@ -316,8 +316,19 @@ changes.
 Adopted 2026-10-31. Everything above applies as written. This section only pins down the
 project-specific choices the general rules leave open. It never relaxes a rule.
 
-**Mandatory review before analysis spending (D-146).** For every future forum pull,
-fetch/validate/preview first, then present the user with a concise per-topic review:
+**Mandatory selection before full downloads (D-166).** Start each future pull with
+`scripts/zforum import discover --db LOCAL_SNAPSHOT` (also the default import stage).
+Use a fresh verified local production copy. Discovery reads forum listings and local
+metadata only, then stops with a selection review; it does not create an import run
+or advance the cutoff. Present candidate priorities and prior exclusions, and wait
+for the user's download selection before fetching histories. Do not treat earlier
+inclusion decisions as approval to download every tracked topic. The legacy fetch
+path can register all tracked topics: use a verified workflow constrained to the
+approved selections, not an unscoped fetch. Preserve grouped-topic membership and
+do not claim full-poll completion for deferred work.
+
+**Mandatory review before analysis spending (D-146).** After download selection,
+fetch/validate/preview the approved scope, then present a concise per-topic review:
 why analysis is worthwhile, recommended priority, new/changed posts versus historical
 backfill, retained assessments/summaries, dated posts, expected fresh summary/reply
 jobs, request sizes and estimated time/token use with uncertainty. Characters are not

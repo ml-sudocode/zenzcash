@@ -3692,3 +3692,24 @@ Implementation in progress; user verification remains pending.
   titles stay for review. Selection approval, D-146 analysis scope/attempt approval
   and publication approval remain separate. No deployment or publication is authorized
   by this request; stop with a concrete review and timing/request audit.
+- **F-190 — Discovery-only entry point implemented and tested.** Import CLI now
+  defaults to discover; explicit `fetch` remains separate. Discovery opens the local
+  snapshot read-only, requests only latest-listing pages with the existing two-pass
+  reconciliation/rate limits, and writes a private selection packet and HTTP/timing
+  audit. It does not register topics, create/resume an import, advance a cutoff or
+  invoke thread/profile/model/server work. Candidates retain grouped membership,
+  current release IDs, bounded retained excerpts and listing post counts; prior
+  exclusions are reported separately. Actual new/edited counts and analysis estimates
+  remain unknown until approved sources are fetched. The legacy all-topic fetch is
+  not an approved-selection consumer: do not run it unscoped after this review.
+  New tests verify readonly-file identity, no import/cutoff mutation, grouping,
+  exclusions, empty windows, pending-state rejection and CLI dispatch. Full gate:
+  232 Node / 61 Rust tests pass, builds/Clippy pass. One old error-message assertion
+  failed after guidance changed to explicit fetch; reported it, then updated exact
+  wording assertions while retaining rejection/publication checks. Log:
+  work/discovery-first-gate.log. No application/UI/schema change or deployment.
+  Fresh production backup verified locally at work/pull-20261109-before.sqlite:
+  schema 11, 122 topics, 12,064 post records, six accounts, cutoff
+  2026-11-06T03:51:56.235Z, no unfinished import. Source SHA
+  02a755555ef857bf64d613a7c935c81b1729b0bfa1e295770915aec414bc9ecf.
+  Temporary remote copy removed only after checksum verification; no live DB mutation.

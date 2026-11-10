@@ -2,8 +2,8 @@ import { importTimestamp } from "./import-time.mjs";
 
 export function parseImportArgs(args) {
   const values = [...args];
-  const stages = ["fetch","preview","analyze","publish"];
-  const stage = stages.includes(values[0]) ? values.shift() : "fetch";
+  const stages = ["discover","fetch","preview","analyze","publish"];
+  const stage = stages.includes(values[0]) ? values.shift() : "discover";
   let since;
   if (values[0] && !values[0].startsWith("--")) since = importTimestamp(values.shift());
   const flags = {};
@@ -12,7 +12,8 @@ export function parseImportArgs(args) {
     if (!["--db","--thread","--max-calls","--review"].includes(key) || value === undefined || value.startsWith("--") || key in flags) throw new Error(`Invalid or repeated import option ${key}`);
     flags[key]=value;
   }
-  if (stage !== "fetch" && (since !== undefined || flags["--thread"] !== undefined)) throw new Error(`${stage} uses the frozen run; timestamp and --thread apply only to fetch`);
+  if (stage === 'discover' && flags['--thread'] !== undefined) throw new Error('discover reviews the active window; --thread applies only to fetch');
+  if (!["discover","fetch"].includes(stage) && (since !== undefined || flags["--thread"] !== undefined)) throw new Error(`${stage} uses the frozen run; timestamp and --thread apply only to fetch`);
   const positive = key => {
     const value=flags[key];
     if (!/^[1-9][0-9]*$/.test(value) || !Number.isSafeInteger(Number(value))) throw new Error(`${key} must be a positive integer, received ${JSON.stringify(value)}`);

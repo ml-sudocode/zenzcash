@@ -6,7 +6,8 @@ import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { ImportStore } from "../tools/lib/import-store.mjs";
 import { importTimestamp } from '../tools/lib/import-time.mjs';
-import { runImport, discoverImport } from "../tools/import.mjs";
+import { runImport } from "../tools/import.mjs";
+import { discoverImport } from '../tools/lib/discovery.mjs';
 import { requireSubscription } from "../tools/lib/agent-runner.mjs";
 import { goodMarks } from "./marks-fixture.mjs";
 import { sampleThread, random } from "./helpers.mjs";
@@ -63,6 +64,62 @@ test("strict UTC input, first-run requirement, unfinished resume, and backward c
     assert.equal(next.since,"2026-11-01T23:55:00.000Z");next.status="complete";h.store.save(next);
     const backfill=h.store.begin("2026-01-01T00:00:00Z","2026-11-04T00:00:00Z",settings);
     assert.equal(backfill.since,"2026-01-01T00:00:00.000Z");
+  }finally{h.close();}
+});
+test('discovery-only review preserves state, uses only listings and retains grouped membership',async()=>{
+  const h=harness({reviews:true});
+  try{
+    for(const [id,threads] of [['group',[7,8]],['inactive',[11]]]){
+      const data={topic:{id,card:{title:`Topic ${id}`},threads:threads.map(id=>({id,title:`Thread ${id}`,posts:[{own_text:'Retained opening'}]}))}};
+      h.store.db.prepare('INSERT INTO releases VALUES(?,?)').run(id,JSON.stringify(data));
+      h.store.db.prepare('INSERT INTO published VALUES(?,?)').run(id,id);
+    }
+    h.store.recordThreadReviews([{id:9,decision:'exclude',classification:'frivolous',reason:'Social-only'}]);
+    const complete=h.store.begin(start,end,settings);complete.status='complete';h.store.save(complete);
+    const before=readFileSync(h.store.path);
+    const readOnly=new ImportStore(h.store.path,{readOnly:true});
+    try{
+      const requests=[];
+      const until='2026-11-03T00:00:00.000Z';
+      const result=await runImport({stage:'discover',store:readOnly,root:h.root,settings:{...settings,excludedDiscoveryThreads:[20456]},clock:()=>until,progress:()=>{},
+        server:()=>{throw Error('Must not invoke server');},modelRun:()=>{throw Error('Must not invoke model');},get:async(path,{observe})=>{
+          requests.push(path);assert.equal(path,'/latest.json?order=activity&page=0');
+          observe({category:'forum.http',path,attempt:1,http_status:200,elapsed_ms:1,status:'complete'});
+          return {body:{topic_list:{more_topics_url:null,topics:[7,9,10,20456].map(id=>({id,title:`Thread ${id}`,slug:`thread-${id}`,bumped_at:until,pinned:false,posts_count:3}))}}};
+        }});
+      assert.deepEqual(requests,Array(2).fill('/latest.json?order=activity&page=0'));
+      assert.deepEqual(result.review.candidates.map(c=>[c.id,c.kind,c.thread_ids,c.published_posts,c.decision]),[['group','existing',[7,8],2,'pending'],['thread-10','new',[10],0,'pending']]);
+      assert.deepEqual(result.review.exclusions.map(t=>[t.id,t.reason]),[[9,'Social-only'],[20456,'Configured exclusion']]);
+      assert.equal(result.review.since,'2026-11-01T23:55:00.000Z');
+      assert.equal(result.review.candidates[0].existing_opening_excerpt,'Retained opening');
+      assert.equal(result.review.candidates[0].active_threads[0].listed_posts,3);
+      assert.equal(readOnly.active(),null);assert.equal(readOnly.cutoff(),end);
+      assert.deepEqual(readFileSync(h.store.path),before);
+      const audit=readJsonStrict(join(result.directory,'audit.json'));
+      assert.equal(audit.model_calls,0);assert.equal(audit.input_tokens,0);assert.equal(audit.output_tokens,0);
+      assert.equal(audit.stages[0].status,'complete');
+      assert.equal(readJsonStrict(join(result.directory,'selection-review.json')).status,'awaiting-selection');
+    }finally{readOnly.close();}
+  }finally{h.close();}
+});
+test('discovery-only review rejects unfinished imports and invalid inputs without fetching',async()=>{
+  const h=harness({reviews:true});
+  const options={stage:'discover',store:h.store,root:h.root,settings,clock:()=>end,progress:()=>{},get:()=>{throw Error('Must not fetch');}};
+  try{
+    await assert.rejects(runImport(options),{message:'First discovery requires a UTC start timestamp'});
+    await assert.rejects(runImport({...options,since:end}),{message:`Discovery start ${end} must precede ${end}`});
+    await assert.rejects(runImport({...options,since:start,thread:7}),{message:'discover accepts only a start timestamp and local database'});
+    h.store.begin(start,end,settings);
+    await assert.rejects(runImport(options),{message:'Finish or explicitly resolve the unfinished local import before starting a new discovery review'});
+  }finally{h.close();}
+});
+test('empty discovery review does not create an import or invent work estimates',async()=>{
+  const h=harness({reviews:true});
+  try{
+    const result=await runImport({stage:'discover',since:start,store:h.store,root:h.root,settings,clock:()=>end,progress:()=>{},get:async()=>({body:{topic_list:{topics:[],more_topics_url:null}}})});
+    assert.deepEqual(result.review.candidates,[]);assert.deepEqual(result.review.exclusions,[]);
+    assert.equal(h.store.active(),null);assert.equal(h.store.cutoff(),null);
+    assert.match(result.review.note,/unknown until selected sources are fetched/);
   }finally{h.close();}
 });
 test("overlapping registrations deduplicate by source id across generated windows and preserve manual membership",()=>{
@@ -211,7 +268,9 @@ test("stage audit persists running work and closes failed and resumed analysis",
 });
 
 test("CLI stages require an explicit analysis allowance and reject mixed or malformed options",()=>{
-  assert.deepEqual(parseImportArgs([]),{stage:"fetch",since:undefined,db:undefined,thread:undefined,maxCalls:0});
+  assert.deepEqual(parseImportArgs([]),{stage:"discover",since:undefined,db:undefined,thread:undefined,maxCalls:0});
+  assert.deepEqual(parseImportArgs(['discover',start,'--db','local.sqlite']),{stage:'discover',since:start,db:'local.sqlite',thread:undefined,maxCalls:0});
+  assert.throws(()=>parseImportArgs(['discover','--thread','7']),{message:'discover reviews the active window; --thread applies only to fetch'});
   assert.deepEqual(parseImportArgs(["fetch",start,"--thread","58723","--db","trial.sqlite"]),{stage:"fetch",since:start,db:"trial.sqlite",thread:58723,maxCalls:0});
   assert.equal(parseImportArgs(["analyze","--max-calls","2"]).maxCalls,2);
   for (const stage of ["preview","publish"]) assert.equal(parseImportArgs([stage,"--db","trial.sqlite"]).stage,stage);
@@ -771,9 +830,9 @@ test("fetch retry preserves the original change comparison after a source checkp
 test("later stages require a completed pull; candidate corruption blocks all publication",async()=>{
   const h=harness(),m=miniOptions(h,2);
   try {
-    for (const stage of ["preview","analyze","publish"]) await assert.rejects(runImport({...m.options,stage,maxCalls:2}),{message:`No unfinished import to ${stage}; run scripts/zforum import first`});
+    for (const stage of ["preview","analyze","publish"]) await assert.rejects(runImport({...m.options,stage,maxCalls:2}),{message:`No unfinished import to ${stage}; review discovery and run scripts/zforum import fetch first`});
     const begun=h.store.begin(start,end,m.options.settings);
-    await assert.rejects(runImport({...m.options,stage:"analyze",maxCalls:2}),{message:"Fetch is incomplete; run scripts/zforum import before analyze"});
+    await assert.rejects(runImport({...m.options,stage:"analyze",maxCalls:2}),{message:"Fetch is incomplete; run scripts/zforum import fetch before analyze"});
     assert.equal(m.calls.length,0);
     await runImport(m.options);
     await runImport({...m.options,stage:"analyze",maxCalls:4});

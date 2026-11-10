@@ -15,6 +15,13 @@ JavaScript ES modules.
 Node.js tools fetch public threads from the Zcash community forum and retain the
 original posts. AI analysis runs separately from the web server:
 
+Each pull begins with `scripts/zforum import discover --db LOCAL_SNAPSHOT`, also
+the default import stage. It reads listing metadata and retained local excerpts,
+records request counts/timing, and stops for thread selection before full downloads.
+It uses a read-only local database copy and leaves the published cutoff unchanged.
+After approved sources are fetched, a second review approves analysis scope and
+spending. Neither review authorizes publication.
+
 1. **Summarize the discussion.** Models produce topic summaries with questions,
    competing views and citations. Long histories are summarized in sections,
    then combined into a topic summary.

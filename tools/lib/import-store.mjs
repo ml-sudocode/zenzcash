@@ -35,6 +35,16 @@ export class ImportStore {
   cutoff() {
     return this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL").get().cutoff;
   }
+  discoveryBaseline() {
+    return this.db.prepare(`SELECT p.topic,p.release,
+      json_extract(r.data,'$.topic.card.title') AS topic_title,
+      json_extract(t.value,'$.id') AS thread,
+      json_extract(t.value,'$.title') AS title,
+      json_array_length(t.value,'$.posts') AS posts,
+      substr(json_extract(t.value,'$.posts[0].own_text'),1,600) AS opening_excerpt
+      FROM published p JOIN releases r ON r.id=p.release,
+      json_each(r.data,'$.topic.threads') t ORDER BY p.topic,thread`).all().map(row=>({...row}));
+  }
   trackedThread(id) {return this.db.prepare("SELECT topic FROM import_threads WHERE thread=?").get(id)!==undefined;}
   threadReview(id) {const row=this.db.prepare("SELECT decision,classification,reason FROM import_thread_reviews WHERE thread=?").get(id);return row?{...row}:null;}
   reinstatedThreads() {return this.db.prepare("SELECT thread AS id FROM import_thread_reviews WHERE decision='include' AND thread NOT IN (SELECT thread FROM import_threads) ORDER BY thread").all().map(row=>({...row}));}

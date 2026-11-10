@@ -1,5 +1,20 @@
 import { IMPORT_TOPICS } from "./config.mjs";
 
+export async function discoverImport({ get, since, until, maxPages, progress }) {
+  let previous = null;
+  const union = new Map();
+  // Matching passes reduce omissions when replies move topics between pages.
+  for (let pass = 1; pass <= 4; pass++) {
+    const result = await discoverRecent({get,since,until,maxPages,includeAfterCutoff:true});
+    for (const thread of result.threads) union.set(thread.id,thread);
+    const identity = JSON.stringify(result.threads.map(t=>t.id).sort((a,b)=>a-b));
+    progress(`Discovery pass ${pass}: ${result.threads.length} active threads across ${result.pages} pages`);
+    if (identity === previous) return {since,until,threads:[...union.values()].sort((a,b)=>a.id-b.id),passes:pass};
+    previous = identity;
+  }
+  throw new Error("Forum listing kept moving after four discovery passes; retry without advancing the checkpoint");
+}
+
 export async function discoverRecent({ get, since, until, maxPages = 20, includeAfterCutoff = false }) {
   const start = Date.parse(since), end = Date.parse(until);
   if (!Number.isFinite(start) || !Number.isFinite(end) || start >= end) throw new Error(`invalid discovery window ${since} to ${until}`);

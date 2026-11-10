@@ -5,7 +5,8 @@ import { ImportStore } from "./lib/import-store.mjs";
 import { readJsonStrict, writeJsonAtomic } from "./lib/fsio.mjs";
 import { runProcess } from "./lib/process.mjs";
 import { forumClient } from "./lib/forum-client.mjs";
-import { discoverRecent } from "./lib/discovery.mjs";
+import { discoverImport } from "./lib/discovery.mjs";
+import { discoverPull } from './lib/pull-discovery.mjs';
 import { fetchSnapshot, sourceChanges } from "./lib/refresh-source.mjs";
 import { validateCandidate, frozenJobs } from "./lib/refresh-analysis.mjs";
 import { analyzeImportTopics } from "./lib/import-analysis.mjs";
@@ -28,29 +29,17 @@ import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
 import { replyAnalysisSince } from './lib/reply-window.mjs';
 import { checkSummarySectionPolicy,expandedJobs } from './lib/summary-sections.mjs';
 
-export async function discoverImport({ get, since, until, maxPages, progress }) {
-  let previous = null;
-  const union = new Map();
-  // Two matching passes mitigate page movement while the live forum receives replies.
-  // Posts after the starting cutoff are included; the next run deliberately overlaps.
-  for (let pass = 1; pass <= 4; pass++) {
-    const result = await discoverRecent({get,since,until,maxPages,includeAfterCutoff:true});
-    for (const thread of result.threads) union.set(thread.id,thread);
-    const identity = JSON.stringify(result.threads.map(t=>t.id).sort((a,b)=>a-b));
-    progress(`Discovery pass ${pass}: ${result.threads.length} active threads across ${result.pages} pages`);
-    if (identity === previous) return {since,until,threads:[...union.values()].sort((a,b)=>a.id-b.id),passes:pass};
-    previous = identity;
-  }
-  throw new Error("Forum listing kept moving after four discovery passes; retry without advancing the checkpoint");
-}
-
 export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, reviewNewThreads=true, reviewFile, clock = () => new Date().toISOString(), progress = console.log }) {
+  if (stage === 'discover') {
+    if(thread!==undefined||reviewFile!==undefined||maxCalls!==0)throw new Error('discover accepts only a start timestamp and local database');
+    return discoverPull({store,root,settings,get,since,clock,progress});
+  }
   if (!["fetch","preview","analyze","publish"].includes(stage)) throw new Error(`Unknown import stage ${stage}`);
   if (["fetch","analyze"].includes(stage)) assertLocalPreparation(store.path,root);
   if (stage === "analyze" && (!Number.isSafeInteger(maxCalls) || maxCalls < 1)) throw new Error(`Analysis requires a positive global call limit, received ${maxCalls}`);
   if (thread !== undefined && (!Number.isSafeInteger(thread) || thread < 1)) throw new Error(`Invalid scoped thread ${thread}`);
   if (stage !== "fetch" && (thread !== undefined || since !== undefined)) throw new Error(`${stage} uses the frozen run; fetch options are not allowed`);
-  if (stage !== "fetch" && store.active() === null) throw new Error(`No unfinished import to ${stage}; run scripts/zforum import first`);
+  if (stage !== "fetch" && store.active() === null) throw new Error(`No unfinished import to ${stage}; review discovery and run scripts/zforum import fetch first`);
   if (stage === "preview") {
     const state = store.active();
     writeImportPreview(state,root,progress);
@@ -78,7 +67,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       acceptThreadReview(reviewFile,state.review,store);
     }
     if(stage!=='fetch'&&state.review?.status==='pending')throw new Error('New-thread review is pending; confirm the staged decisions with fetch --review FILE before analysis or publication');
-    if (stage !== "fetch" && (state.discovery === null || state.topics.some(topic=>topic.status==="pending"))) throw new Error(`Fetch is incomplete; run scripts/zforum import before ${stage}`);
+    if (stage !== "fetch" && (state.discovery === null || state.topics.some(topic=>topic.status==="pending"))) throw new Error(`Fetch is incomplete; run scripts/zforum import fetch before ${stage}`);
     if (stage === "fetch" && state.discovery === null) {
       state.discovery = state.scope_thread === null
         ? await discoverImport({get,since:state.since,until:state.until,maxPages:settings.discoveryMaxPages,progress})
@@ -214,12 +203,12 @@ if (import.meta.main) {
   process.umask(0o077);
   const options = parseImportArgs(process.argv.slice(2));
   const db = resolve(options.db ?? join(WORK_DIR,"zforum.sqlite"));
-  if (["fetch","analyze"].includes(options.stage)) assertLocalPreparation(db,WORK_DIR);
+  if (["discover","fetch","analyze"].includes(options.stage)) assertLocalPreparation(db,WORK_DIR);
   if (options.stage === "analyze") checkSubscriptionLogin();
   const server = async (command,...flags) => (await runProcess(join(REPO_ROOT,"server/target/release/zforum-server"),[command,"--db",db,...flags])).stdout;
   if (options.stage === "fetch") await server("report");
   else if (!existsSync(db)) throw new Error(`Import database does not exist: ${db}`);
-  const store = new ImportStore(db,{readOnly:options.stage === "preview"});
+  const store = new ImportStore(db,{readOnly:["preview","discover"].includes(options.stage)});
   try {
     const active=store.active();
     const settings=options.stage!=='fetch'&&active!==null?active.settings:{...readJsonStrict(join(REPO_ROOT,"tools/import-config.json")),prompts:{summary:promptText("summary"),marks:promptText("marks")}};
