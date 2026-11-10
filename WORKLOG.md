@@ -3908,3 +3908,9 @@ Implementation in progress; user verification remains pending.
   No workers or monitors remain active. Both holds stay in force; the narrowed
   age request applies only to When We Disagree, not Crosslink. All accepted
   artifacts remain saved locally; production, publication and Git push unchanged.
+- **F-198 — Final audit reconciled without new spending.** Under the import lock,
+  marked the interrupted legacy analysis stage failed with unknown terminal time
+  and duration, then regenerated audit reports; all attempt/token totals match.
+  Current pointer and progress report now say awaiting-spending-review and record
+  D-172's three-month selection equivalence. No model calls, limit increases,
+  hold releases, snapshot changes or summary regeneration occurred.
