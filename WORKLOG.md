@@ -3767,3 +3767,33 @@ Implementation in progress; user verification remains pending.
   grouped/partial selection, invalid/stale selections, resume, private publication
   invariants and transfer. Full gate passed 238 Node and 61 Rust tests, builds and
   Clippy (work/selected-download-gate.log). No real model calls or production writes.
+- **F-193 — Approved source download finished locally; analysis has not started.**
+  Security review of 9343693 found no new issue: numeric source IDs, validated
+  selection paths/membership, parameterized SQL, source-as-data model boundaries,
+  and existing local-preparation guards. Run 110a0256-4960-4b31-9e72-dd61e795a474
+  in work/pull-20261109-draft.sqlite fetched 90 topics / 95 forum threads in
+  569,633 ms: 264 thread HTTP requests, 295 profile requests, zero retries, and
+  286 profile-cache hits. No unselected thread requests. Both partial histories
+  contain opening plus ten recent replies, omitting 112 / 137 middle stream IDs.
+  Full coinholder/Crosslink histories contain 140 / 114 posts. Retained source:
+  2,058 records, 2,047 visible; 290 additions within discovery window, five more
+  observed after discovery, 419 earlier additions, three changed records. All
+  changes remain private. Original backup checksum, local published baseline,
+  accounts and cutoff unchanged; live 122 release IDs/cutoff matched backup at
+  2026-11-10T04:20:47Z. No deployment or Git push.
+  Initial analysis plan: 90 summaries + 152 reply batches for 715 posts; 1,330
+  existing assessments reused, two dated originals excluded from individual work.
+  Generic timing estimate 270–730 minutes; matching historical batch sizes/request
+  sizes narrows the planning range to 287–538 minutes, still uncertain. No calls
+  spent. Local analysis-review JSON/TXT/CSV and audit under work/pull-20261109-*.
+  Source scan recorded 16 findings; no publication acknowledgment manufactured.
+- **D-168 — Explain spending and allow review of unnecessary analysis first.**
+  User asks for resource breakdown to reject unnecessary work and reiterates the
+  one-year rule. Keep individual-analysis omissions for older new-topic posts;
+  originals remain summary context. Here the two 2023 opening posts are omitted
+  from individual analysis; coinholder begins 2025-11-28 and Crosslink 2026-04-02,
+  so their backfill is younger than a year. Clearly distinguish pre-poll additions
+  from posts older than a year. Provide per-topic and per-work-type costs and an
+  interactive planning comparison. No scheduling changes, model spending or
+  publication are approved. Selections are proposed scope changes, not permission
+  to start models; revise/freeze the plan after the user's decisions.
