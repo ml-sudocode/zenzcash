@@ -3,12 +3,12 @@ import { validatePostAnalysisState } from '../../site/js/analysis-state.js';
 import { importTimestamp } from './import-time.mjs';
 import { postKey } from './jobs.mjs';
 
-export const NEW_TOPIC_REPLY_POLICY='new-topics-one-year-v1';
+export const NEW_TOPIC_REPLY_POLICY='new-topics-six-months-v1';
 
 export function replyAnalysisSince(settings,previous,baseline,until) {
   if(settings.newTopicReplyAnalysisPolicy!==undefined&&settings.newTopicReplyAnalysisPolicy!==NEW_TOPIC_REPLY_POLICY)throw new Error(`Unknown new-topic reply policy ${settings.newTopicReplyAnalysisPolicy}`);
   if(previous.replyAnalysisSince!==undefined)return importTimestamp(previous.replyAnalysisSince);
-  if(settings.newTopicReplyAnalysisPolicy===NEW_TOPIC_REPLY_POLICY&&baseline===null)return new Date(calendarCutoff(importTimestamp(until),12)).toISOString();
+  if(settings.newTopicReplyAnalysisPolicy===NEW_TOPIC_REPLY_POLICY&&baseline===null)return new Date(calendarCutoff(importTimestamp(until),6)).toISOString();
   return undefined;
 }
 

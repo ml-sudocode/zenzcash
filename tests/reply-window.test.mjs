@@ -9,9 +9,10 @@ import {greyReasons,DEFAULT_SETTINGS} from '../site/js/logic.js';
 import {postQueue} from '../site/js/speech.js';
 
 const settings={newTopicReplyAnalysisPolicy:NEW_TOPIC_REPLY_POLICY};
-test('new-topic cutoff freezes twelve calendar months, clamps leap days and leaves existing topics unchanged',()=>{
-  assert.equal(replyAnalysisSince(settings,{},null,'2026-11-06T03:51:56.235Z'),'2025-11-06T03:51:56.235Z');
-  assert.equal(replyAnalysisSince(settings,{},null,'2024-02-29T12:00:00Z'),'2023-02-28T12:00:00.000Z');
+test('new-topic cutoff freezes six calendar months, clamps month ends and leaves existing topics unchanged',()=>{
+  assert.equal(replyAnalysisSince(settings,{},null,'2026-11-06T03:51:56.235Z'),'2026-05-06T03:51:56.235Z');
+  assert.equal(replyAnalysisSince(settings,{},null,'2024-08-31T12:00:00Z'),'2024-02-29T12:00:00.000Z');
+  assert.equal(replyAnalysisSince(settings,{},null,'2025-08-31T12:00:00Z'),'2025-02-28T12:00:00.000Z');
   assert.equal(replyAnalysisSince(settings,{}, {},'2026-11-06T00:00:00Z'),undefined);
   assert.equal(replyAnalysisSince({}, {},null,'2026-11-06T00:00:00Z'),undefined);
   assert.equal(replyAnalysisSince(settings,{replyAnalysisSince:'2025-11-06T03:51:56.235Z'},{},'2027-11-06T00:00:00Z'),'2025-11-06T03:51:56.235Z');

@@ -37,7 +37,10 @@ include a forum-provided opening batch; only selected post bodies enter snapshot
 2. **Analyze individual posts.** Models generate short summaries, optional calmer
    rewrites, and separate assessments such as tone and argument support. These
    use the original text and discussion context. Older posts can remain available
-   without an individual assessment.
+   without an individual assessment. Newly imported topics use a six-calendar-month
+   cutoff for individual assessments; older originals still inform the summary.
+   The cutoff is frozen with the import and retained on subsequent pulls. Existing
+   accepted assessments remain available.
 3. **Validate and publish.** The tools check output structure, source references
    and quoted evidence. Accepted results retain their model and prompt provenance
    and can be reused. Publication is a separate, explicit step.
