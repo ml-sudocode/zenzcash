@@ -4043,3 +4043,15 @@ Implementation in progress; user verification remains pending.
   before publication. On approval, bind acknowledgment to the actual post-staging
   report/candidate digests and identify the delegated operator honestly. Until then,
   no acknowledgment, live staging/publication, new model calls or GitHub push.
+- **F-204 — Live content remains unchanged while deployment waits.** Initial
+  workstation HTTP checks timed out. Recheck: direct zencash.fly.dev/healthz
+  returned 200/ok in 0.66s; zenzcash.com/data/topics.json completed with 200 in
+  20s and exactly matches the saved pre-deployment 122-topic catalog. Evidence
+  work/release-20261110-status.json. Pending user questions request Fly login
+  refresh and one-time delegated acknowledgment; neither answer received yet.
+  Resume with fresh app authentication, retry the cached --depot=false remote
+  build without repeating unchanged successful local gates, then upload/run
+  work/release-20261110-stage.mjs under the live import lock as zforum. The script
+  only stages and verifies public/personal state; it does not acknowledge/publish.
+  Scope any subsequent acknowledgment to the actual production scan and explicit
+  user delegation. Keep the local verified backup and exact prepared bundle.
