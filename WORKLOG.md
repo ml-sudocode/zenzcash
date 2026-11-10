@@ -4068,3 +4068,38 @@ Implementation in progress; user verification remains pending.
   finish the checked image rollout and atomic content publication, verify accounts,
   previous content/history, live health and offsite backup. No additional approval,
   model calls, source fetching, preview replacement or GitHub push is required.
+- **F-205 — Approved image and selected content deployed and verified.** Fresh
+  app-scoped credentials worked. Fly Machine e823213f175598 runs image
+  deployment-01M73APQJP56P5YG914VDPTAA3, digest
+  sha256:545db058fa7017bcc4932538bb4e0b2f80ec7cc94a63bbe7c18533bf262d0ea6.
+  The image restart at 18:21:04Z waited for its startup backup; health passed at
+  18:22:14Z. This single-Machine code rollout had a brief interruption; do not
+  claim zero downtime. Staging preserved every public/personal table and cutoff.
+  Recorded the user's D-178 review as delegated approval after checking the exact
+  41 findings and candidate digest, bound to production report digest
+  3c8e1e68919e0ebe51b2edd8d3d772cfc141e680c91bc640dab76be2d431fd90.
+  The real publication path atomically completed run
+  2b57ddfd-5c4e-464b-b334-9c7027cb8559 at 18:25:02.994Z: 59 new topics,
+  31 refreshed, 91 existing topics retained, 181 total. Every release ID exactly
+  matches the local publication rehearsal. All fourteen personal tables are
+  unchanged; previous releases, renditions, source revisions and pulls remain.
+  SQLite integrity passes: schema 11, 12,779 post records, six accounts.
+  Public HTTPS health, catalog, featured topic, When We Disagree and Crosslink
+  checks pass; no unavailable topics. The served runtime matches the checked
+  revision 9dd9627d5bc960b0c6a03a0160a0cb7a48b00cf7962838096efe9339d3029c04.
+  Full-poll cutoff remains 2026-11-06T03:51:56.235Z because this was selected
+  coverage. Evidence: work/release-20261110-published.json, live-final.json and
+  deploy-approved/stage/publish logs under the same release prefix. Browser-host
+  access was unavailable; no live visual inspection claimed. F-202's complete
+  deployment gate and local browser/passkey checks passed before deployment.
+  The final backup initially failed with "No space left on device" while making
+  its archive. Losslessly compressed the inactive November 6 rollback SQLite and
+  removed only the redundant raw November 6 transfer bundle after SHA-256 checks
+  against retained gzip copies; recovered 395,756,916 bytes without removing
+  database/history content. Repeated the backup successfully using the normal
+  tool, with 181 topics, 12,779 posts and six accounts, completed 18:31:22.753Z.
+  Offsite key: zforum/2026-11-10T18-30-32.234Z-0ef5d060-60d8-44e8-b3cd-3ded4ef2b82d.tar.gz;
+  archive SHA a4ad7df06aa2e506949caef9e8c81197c7219c8c6f65ab5a161d406720356a5f.
+  Space/backup evidence: work/release-20261110-space.log and backup-retry.log.
+  Added the production-publication reference to the local plan pointer, retaining
+  its honest local analysis-complete status. No new model calls or GitHub push.
