@@ -4055,3 +4055,16 @@ Implementation in progress; user verification remains pending.
   only stages and verifies public/personal state; it does not acknowledge/publish.
   Scope any subsequent acknowledgment to the actual production scan and explicit
   user delegation. Keep the local verified backup and exact prepared bundle.
+- **D-178 — Record the user's completed review and finish deployment.** User
+  confirms Fly login is refreshed and says “2 - i have reviewed. pls deploy” in
+  response to the two pending requests. This explicitly authorizes recording the
+  user's review acknowledgment on their behalf and publishing run
+  2b57ddfd-5c4e-464b-b334-9c7027cb8559, candidate digest
+  6da8e742f0a80313330f2f1144dba10a7a2c9df588a5b88a90e51397340ee9a4,
+  with the exact unchanged prepared bundle and 41 findings. Bind the acknowledgment
+  to each actual staged scan/report after verifying the findings match; identify
+  Codex as recording the user's D-178 approval, not as the human reviewer.
+  Use refreshed credentials and a private, short-lived zencash deployment token;
+  finish the checked image rollout and atomic content publication, verify accounts,
+  previous content/history, live health and offsite backup. No additional approval,
+  model calls, source fetching, preview replacement or GitHub push is required.
