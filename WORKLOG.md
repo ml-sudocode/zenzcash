@@ -3980,3 +3980,10 @@ Implementation in progress; user verification remains pending.
   clarify in its banner that the cutoff covers these 90 selected topics. This is
   preview metadata only; do not advance any stored full-poll cutoff or change
   production. Verify the served catalog and the existing date-display path.
+- **F-201 — Preview pull date restored.** Restarted only the local preview.
+  Its served catalog now provides the selected pull cutoff, and the existing
+  Topics renderer produces exactly one date indicator below the introduction.
+  The existing cutoff-display test passes; served-catalog/DOM verification is in
+  work/pull-20261109-preview-verification.json. In Pacific time the cutoff is
+  November 9, 2026 at 7:25 PM PST. Refresh localhost:8001/#/topics to see it.
+  No application source, database, model work or production change.
