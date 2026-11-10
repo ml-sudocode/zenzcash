@@ -3932,3 +3932,22 @@ Implementation in progress; user verification remains pending.
   authorization without repetitive questions; ask only for material further work.
   The three-month When We Disagree selection remains equivalent to its sole
   November 8 post. No new sources, publication, deployment or Git push authorized.
+- **F-199 — All 90 selected topics analyzed and validated.** D-173's completion
+  allowance finished the run in another 12.4 active minutes using seven attempts
+  (six accepted assessment jobs and one rejected formatting output), with one
+  authorized attempt unused. No summaries or accepted assessments were rerun.
+  When We Disagree is complete at 190,125 known tokens; Crosslink at 502,694.
+  Both holds are released with the D-173 decision recorded, and no jobs remain.
+  Final total: 225 attempts (218 accepted, six rejected, one interrupted/failed),
+  5,196,972 input tokens including 2,741,376 cached, and 1,016,808 output tokens.
+  Known total is 6,213,780; the earlier interrupted attempt remains unknown.
+  Completion added 261,244 known tokens, about 4.4% beyond the paused subtotal.
+  Analysis consumed 321.0 active minutes (review pause excluded); downloads took
+  9.5 minutes and discovery 9.2 seconds. Summed concurrent model time is separate.
+  Revalidated all 90 final candidates against frozen sources and artifacts.
+  Verified the original backup hash and all 23 non-import database tables remain
+  unchanged, including credentials, preferences and published release pointers.
+  Auditable final breakdown: work/pull-20261109-final-review.json/.txt, with
+  per-topic/task CSV links and full candidate preview. The pointer and progress
+  files now report analysis-complete; runner and monitor exited. Content review
+  findings remain unacknowledged; nothing published, deployed or pushed to GitHub.
