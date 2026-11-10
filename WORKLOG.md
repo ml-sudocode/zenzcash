@@ -4113,3 +4113,11 @@ Implementation in progress; user verification remains pending.
   backups, rehearsal data, audit reports and browser profiles. No production action.
   Capture protected-file metadata and preview executable hashes before cleanup;
   verify them afterward. Initial installer removal recovered room for this ledger.
+- **F-206 — Approved disk cleanup completed and preservation checked.** Removed
+  only D-179 build output, installers and cache files. Measured 8.879 GiB reclaimed;
+  filesystem use fell from 100% to 85%, with approximately 8.8 GiB available.
+  All 132,403 protected files retained their size, modification time and inode.
+  Current release server and WebAuthn executables retain identical SHA-256 hashes;
+  both launch and return the expected errors for missing/invalid input. This is a
+  binary startup check, not an end-to-end browser/passkey test. Both current release
+  trees and all forum data, backups and audit artifacts remain. No deployment.
