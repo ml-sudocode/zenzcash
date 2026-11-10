@@ -352,16 +352,23 @@ It is an operator workflow requirement using the existing separate stages, not a
 that the CLI can authenticate user consent. Security acknowledgment/publication remain
 separate controls. Never manufacture either kind of approval.
 
-**Unexpected analysis spending (D-171).** Real CLI analysis requires a
+**Unexpected analysis spending (D-171, amended by D-173).** Real CLI analysis requires a
 `spending-review.json` in the run directory, binding per-job/per-topic token ceilings
 and the total approved attempt allowance to the reviewed snapshot hashes. Default
 anomaly ceilings are twice each job's estimated upper input-plus-output tokens and
 150% of each topic's estimated upper total. Count cached input only as a subset of
 input. Token usage arrives after completion; held threads must make no further
 calls while other threads continue. Keep validated results and count in-flight calls
-against the total allowance. Ask the user before releasing a hold or raising limits;
-`releaseSpendingHold` records that reviewed decision and does not reset attempts.
-No automatic retry/resume may erase a hold. Report unknown usage explicitly.
+against the total allowance. The user authorizes reasonable flexibility for small
+overruns and finishing a nearly complete run: estimates are not exact budgets.
+Record a bounded completion allowance before using it; include remaining work and
+modest retry headroom, retain paid outputs, and do not repeatedly stop for a minor
+threshold crossing. A roughly 10% run-level extension or 15% per-job tolerance is
+a guide for modest overruns, not authority for new topics or open-ended retries.
+Seek a decision for materially larger or repeated unexpected spending. Existing
+authorization can release a hold; `releaseSpendingHold` records that decision and
+does not reset attempts. No automatic retry/resume may erase a hold without a
+recorded basis. Report unknown usage explicitly.
 
 **Where things live.**
 - Technical overview: `ARCHITECTURE.md`. Decision ledger and progress: `WORKLOG.md`

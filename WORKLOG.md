@@ -3914,3 +3914,21 @@ Implementation in progress; user verification remains pending.
   Current pointer and progress report now say awaiting-spending-review and record
   D-172's three-month selection equivalence. No model calls, limit increases,
   hold releases, snapshot changes or summary regeneration occurred.
+- **D-173 — Finish nearly complete work with modest spending flexibility.**
+  User explicitly says to continue when only slightly above estimates and finish
+  this almost-complete run. This supersedes D-172's pending extra-attempt question
+  and D-171's requirement to ask again for every small threshold crossing.
+  Resume both remaining topics, retaining all accepted summaries/assessments.
+  There are six pending assessment jobs; allow eight further attempts (six jobs
+  plus two retry attempts), raising the lifetime cap from 218 to 226, a 3.7%
+  extension. Set When We Disagree's cumulative review ceiling to 220,000 recorded
+  tokens to cover its remaining long assessment and one retry; apply 15% per-job
+  tolerance to the two held topics' existing ceilings. Keep Crosslink's 693,513
+  cumulative ceiling. Unknown interrupted usage remains explicitly unknown.
+  Expected remaining time is approximately 10–20 minutes, longer if retries are
+  needed. This is a bounded completion allowance, not a spending target.
+  Future runs should include modest completion/retry headroom and distinguish a
+  minor estimate overrun from materially excessive spending. Continue within this
+  authorization without repetitive questions; ask only for material further work.
+  The three-month When We Disagree selection remains equivalent to its sole
+  November 8 post. No new sources, publication, deployment or Git push authorized.
