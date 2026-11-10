@@ -4004,3 +4004,23 @@ Implementation in progress; user verification remains pending.
   No forum/model calls or GitHub push requested. Complete all preparation/checks
   before surfacing any remaining exact-report human-acknowledgment requirement;
   the D-154 waiver was explicitly limited to the previous run and is not reusable.
+- **F-202 — Deployment preparation and staging rehearsal pass.** Prepared bundle
+  work/pull-20261109-prepared.json is 81,812,067 bytes, SHA
+  0e375d3fa52b56a1264692e8f96a590613fe2aa04a66debc545818daf071b5c9.
+  Fresh live backup work/release-20261110-before.sqlite is schema 11, 122 topics,
+  12,064 posts and six accounts; local/remote SHA match
+  7f5661f98e02ac974956b4624c6c927d89add9ea4c9bd5cc4a1ac771fdac7605.
+  All published baselines still match preparation. Remote backup is gzip-compressed
+  after verification to preserve volume headroom; local original remains intact.
+  Full deployment gate passes: 243 Node, 61 Rust, Clippy/builds/runtime smoke,
+  browser and passkey checks. No runtime edits after that gate; avoid duplicate runs.
+  Rehearsal work/rehearsals/release-20261110-DkuKlV stages all 90 exact candidates
+  under the production 512 MiB Node heap limit (715,456 KiB peak RSS). All fourteen
+  personal tables, public content and full-poll cutoff unchanged by staging.
+  Expected final catalog is 181 topics (59 new, 31 refreshed, 91 retained).
+  Candidate digest 6da8e742f0a80313330f2f1144dba10a7a2c9df588a5b88a90e51397340ee9a4
+  has 41 review matches across four posts: 32 formatting-character matches and
+  nine credential/command-language matches. Excerpts concern invisible formatting,
+  an emoji joiner, a wallet-support question and a testnet command assumption.
+  Context reviewed as data; no malicious instructions followed. This is not the
+  required human acknowledgment. Prepare exact production scan before final gate.
