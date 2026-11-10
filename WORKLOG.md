@@ -3831,3 +3831,17 @@ Implementation in progress; user verification remains pending.
   spending approval if the allowance is exhausted before completion. No deployment,
   publication or Git push is authorized. Finish the spending display while analysis
   runs if useful; do not delay the authorized start for presentation-only work.
+- **D-171 — Hold costly threads for the user's decision and continue other work.**
+  User requires pausing unexpectedly expensive analysis instead of spending onward,
+  while other threads continue during review. Add per-job/per-topic token guards
+  bound to this reviewed plan, plus persistent holds and an explicit reviewed
+  release path. Initial anomaly limits: twice a job's estimated upper input-plus-
+  output tokens, and 150% of a topic's estimated upper total. These are ceilings
+  for anomaly detection, not spending targets or extra attempt authorization.
+  The existing 218-total-attempt cap remains. Count cached input as a subset of
+  input, not twice. Token metrics arrive at call completion; retain validated
+  completed results, prevent subsequent calls for a held thread, and let other
+  topics proceed. Already-running calls may finish; record all their usage.
+  Ask the user about held topics with measured usage and remaining work. Do not
+  restart held work or increase its limits without approval. Keep monitoring the
+  current process during setup; no costly anomaly has been observed so far.
