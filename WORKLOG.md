@@ -3797,3 +3797,13 @@ Implementation in progress; user verification remains pending.
   interactive planning comparison. No scheduling changes, model spending or
   publication are approved. Selections are proposed scope changes, not permission
   to start models; revise/freeze the plan after the user's decisions.
+- **D-169 — Reduce the new-post analysis window from one year to six months.**
+  User explicitly narrows the age threshold. Change the new-topic individual
+  analysis policy to six calendar months. Keep older originals as summary context
+  and preserve accepted assessments. Rebuild this unspent plan from the already
+  downloaded sources in a fresh local draft/run, with a cutoff of
+  2026-05-10T03:25:08.908Z for new topics. Preserve the original one-year run and
+  its audit as superseded rather than mutating frozen source identities. Reuse
+  downloads, make no forum/model calls, and recalculate resource breakdown and
+  comparison controls. This authorizes narrowing/replanning, not model spending,
+  a new last-poll-only rule, deployment or publication.
