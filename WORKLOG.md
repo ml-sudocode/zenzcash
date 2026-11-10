@@ -3735,3 +3735,20 @@ Implementation in progress; user verification remains pending.
   then constrain fetching to that scope, followed by D-146 analysis review. Do not
   run the legacy unscoped fetch or mark deferred work as completed coverage. No
   deployment, Git push, production publication, analysis spending or model work.
+- **D-167 — Fetch the approved selection, with two explicit partial histories.**
+  User approves the 86 recommended topics in F-191, plus full histories for
+  coinholder voting (53533) and Crosslink (55210). For Avalanche bridge (44220)
+  and Zingo-PC (45359), user clarifies: include the opening post AND the latest
+  ten replies, not only the latest ten posts. Deduplicate the opening in short
+  threads. Defer 8, 29765, 56891, 57228 and 58858 without changing published
+  content or permanent exclusions. Preserve the configured music exclusion.
+  Implement/test selection-bound fetching before downloading: bind the selection
+  to the discovery packet and unchanged published baseline, retain grouped topic
+  membership, record omitted source coverage explicitly, and retain each partial
+  thread's opening plus its initially selected range and subsequent replies on
+  future pulls. Do not expand these two histories without explicit approval.
+  This exception to full-history collection applies only to these two threads;
+  omitted posts are not dated-analysis omissions. Selected pulls must not advance
+  the full-poll cutoff. Work on a new local copy of the verified backup. Audit
+  requests/timing, then present the D-146 analysis scope/cost review. No importer
+  model calls, production changes, deployment or Git push are authorized here.
