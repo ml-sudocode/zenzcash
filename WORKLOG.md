@@ -3973,3 +3973,10 @@ Implementation in progress; user verification remains pending.
   link. Server PID/lifetime in work/pull-20261109-preview-server.json; four-hour
   bound, log and verification under work/pull-20261109-preview*. Production and
   all databases unchanged; no publication/security acknowledgment fabricated.
+- **D-175 — Restore the pull cutoff in the local preview.** User reports that
+  the Topics-page last-pulled indicator disappeared. The application still renders
+  it, but D-174's preview supplied last_pull_cutoff:null. Set the preview catalog
+  to the staged selection's frozen until value (2026-11-10T03:25:08.908Z) and
+  clarify in its banner that the cutoff covers these 90 selected topics. This is
+  preview metadata only; do not advance any stored full-poll cutoff or change
+  production. Verify the served catalog and the existing date-display path.
