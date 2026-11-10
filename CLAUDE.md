@@ -371,6 +371,12 @@ does not reset attempts. No automatic retry/resume may erase a hold without a
 recorded basis. Report unknown usage explicitly.
 
 **Where things live.**
+- Deployment previews must run the actual application and publication workflow
+  against a separate local database containing the full existing catalog plus the
+  staged changes. Preserve real API responses, metadata, filters and account flows;
+  do not replace them with a simplified viewer or invented timestamps. State any
+  unavoidable localhost/origin differences. A content-only viewer is not a faithful
+  deployment preview. Production publication remains separately authorized.
 - Technical overview: `ARCHITECTURE.md`. Decision ledger and progress: `WORKLOG.md`
   (append-only, `D-`/`F-`/`Q-`/`A-` ids, rationale included). Read the latest entries
   for current progress; do not maintain a separate resume or handoff file. The

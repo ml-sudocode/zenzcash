@@ -3987,3 +3987,20 @@ Implementation in progress; user verification remains pending.
   work/pull-20261109-preview-verification.json. In Pacific time the cutoff is
   November 9, 2026 at 7:25 PM PST. Refresh localhost:8001/#/topics to see it.
   No application source, database, model work or production change.
+- **D-176 — Future previews must accurately represent deployment.** User rejects
+  the simplified viewer and requires previews to match the future live site.
+  Record this as a standing workflow requirement: use the actual application,
+  real APIs and publication path on an isolated local database with existing
+  content plus staged changes. Do not omit features, replace account/ratings
+  responses or invent display metadata. Explain unavoidable origin differences.
+  User then cancels replacing the current preview and requests deployment now;
+  leave that preview as-is and apply the corrected workflow to future previews.
+- **D-177 — Deploy the completed selected pull.** User explicitly authorizes
+  deployment of run 2b57ddfd-5c4e-464b-b334-9c7027cb8559. Prepare its exact bundle,
+  take a fresh consistent live backup, verify unchanged published baselines,
+  rehearse staging and preserve accounts/personal state, deploy checked repository
+  code needed for selected imports, then stage and atomically publish the update
+  on the existing Fly database. Keep unselected published topics and history.
+  No forum/model calls or GitHub push requested. Complete all preparation/checks
+  before surfacing any remaining exact-report human-acknowledgment requirement;
+  the D-154 waiver was explicitly limited to the previous run and is not reusable.
