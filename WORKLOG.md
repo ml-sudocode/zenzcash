@@ -3861,3 +3861,27 @@ Implementation in progress; user verification remains pending.
   Initial spending review covers the exact 90 snapshots / 218 planned jobs.
   At installation, 16 attempts had started and 282,544 completed input-plus-output
   tokens were recorded; no holds. All work remains local, publication unapproved.
+- **F-196 — First spending hold enforced; other topics continue.** The legacy
+  worker reached a cumulative hold for thread-59026, “When We Disagree: Making
+  Rough Consensus Work”: 102,565 recorded tokens against a 102,221 review ceiling.
+  Summary first failed its 300-character point limit (307 characters), then passed;
+  individual assessment failed the 50-claim limit (53 entries). The accepted
+  summary is preserved. Supervisor stopped the legacy worker while the next retry
+  was in flight; that attempt remains counted and is marked failed with unknown
+  token/time metrics. Do not invent a zero charge or refund its allowance.
+  Supervisor then launched the guarded CLI with 198 of the original 218 attempts
+  remaining. Current worker is PID 16026 (supervised flock PID 16025); authoritative
+  PID/run/database pointer is work/pull-20261109-current-plan.json. Guarded work is
+  continuing on other topics. A user question is pending: leave this thread held
+  (recommended), or authorize continuation with a 160,000-recorded-token topic
+  review ceiling; overall 218-attempt cap unchanged. No release is authorized yet.
+  Use releaseSpendingHold only after that answer; retained summary must not rerun.
+  Live tracking refreshes work/pull-20261109-progress.json/.txt every 15 seconds.
+  Per-topic audits live under work/imports/2b57ddfd-5c4e-464b-b334-9c7027cb8559/.
+  Operational supervisor/monitor logs are work/pull-20261109-spending-supervisor.log
+  and work/pull-20261109-monitor.log. The interrupted legacy stage retains an
+  incomplete timing marker; reconcile its terminal metadata once the active worker
+  stops, without fabricating lost monotonic duration. The live monitor measures
+  total wall time from the original stage start and reports unknown usage explicitly.
+  Comparison display now uses the six-month plan; controls were checked offline
+  and its Chrome screenshot inspected. No production changes, deployment or push.
