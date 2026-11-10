@@ -3885,3 +3885,26 @@ Implementation in progress; user verification remains pending.
   total wall time from the original stage start and reports unknown usage explicitly.
   Comparison display now uses the six-month plan; controls were checked offline
   and its Chrome screenshot inspected. No production changes, deployment or push.
+- **D-172 — Limit When We Disagree to the last three months.** User narrows
+  thread-59026 only. At this pull's frozen end, the cutoff is
+  2026-08-10T03:25:08.908Z. The downloaded thread contains exactly one visible
+  post, dated 2026-11-08T00:46:45.568Z (31,650 source characters). Comparing
+  datedReplies with three versus six months yields the same empty omission set:
+  the requested scope removes no posts or model jobs. Keep the frozen snapshot
+  and accepted summary intact; no replan or repeated summary is needed to satisfy
+  the narrower content selection for this pull. Do not interpret the age change
+  as permission to silently raise the costly-topic or total-attempt limits.
+  Ask whether to allow one additional assessment attempt, no automatic retry;
+  the previous completed assessment attempt used 53,206 tokens and about
+  3.3 minutes. Pending that answer, keep this topic held and make no model calls.
+- **F-197 — Background analysis stopped with 88 of 90 topics complete.**
+  The guarded worker exited successfully after skipping held work. Recorded
+  wall time is 308.6 minutes (about 5h 9m), with 218/218 attempts used and
+  212 accepted jobs. Usage: 4,986,588 input tokens including 2,633,728 cached,
+  plus 965,948 output; the earlier interrupted attempt still has unknown usage.
+  Crosslink (thread-55210) also hit a hold: marks-55210-63-69 used 56,227 tokens
+  against a 51,120 per-job ceiling; 278,014 topic tokens were recorded when held.
+  Five Crosslink assessment batches and one When We Disagree assessment remain.
+  No workers or monitors remain active. Both holds stay in force; the narrowed
+  age request applies only to When We Disagree, not Crosslink. All accepted
+  artifacts remain saved locally; production, publication and Git push unchanged.
