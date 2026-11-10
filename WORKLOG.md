@@ -3807,3 +3807,27 @@ Implementation in progress; user verification remains pending.
   downloads, make no forum/model calls, and recalculate resource breakdown and
   comparison controls. This authorizes narrowing/replanning, not model spending,
   a new last-poll-only rule, deployment or publication.
+- **F-194 — Six-month plan rebuilt without network/model calls.** Policy change
+  committed as 79988d3; 40 targeted import/window tests pass. Security review found
+  no new issue (existing calendar arithmetic, no new I/O or trust boundary).
+  Current run is 2b57ddfd-5c4e-464b-b334-9c7027cb8559 in
+  work/pull-20261109-six-months.sqlite; pointer work/pull-20261109-current-plan.json.
+  Reused all verified downloaded threads/accounts from 110a0256-4960-4b31-9e72-dd61e795a474
+  into a fresh copy of the original backup; old run remains an immutable superseded
+  preparation. No refetch, model calls, server writes or production changes.
+  Plan: 90 summaries + 128 reply batches for 528 posts, retaining 1,330 accepted
+  assessments and 189 dated originals. Six-month rule removes 187 additional
+  individual assessments and 24 calls. Coinholder: 130 dated / 10 assessed posts;
+  Crosslink: 35 dated / 79 assessed. Revised size-matched estimate 253–480 minutes,
+  roughly 3.61–5.18M input and 0.64–1.28M output tokens before retries; not guarantees.
+- **D-170 — Start the reviewed six-month analysis with a total 218-attempt cap.**
+  User explicitly says start analysis and track time, progress and token usage.
+  Approve all 90 topics in current run 2b57ddfd-5c4e-464b-b334-9c7027cb8559 using
+  the six-month policy; do not apply the unapproved last-poll-only alternative.
+  Interpret approval conservatively as 218 TOTAL model attempts, including retries,
+  rather than the unaccepted proposed contingency. Record attempts/usage/timing
+  per task/topic, refresh remaining-time estimates, and report progress. A resumed
+  command may spend only 218 minus attempts already consumed. Stop for renewed
+  spending approval if the allowance is exhausted before completion. No deployment,
+  publication or Git push is authorized. Finish the spending display while analysis
+  runs if useful; do not delay the authorized start for presentation-only work.
