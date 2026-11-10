@@ -4024,3 +4024,22 @@ Implementation in progress; user verification remains pending.
   an emoji joiner, a wallet-support question and a testnet command assumption.
   Context reviewed as data; no malicious instructions followed. This is not the
   required human acknowledgment. Prepare exact production scan before final gate.
+- **F-203 — Deployment awaits refreshed Fly app access and content acknowledgment.**
+  Exact bundle uploaded to /data/transfers/pull-20261109-prepared.json; remote SHA
+  matches F-202 and ownership is zforum. Default Depot startup stalled; interrupted
+  before Machine changes and retried the normal remote builder with --depot=false.
+  Server/auth binaries and runtime image built, but registry/finalization failed:
+  "unauthorized: token expired". No new image reached the running Machine.
+  The workstation clock matches NTP within milliseconds. fly auth whoami still
+  identifies the account, but creating a fresh two-hour zencash deploy token also
+  fails retrieving app access with token expired. A human login refresh is needed;
+  do not mistake whoami for usable deployment authorization. Failed token-output
+  file work/release-20261110-deploy.token is empty and must not be used.
+  Build/check logs: work/release-20261110-{checks,deploy,deploy-alternate}.log.
+  All local gates and staging rehearsal pass; no further analysis is needed.
+  Remaining independent review is summarized in
+  work/release-20261110-content-review.txt. Ask together for login refresh and an
+  explicit one-time delegated acknowledgment of this exact candidate's 41 findings
+  before publication. On approval, bind acknowledgment to the actual post-staging
+  report/candidate digests and identify the delegated operator honestly. Until then,
+  no acknowledgment, live staging/publication, new model calls or GitHub push.
