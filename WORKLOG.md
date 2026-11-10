@@ -3951,3 +3951,13 @@ Implementation in progress; user verification remains pending.
   per-topic/task CSV links and full candidate preview. The pointer and progress
   files now report analysis-complete; runner and monitor exited. Content review
   findings remain unacknowledged; nothing published, deployed or pushed to GitHub.
+- **D-174 — Open a read-only localhost preview of the prepared content.** User
+  asks where to inspect the completed pull. Serve the 90 validated candidates in
+  the existing site interface at localhost:8001 for four hours, clearly labeled
+  as a local content preview. Use an in-memory allowlist of static assets and
+  candidate JSON; no publication, database writes, production access or invented
+  content-review acknowledgment. Guest browsing, summaries and browser-local
+  filters work; account actions and community ratings are unavailable in this
+  content-only preview. Validate the catalog and candidate boundary schemas and
+  inspect the rendered result before providing the link. Keep cost-report links
+  available separately. The preview covers this pull's 90 selected topics only.
