@@ -3961,3 +3961,15 @@ Implementation in progress; user verification remains pending.
   content-only preview. Validate the catalog and candidate boundary schemas and
   inspect the rendered result before providing the link. Keep cost-report links
   available separately. The preview covers this pull's 90 selected topics only.
+- **F-200 — Local preview available on port 8001.** Read-only in-memory server
+  serves all 90 validated candidates and the existing interface, plus audit text
+  and per-topic CSV. Guest catalog, featured topic, When We Disagree and Crosslink
+  responses pass frontend boundary validation. Writes return 405, private paths
+  404 and unexpected Host headers 403. Initial Host check using Node fetch returned
+  200; isolated echo confirmed that client ignores a supplied Host header, while
+  direct HTTP exercises and passes the 403 boundary. No application/test assertion
+  was weakened. Browser opening/visual inspection could not run: computer-use host
+  reports unavailable. Do not claim visual verification; user has the localhost
+  link. Server PID/lifetime in work/pull-20261109-preview-server.json; four-hour
+  bound, log and verification under work/pull-20261109-preview*. Production and
+  all databases unchanged; no publication/security acknowledgment fabricated.
