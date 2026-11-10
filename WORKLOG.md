@@ -4103,3 +4103,13 @@ Implementation in progress; user verification remains pending.
   Space/backup evidence: work/release-20261110-space.log and backup-retry.log.
   Added the production-publication reference to the local plan pointer, retaining
   its honest local analysis-complete status. No new model calls or GitHub push.
+
+- **D-179 — Approved local disk cleanup while preserving preview.** User approved
+  the approximately 8.8 GiB cleanup after requiring working local preview/login.
+  Remove only current server and WebAuthn target/debug directories, both target
+  directories in zforum-fixes and work/reproducible-clean-7livqt3m, downloaded
+  application installers, Chrome disk/code caches and cached VS Code installers.
+  Preserve current target/release trees, source, databases, imports, paid analyses,
+  backups, rehearsal data, audit reports and browser profiles. No production action.
+  Capture protected-file metadata and preview executable hashes before cleanup;
+  verify them afterward. Initial installer removal recovered room for this ledger.
