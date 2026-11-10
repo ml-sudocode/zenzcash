@@ -8,11 +8,20 @@ import { analysisBaseline, REPLY_ANALYSIS_POLICY } from "./reply-analysis.mjs";
 import { importTimestamp } from "./import-time.mjs";
 import {validateThreadReview} from './thread-review.mjs';
 import { isDeepStrictEqual } from 'node:util';
+import { selectionTopics,validateFrozenSelection } from './download-selection.mjs';
 
 function keys(value, expected) {
   if (!value || typeof value !== "object" || Array.isArray(value) || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify([...expected].sort())) throw new Error(`Transfer requires fields: ${expected.join(", ")}`);
 }
 function statePaths(state) {
+  if(state.selection!==undefined){
+    validateFrozenSelection(state.selection);
+    if(state.scope_thread!==null||state.since!==state.selection.since||state.until!==state.selection.until)throw new Error('Transfer selection window/scope differs');
+    selectionTopics(state.topics,state.selection);
+    if(state.topics.length!==state.selection.choices.length)throw new Error('Transfer contains unselected topics');
+    const selectedIds=state.selection.choices.flatMap(choice=>choice.thread_ids).sort((a,b)=>a-b);
+    if(!Array.isArray(state.discovery?.threads)||!isDeepStrictEqual(state.discovery.threads.map(thread=>thread.id).sort((a,b)=>a-b),selectedIds))throw new Error('Transfer discovery differs from selected threads');
+  }
   if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(state.id) || !Array.isArray(state.topics) || new Set(state.topics.map(t=>t.id)).size !== state.topics.length) throw new Error("Invalid transfer run identity");
   for (const topic of state.topics) {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(topic.id) || !["fetched","analyzed","published"].includes(topic.status)) throw new Error(`Transfer requires fetched topics with safe IDs: ${topic.id}`);
@@ -35,7 +44,7 @@ function writeArtifacts(directory, files, missingOnly = false) {
   }
 }
 function identity(state) {
-  return sha256(JSON.stringify([state.id,state.settings,state.topics.map(t=>[t.id,t.snapshot_sha256,t.baseline_release])]));
+  return sha256(JSON.stringify([state.id,state.settings,state.topics.map(t=>[t.id,t.snapshot_sha256,t.baseline_release]),...(state.selection===undefined?[]:[state.selection])]));
 }
 
 export function exportImport(state, root) {
@@ -155,12 +164,13 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
     if(JSON.stringify(snapshot.threads.map(t=>t.id))!==JSON.stringify(topic.threadIds))throw new Error(`Prepared membership differs: ${topic.id}`);
   }
   if(active===null) {
-    const registered=store.register(requested.discovery.threads,{dryRun:true}).filter(topic=>requested.scope_thread===null||topic.threadIds.includes(requested.scope_thread));
+    const groups=store.register(requested.discovery.threads,{dryRun:true});
+    const registered=(requested.selection===undefined?groups:selectionTopics(groups,requested.selection)).filter(topic=>requested.scope_thread===null||topic.threadIds.includes(requested.scope_thread));
     if(JSON.stringify(registered.map(t=>[t.id,t.threadIds]))!==JSON.stringify(requested.topics.map(t=>[t.id,t.threadIds])))throw new Error("Production topic membership changed since preparation");
     if(review!==null&&store.db.prepare('PRAGMA user_version').get().user_version<7)await server('report');
     if(review!==null)store.recordThreadReviews(review.threads);
     store.register(requested.discovery.threads);
-    const state={id:requested.id,since,until,status:"running",scope_thread:requested.scope_thread,settings:requested.settings,discovery:requested.discovery,...(review===null?{}:{review}),
+    const state={id:requested.id,since,until,status:"running",scope_thread:requested.scope_thread,...(requested.selection===undefined?{}:{selection:requested.selection}),settings:requested.settings,discovery:requested.discovery,...(review===null?{}:{review}),
       topics:registered.map(t=>({...t,status:"pending",baseline_release:store.release(t.id)})),started_at:until,elapsed_ms:0};
     store.db.prepare("INSERT INTO import_runs VALUES(?,?,?,?,?)").run(state.id,since,until,state.status,JSON.stringify(state));
   }

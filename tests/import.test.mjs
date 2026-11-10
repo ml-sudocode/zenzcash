@@ -24,6 +24,8 @@ import { SUMMARY_REUSE_POLICY,summaryReuse } from '../tools/lib/summary-reuse.mj
 import { BATCH_REPAIR_POLICY } from '../tools/lib/batch-repair.mjs';
 import { acknowledgeReview,FINDINGS_FILE } from '../tools/lib/content-review.mjs';
 import { importReviewInput } from '../tools/lib/import-review.mjs';
+import { readDownloadSelection } from '../tools/lib/download-selection.mjs';
+import { historicalAttempts } from '../tools/lib/import-audit.mjs';
 
 function harness({reviews=false}={}) {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -37,6 +39,81 @@ function harness({reviews=false}={}) {
 }
 const end="2026-11-02T00:00:00.000Z",start="2026-11-01T00:00:00.000Z";
 const settings={model:"fixture",timeoutSeconds:5,maxCallsPerTopic:20,discoveryMaxPages:10,prompts:{summary:"summary prompt",marks:"marks prompt"}};
+
+test('selected downloads fetch only approved groups and opening plus latest ten, resume without expansion, and leave cutoff unchanged',async()=>{
+  const h=harness({reviews:true});
+  try{
+    for(const [id,ids] of [['group',[7,8]],['deferred',[9]]]){
+      const release=sha256(id),data={topic:{id,card:{title:id},threads:ids.map(id=>({id,title:`Thread ${id}`,posts:[]}))}};
+      h.store.db.prepare('INSERT INTO releases VALUES(?,?)').run(release,JSON.stringify(data));
+      h.store.db.prepare('INSERT INTO published VALUES(?,?)').run(id,release);
+    }
+    const discovery=await runImport({stage:'discover',since:start,store:h.store,root:h.root,settings,clock:()=>end,progress:()=>{},get:async()=>({body:{topic_list:{more_topics_url:null,topics:[7,9,10].map(id=>({id,title:`Thread ${id}`,slug:`thread-${id}`,bumped_at:end,pinned:false,posts_count:20}))}}})});
+    const selectionFile=join(h.root,'selection.json');
+    const packet={format:'zforum-download-selection-1',review:discovery.review,review_sha256:sha256(JSON.stringify(discovery.review)),choices:[{id:'group',history:'full'},{id:'thread-10',history:'opening-and-latest-10'}]};
+    writeJsonAtomic(selectionFile,packet);
+    const requests=[];
+    const get=async path=>{
+      requests.push(path);
+      if(path.startsWith('/u/'))return {body:{user:{created_at:start}}};
+      const id=Number(path.split('/')[2].split('.')[0]);
+      assert.equal([7,8,10].includes(id),true);
+      if(path.includes('/posts.json')){
+        const ids=new URL(`https://example.org${path}`).searchParams.getAll('post_ids[]').map(Number);
+        return {body:{post_stream:{posts:ids.map(number=>({id:id*100+number%100,post_number:number%100,post_type:1,username:'alice',created_at:start,reply_to_post_number:null,hidden:false,raw:`Post ${number}`}))}}};
+      }
+      return {body:{id,title:`Thread ${id}`,slug:`thread-${id}`,created_at:start,post_stream:{stream:Array.from({length:id===10?20:1},(_,n)=>id*100+n+1)}}};
+    };
+    const options={stage:'fetch',selectionFile,store:h.store,root:h.root,settings,get,clock:()=>end,progress:()=>{},modelRun:()=>{throw Error('No models authorized');},server:()=>{throw Error('No server writes authorized');}};
+    const state=await runImport(options);
+    assert.deepEqual(state.topics.map(t=>[t.id,t.threadIds,t.posts,t.status]),[['group',[7,8],2,'fetched'],['thread-10',[10],11,'fetched']]);
+    assert.deepEqual(requests.filter(p=>p.includes('/posts.json')).map(p=>new URL(`https://example.org${p}`).searchParams.getAll('post_ids[]').map(Number)),[[701],[801],[1001,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020]]);
+    assert.equal(requests.filter(p=>p.startsWith('/u/')).length,1);
+    const snapshot=readJsonStrict(join(h.root,state.id,'thread-10','snapshot.json'));
+    assert.deepEqual(snapshot.threads[0].source_coverage,{policy:'opening-and-latest-10',omitted_forum_ids:[1002,1003,1004,1005,1006,1007,1008,1009,1010],available_posts:20,omitted_posts:9});
+    const preview=readJsonStrict(join(h.root,state.id,'preview.json'));
+    assert.deepEqual(preview.topics[1].source_coverage,[{thread:10,...snapshot.threads[0].source_coverage}]);
+    assert.equal(readJsonStrict(join(h.root,state.id,'audit.json')).totals.invocations,0);
+    assert.deepEqual(historicalAttempts(h.root,state.id),[]);
+    assert.equal(h.store.cutoff(),null);
+    const requestCount=requests.length;
+    assert.equal((await runImport(options)).id,state.id);
+    assert.equal(requests.length,requestCount);
+    packet.choices[1].history='full';writeJsonAtomic(selectionFile,packet);
+    await assert.rejects(runImport(options),{message:'Unfinished import download selection differs'});
+    state.status='complete';h.store.save(state);
+    assert.equal(h.store.cutoff(),null);
+    assert.deepEqual(h.store.db.prepare('SELECT topic FROM published ORDER BY topic').all().map(row=>row.topic),['deferred','group']);
+  }finally{h.close();}
+});
+
+test('download selection rejects corrupt, stale, excluded, unknown and truncated existing scopes before starting',async()=>{
+  const h=harness({reviews:true});
+  try{
+    const result=await runImport({stage:'discover',since:start,store:h.store,root:h.root,settings,clock:()=>end,progress:()=>{},get:async()=>({body:{topic_list:{more_topics_url:null,topics:[7].map(id=>({id,title:'Thread',slug:'thread',bumped_at:end,pinned:false,posts_count:2}))}}})});
+    const file=join(h.root,'selection.json'),packet={format:'zforum-download-selection-1',review:result.review,review_sha256:sha256(JSON.stringify(result.review)),choices:[{id:'thread-7',history:'full'}]};
+    const check=(value,message,config=settings)=>{writeJsonAtomic(file,value);assert.throws(()=>readDownloadSelection(file,h.store,config),{message});assert.equal(h.store.active(),null);};
+    check({...packet,review_sha256:'bad'},'Download selection discovery hash mismatch');
+    check({...packet,choices:[]},'Download selection requires distinct nonempty choices');
+    check({...packet,choices:[packet.choices[0],packet.choices[0]]},'Download selection requires distinct nonempty choices');
+    check({...packet,choices:[{id:'../escape',history:'full'}]},'Invalid selected topic ID ../escape');
+    check({...packet,choices:[{id:'thread-8',history:'full'}]},'Invalid selected discovery candidate thread-8');
+    check({...packet,choices:[{id:'thread-7',history:'tail'}]},'Unknown selected history tail');
+    check(packet,'Selected thread 7 is excluded',{...settings,excludedDiscoveryThreads:[7]});
+    h.store.recordThreadReviews([{id:7,decision:'exclude',classification:'frivolous',reason:'Only social'}]);
+    check(packet,'Selected thread 7 is excluded');
+    h.store.db.prepare('DELETE FROM import_thread_reviews').run();
+    h.store.register([{id:7}]);h.store.db.prepare('UPDATE import_topics SET snapshot=?').run(JSON.stringify({threads:[{id:7,posts:[]}]}));
+    check({...packet,choices:[{id:'thread-7',history:'opening-and-latest-10'}]},'Partial history requires a new single-thread topic: thread-7');
+    const prior=h.store.begin(start,end,settings);prior.status='complete';h.store.save(prior);
+    check(packet,'Published baseline or cutoff changed since discovery; repeat selection review');
+  }finally{h.close();}
+});
+
+test('selection CLI options have one unambiguous fetch scope',()=>{
+  assert.deepEqual(parseImportArgs(['fetch','--selection','scope.json','--db','draft.sqlite']),{stage:'fetch',since:undefined,db:'draft.sqlite',thread:undefined,maxCalls:0,selectionFile:'scope.json'});
+  for(const args of [['discover'],['analyze','--max-calls','1'],['fetch','--thread','7'],['fetch',start],['fetch','--review','review.json']])assert.throws(()=>parseImportArgs([...args,'--selection','scope.json']),{message:'--selection applies only to fetch and cannot combine with timestamp, --thread or --review'});
+});
 function mockPublication(h,packet,publish=()=>sha256('fixture-release')) {
   const state=h.store.active();
   assert.deepEqual(packet.topics.map(t=>t.id),state.topics.map(t=>t.id));
@@ -593,6 +670,31 @@ test("prepared optimized import stages without models, network, personal replace
     const other=structuredClone(bundle);other.source.state.id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     await assert.rejects(stagePreparedImport(other,production.store,root,server,()=>{}),{message:"Another production import is unfinished"});
   } finally {draft.close();production.close();}
+});
+
+test('selected partial sources survive preparation and atomic publication without falsely completing full coverage',async()=>{
+  const draft=harness({reviews:true}),production=harness({reviews:true}),m=miniOptions(draft,1,2);
+  const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY},modelRun:async args=>{
+    const result=await m.options.modelRun(args);if(result.output.task==='marks')result.output.posts.forEach(post=>{post.issue_ids=[];});return result;
+  }};
+  try{
+    const discovery=await runImport({...options,stage:'discover',since:start});
+    const selectionFile=join(draft.root,'selection.json');
+    writeJsonAtomic(selectionFile,{format:'zforum-download-selection-1',review:discovery.review,review_sha256:sha256(JSON.stringify(discovery.review)),choices:[{id:'thread-7',history:'opening-and-latest-10'}]});
+    await runImport({...options,selectionFile});
+    await runImport({...options,stage:'analyze',maxCalls:2});
+    const bundle=prepareImport(draft.store,draft.root);
+    const expanded=structuredClone(bundle);expanded.source.state.discovery.threads.push({id:99});
+    await assert.rejects(stagePreparedImport(expanded,production.store,production.root,()=>assert.fail('Invalid transfer server call'),()=>{}),{message:'Transfer discovery differs from selected threads'});
+    production.store.register([{id:99}]);
+    const state=await stagePreparedImport(bundle,production.store,production.root,async()=>'',()=>{});
+    assert.deepEqual(state.topics.map(t=>t.id),['thread-7']);
+    assert.deepEqual(state.selection,bundle.source.state.selection);
+    assert.deepEqual(production.store.previous('thread-7').threads[0].source_coverage,{policy:'opening-and-latest-10',omitted_forum_ids:[],available_posts:2,omitted_posts:0});
+    await runImport({...options,store:production.store,root:production.root,stage:'publish',get:()=>assert.fail('No publication fetch'),modelRun:()=>assert.fail('No publication model'),server:async(command,...args)=>mockPublication(production,readJsonStrict(args[1]))});
+    assert.equal(production.store.cutoff(),null);
+    assert.equal(production.store.active(),null);
+  }finally{draft.close();production.close();}
 });
 
 test("every hidden/deleted/removed combination and interrupted pull preserves published data until explicit publication",async()=>{

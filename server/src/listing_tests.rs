@@ -50,6 +50,8 @@ fn listing_states_the_cutoff_of_the_newest_completed_full_import() {
     assert_eq!(cutoff(),"2026-11-02T00:00:00.000Z");
     run("one-thread","2026-11-04T00:00:00.000Z","complete",json!({"scope_thread":7}));
     assert_eq!(cutoff(),"2026-11-02T00:00:00.000Z");
+    run("selected-topics","2026-11-07T00:00:00.000Z","complete",json!({"scope_thread":null,"selection":{"choices":[{"id":"one"}]}}));
+    assert_eq!(cutoff(),"2026-11-02T00:00:00.000Z");
     run("predates-scopes","2026-11-03T00:00:00.000Z","complete",json!({}));
     assert_eq!(cutoff(),"2026-11-03T00:00:00.000Z");
     run("newest","2026-11-05T12:34:56.789Z","complete",json!({"scope_thread":null}));

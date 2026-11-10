@@ -33,7 +33,7 @@ export class ImportStore {
     return row ? JSON.parse(row.data) : null;
   }
   cutoff() {
-    return this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL").get().cutoff;
+    return this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL AND json_extract(state,'$.selection') IS NULL").get().cutoff;
   }
   discoveryBaseline() {
     return this.db.prepare(`SELECT p.topic,p.release,
@@ -81,12 +81,13 @@ export class ImportStore {
     }
     throw new Error(`Published content for ${topic} changed since fetch; review the new release before publishing`);
   }
-  begin(since, until, settings, thread) {
+  begin(since, until, settings, thread, selection) {
     const requested = since === undefined ? null : importTimestamp(since);
     const end = importTimestamp(until);
     const active = this.active();
     if (active) {
       const state = active;
+      if(selection!==undefined&&!isDeepStrictEqual(state.selection,selection))throw new Error('Unfinished import download selection differs');
       if (!(state.scope_thread === null || Number.isSafeInteger(state.scope_thread))) throw new Error(`Unfinished import ${state.id} predates staged previews; explicit migration is required`);
       if (thread !== undefined && thread !== state.scope_thread) throw new Error(`Unfinished import scope is ${state.scope_thread}; cannot switch to thread ${thread}`);
       if (requested !== null && requested !== state.since) throw new Error(`Unfinished import starts at ${state.since}; run scripts/zforum import to resume it before changing the window`);
@@ -100,7 +101,7 @@ export class ImportStore {
     if (requested === null && last === null) throw new Error("First import requires a UTC timestamp: scripts/zforum import YYYY-MM-DDTHH:mm:ssZ");
     const start = requested ?? new Date(Date.parse(last) - 300000).toISOString();
     if (start >= end) throw new Error(`Import start ${start} must precede ${end}`);
-    const state = { id: randomUUID(), since: start, until: end, status: "running", scope_thread: thread ?? null, settings, discovery: null, topics: [], started_at: end, elapsed_ms: 0 };
+    const state = { id: randomUUID(), since: start, until: end, status: "running", scope_thread: thread ?? null, ...(selection===undefined?{}:{selection}), settings, discovery: null, topics: [], started_at: end, elapsed_ms: 0 };
     this.db.prepare("INSERT INTO import_runs VALUES(?,?,?,?,?)").run(state.id,start,end,state.status,JSON.stringify(state));
     return state;
   }

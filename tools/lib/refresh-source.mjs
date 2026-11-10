@@ -3,7 +3,8 @@ import { parsePost } from "./snapshot.mjs";
 import { accountProfile } from "./forum-client.mjs";
 import { sha256 } from "./jobs.mjs";
 import { assertLocalPreparation } from "./preparation-boundary.mjs";
-export async function fetchSnapshot({ get, previous, checkpoint, profile = username=>accountProfile(get,username), topic = TOPIC, clock = () => new Date().toISOString(), retainForumIds = false }) {
+import { selectedPostStream } from './source-coverage.mjs';
+export async function fetchSnapshot({ get, previous, checkpoint, profile = username=>accountProfile(get,username), topic = TOPIC, history, clock = () => new Date().toISOString(), retainForumIds = false }) {
   assertLocalPreparation();
   const threads = [], pulls = [];
   for (const id of topic.threadIds) {
@@ -17,8 +18,9 @@ export async function fetchSnapshot({ get, previous, checkpoint, profile = usern
     }
     const topic = result.body;
     if (topic.id !== id || typeof topic.title !== "string" || typeof topic.slug !== "string" || !Number.isFinite(Date.parse(topic.created_at)) || !Array.isArray(topic.post_stream?.stream)) throw new Error(`thread ${id}: malformed topic response`);
-    const stream = topic.post_stream.stream;
-    if (stream.length > 10000 || new Set(stream).size !== stream.length || stream.some((key) => !Number.isSafeInteger(key) || key <= 0)) throw new Error(`thread ${id}: invalid or oversized post-id stream (${stream.length})`);
+    const available = topic.post_stream.stream;
+    if (available.length > 10000 || new Set(available).size !== available.length || available.some((key) => !Number.isSafeInteger(key) || key <= 0)) throw new Error(`thread ${id}: invalid or oversized post-id stream (${available.length})`);
+    const {stream,coverage}=selectedPostStream(available,old,history,id);
     const records = new Map();
     // Re-fetch every batch, including older posts. Creation timestamps cannot detect edits.
     for (let offset = 0; offset < stream.length; offset += 20) {
@@ -38,7 +40,7 @@ export async function fetchSnapshot({ get, previous, checkpoint, profile = usern
       if (ids.some((key) => !records.has(key))) throw new Error(`thread ${id}: missing post in requested batch; retry the pull`);
       await checkpoint({ threads, pulls, cursor: { thread: id, fetched: records.size, total: stream.length } });
     }
-    const thread = { id, title: topic.title, slug: topic.slug, created_at: topic.created_at, posts: [...records.values()].filter((post) => post !== null).sort((a,b) => a.number-b.number) };
+    const thread = { id, title: topic.title, slug: topic.slug, created_at: topic.created_at, ...(coverage===undefined?{}:{source_coverage:coverage}), posts: [...records.values()].filter((post) => post !== null).sort((a,b) => a.number-b.number) };
     threads.push(thread); pulls.push({ thread: id, pulled_at: clock(), unavailable: null });
     await checkpoint({ threads, pulls });
   }

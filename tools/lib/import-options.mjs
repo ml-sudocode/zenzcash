@@ -9,7 +9,7 @@ export function parseImportArgs(args) {
   const flags = {};
   for (let i=0;i<values.length;i+=2) {
     const key=values[i],value=values[i+1];
-    if (!["--db","--thread","--max-calls","--review"].includes(key) || value === undefined || value.startsWith("--") || key in flags) throw new Error(`Invalid or repeated import option ${key}`);
+    if (!["--db","--thread","--max-calls","--review","--selection"].includes(key) || value === undefined || value.startsWith("--") || key in flags) throw new Error(`Invalid or repeated import option ${key}`);
     flags[key]=value;
   }
   if (stage === 'discover' && flags['--thread'] !== undefined) throw new Error('discover reviews the active window; --thread applies only to fetch');
@@ -24,6 +24,8 @@ export function parseImportArgs(args) {
   if (flags["--db"] === "") throw new Error("--db must name a database file");
   if(flags['--review']!==undefined&&stage!=='fetch')throw new Error('--review applies only to fetch');
   if(flags['--review']==='')throw new Error('--review must name a decision file');
+  if(flags['--selection']!==undefined&&(stage!=='fetch'||since!==undefined||flags['--thread']!==undefined||flags['--review']!==undefined))throw new Error('--selection applies only to fetch and cannot combine with timestamp, --thread or --review');
+  if(flags['--selection']==='')throw new Error('--selection must name an approved download selection');
   return {stage,since,db:flags["--db"],thread:flags["--thread"] === undefined ? undefined : positive("--thread"),
-    maxCalls:stage === "analyze" ? positive("--max-calls") : 0,...(flags['--review']===undefined?{}:{reviewFile:flags['--review']})};
+    maxCalls:stage === "analyze" ? positive("--max-calls") : 0,...(flags['--review']===undefined?{}:{reviewFile:flags['--review']}),...(flags['--selection']===undefined?{}:{selectionFile:flags['--selection']})};
 }

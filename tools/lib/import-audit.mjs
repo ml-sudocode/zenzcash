@@ -77,7 +77,7 @@ export function historicalAttempts(root,currentRun) {
   const rows=[];
   if(!existsSync(root))return rows;
   for(const directory of readdirSync(root,{withFileTypes:true})) {
-    if(!directory.isDirectory()||directory.name===currentRun||directory.name==='cache')continue;
+    if(!directory.isDirectory()||directory.name===currentRun||directory.name==='cache'||directory.name.startsWith('discovery-'))continue;
     const path=join(root,directory.name,'audit.json');
     if(existsSync(path))rows.push(...readJsonStrict(path).attempts);
     else {

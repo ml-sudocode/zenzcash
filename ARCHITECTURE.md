@@ -22,6 +22,15 @@ It uses a read-only local database copy and leaves the published cutoff unchange
 After approved sources are fetched, a second review approves analysis scope and
 spending. Neither review authorizes publication.
 
+Approved downloads use `fetch --selection FILE --db LOCAL_DRAFT`. The selection
+embeds the discovery packet and its hash, exact topic choices and history scope;
+the importer checks the published baseline and grouped membership before fetching.
+Selected runs do not advance the full-poll cutoff. Explicit opening-plus-recent
+histories record omitted forum IDs; subsequent pulls retain the chosen opening
+and range, add new replies, and recheck retained posts for edits/removals. Private
+previews and model inputs carry the coverage limitation. Discovery responses may
+include a forum-provided opening batch; only selected post bodies enter snapshots.
+
 1. **Summarize the discussion.** Models produce topic summaries with questions,
    competing views and citations. Long histories are summarized in sections,
    then combined into a topic summary.

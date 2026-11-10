@@ -28,8 +28,10 @@ import { cachedProfiles } from './lib/profile-cache.mjs';
 import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
 import { replyAnalysisSince } from './lib/reply-window.mjs';
 import { checkSummarySectionPolicy,expandedJobs } from './lib/summary-sections.mjs';
+import { readDownloadSelection,selectionTopics } from './lib/download-selection.mjs';
 
-export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, reviewNewThreads=true, reviewFile, clock = () => new Date().toISOString(), progress = console.log }) {
+export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, reviewNewThreads=true, reviewFile, selectionFile, clock = () => new Date().toISOString(), progress = console.log }) {
+  if(selectionFile!==undefined&&(stage!=='fetch'||since!==undefined||thread!==undefined||reviewFile!==undefined))throw new Error('--selection applies only to fetch and cannot combine with timestamp, --thread or --review');
   if (stage === 'discover') {
     if(thread!==undefined||reviewFile!==undefined||maxCalls!==0)throw new Error('discover accepts only a start timestamp and local database');
     return discoverPull({store,root,settings,get,since,clock,progress});
@@ -50,7 +52,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
   checkSummarySectionPolicy(settings.summarySectionPolicy);
   const excluded=settings.excludedDiscoveryThreads??[];
   if(!Array.isArray(excluded)||excluded.some(id=>!Number.isSafeInteger(id)||id<1)||new Set(excluded).size!==excluded.length)throw new Error(`Invalid excluded discovery threads: ${JSON.stringify(excluded)}`);
-  const state = store.begin(since,clock(),settings,thread);
+  const selection=selectionFile===undefined?undefined:readDownloadSelection(selectionFile,store,settings);
+  const state = store.begin(selection?.since??since,selection?.until??clock(),settings,thread,selection);
   const directory = join(root,state.id);
   mkdirSync(directory,{recursive:true,mode:0o700});
   const audit=importAudit(directory);
@@ -69,16 +72,18 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     if(stage!=='fetch'&&state.review?.status==='pending')throw new Error('New-thread review is pending; confirm the staged decisions with fetch --review FILE before analysis or publication');
     if (stage !== "fetch" && (state.discovery === null || state.topics.some(topic=>topic.status==="pending"))) throw new Error(`Fetch is incomplete; run scripts/zforum import fetch before ${stage}`);
     if (stage === "fetch" && state.discovery === null) {
-      state.discovery = state.scope_thread === null
+      state.discovery = state.selection!==undefined
+        ? {since:state.since,until:state.until,threads:state.selection.choices.flatMap(choice=>choice.thread_ids.map(id=>({id}))),passes:0}
+        : state.scope_thread === null
         ? await discoverImport({get,since:state.since,until:state.until,maxPages:settings.discoveryMaxPages,progress})
         : {since:state.since,until:state.until,threads:[{id:state.scope_thread}],passes:0};
-      if(reviewNewThreads&&state.scope_thread===null)for(const thread of store.reinstatedThreads())if(!state.discovery.threads.some(found=>found.id===thread.id))state.discovery.threads.push(thread);
+      if(reviewNewThreads&&state.scope_thread===null&&state.selection===undefined)for(const thread of store.reinstatedThreads())if(!state.discovery.threads.some(found=>found.id===thread.id))state.discovery.threads.push(thread);
       state.discovery.excluded_threads=state.discovery.threads.filter(t=>excluded.includes(t.id)).map(t=>t.id);
       state.discovery.threads=state.discovery.threads.filter(t=>!excluded.includes(t.id));
       save();
     }
     if(stage==='fetch'&&state.topics.length===0) {
-      if(reviewNewThreads) {
+      if(reviewNewThreads&&state.selection===undefined) {
         fetchSection='new_thread_review';
         if(state.review===undefined)state.review=await newThreadReview(state,store,get);
         if(state.review===null&&reviewFile!==undefined)throw new Error('No pending new-thread review matches this fetch');
@@ -95,7 +100,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         }
         state.discovery.threads=state.discovery.threads.filter(t=>store.threadReview(t.id)?.decision!=='exclude');
       }
-      state.topics = store.register(state.discovery.threads)
+      const registered=store.register(state.discovery.threads);
+      state.topics = (state.selection===undefined?registered:selectionTopics(registered,state.selection))
         .filter(topic=>state.scope_thread === null || topic.threadIds.includes(state.scope_thread))
         .map(topic=>({...topic,status:"pending",baseline_release:store.release(topic.id)}));
       save();
@@ -127,7 +133,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         snapshot = readJsonStrict(snapshotPath);
         if (snapshot.topic !== topic.id || snapshot.source_sha256 !== sha256(JSON.stringify(snapshot.threads))) throw new Error(`Frozen snapshot mismatch: ${topic.id}`);
       } else {
-        snapshot = await fetchSnapshot({get,profile,previous:before,topic,retainForumIds:true,clock,
+        snapshot = await fetchSnapshot({get,profile,previous:before,topic,history:state.selection?.choices.find(choice=>choice.id===topic.id).history,retainForumIds:true,clock,
           checkpoint: async value => { writeJsonAtomic(join(topicDirectory,"fetch-progress.json"),value); if (value.cursor) progress(`  ${topic.id}: ${value.cursor.fetched}/${value.cursor.total} source posts fetched`); },
         });
         snapshot.modelInputFormat=MODEL_INPUT_FORMAT;

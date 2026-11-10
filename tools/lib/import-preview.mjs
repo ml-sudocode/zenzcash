@@ -38,16 +38,17 @@ export function writeImportPreview(state, root, progress) {
     const attempts = existsSync(manifest) ? readJsonStrict(manifest).attempts : [];
     return { id:topic.id,status:topic.status,titles:snapshot.threads.map(thread=>thread.title),posts:topic.posts,visible:topic.visible,
       changes:topic.changes,changed_posts:posts,jobs,dated_replies:datedReplies(snapshot).size,
+      source_coverage:snapshot.threads.filter(thread=>thread.source_coverage!==undefined).map(thread=>({thread:thread.id,...thread.source_coverage})),
       candidate:checked === null ? null : {title:checked.data.topic.card.title,overview:checked.data.topic.overview,
         posts:checked.data.topic.threads.flatMap(thread=>thread.posts.filter(post=>!post.hidden).map(post=>({post:post.key,summary:post.analysis===null?null:post.analysis.summary,rendition:post.analysis===null?null:post.analysis.neutral_rendition,...(post.analysis_omitted===undefined?{}:{analysis_omitted:post.analysis_omitted})})))},
       attempts:attempts.map(({job,task,status,accepted,usage,elapsed_ms,timing,started_at,requested_posts,accepted_posts,partial_repair})=>({job,task,status,accepted,usage,elapsed_ms,timing,started_at,...(requested_posts===undefined?{}:{requested_posts,accepted_posts,partial_repair})})),
     };
   });
-  const report = { source_label:'untrusted_forum_content',instructions:REVIEW_INSTRUCTIONS,run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,new_threads:state.review?threadReviewPacket(state.review):null,
+  const report = { source_label:'untrusted_forum_content',instructions:REVIEW_INSTRUCTIONS,run:state.id,scope_thread:state.scope_thread,...(state.selection===undefined?{}:{selection:state.selection}),since:state.since,until:state.until,status:state.status,new_threads:state.review?threadReviewPacket(state.review):null,
     note:`Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. ${state.settings.summaryReusePolicy===undefined?'This frozen run generates a fresh full-discussion summary per topic.':'accepted-summary means an unchanged published summary is retained with its original provenance and no model call; changed topics get a fresh full-discussion summary.'} New/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted observations stay in the private draft. Only explicit publish changes public content and visibility.`,topics };
   writeReviewJson(join(directory,"preview.json"),report);
   const scan=scanReview(directory,importReviewInput(state,root));
-  const lines = [`Import preview ${state.id}`,`Scope: ${state.scope_thread === null ? "full update" : `thread ${state.scope_thread} (no full-coverage advancement)`}`,
+  const lines = [`Import preview ${state.id}`,`Scope: ${state.selection!==undefined?`${state.selection.choices.length} selected topics (no full-coverage advancement)`:state.scope_thread === null ? "full update" : `thread ${state.scope_thread} (no full-coverage advancement)`}`,
     `${state.since} → ${state.until}`,report.note,""];
   if(state.review?.status==='pending') {
     lines.push(`New-thread review pending: ${state.review.threads.length} short openings. No full histories or model analyses yet.`);
@@ -57,6 +58,7 @@ export function writeImportPreview(state, root, progress) {
   for (const topic of topics) {
     lines.push(`${topic.id} — ${topic.status}`);
     if (topic.status === "pending") continue;
+    for(const coverage of topic.source_coverage)lines.push(`  Partial history ${coverage.thread}: opening plus latest ten replies at first selection and subsequent replies; ${coverage.omitted_posts} currently available middle posts omitted. Summaries cover only supplied posts.`);
     lines.push(reviewJson(sourceReview(importSnapshot(directory,state.topics.find(item=>item.id===topic.id)).threads.map(thread=>({id:thread.id,title:thread.title})))),
       `  ${topic.posts} posts (${topic.visible} visible); +${topic.changes.added.length} new, ${topic.changes.changed.length} changed, ${topic.changes.unavailable.length} newly unavailable`,
       `  ${topic.dated_replies} dated posts: originals retained and included in the full summary; no individual model analysis`,

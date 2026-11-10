@@ -3752,3 +3752,18 @@ Implementation in progress; user verification remains pending.
   the full-poll cutoff. Work on a new local copy of the verified backup. Audit
   requests/timing, then present the D-146 analysis scope/cost review. No importer
   model calls, production changes, deployment or Git push are authorized here.
+- **F-192 — Selected downloads implemented and verified before the real fetch.**
+  `fetch --selection FILE` binds approved IDs/history scope to the discovery packet
+  and published baseline, preserves groups, and fetches only selected topics.
+  Opening-plus-latest-ten retains eleven distinct source positions in a long
+  thread, records the omitted middle IDs, and preserves that range plus subsequent
+  replies on later pulls. Hidden posts remain hidden. The forum's initial metadata
+  response may contain its own opening batch; omitted bodies do not enter snapshots.
+  Source coverage reaches private previews and structured model inputs; partial
+  summaries must disclose missing history. Selected scope survives artifact
+  transfer/publication and is excluded from full-cutoff calculation in both Node
+  and Rust. No database schema change. Historical analysis audit ignores separate
+  discovery-only audit directories. Tests include generated history lengths/growth,
+  grouped/partial selection, invalid/stale selections, resume, private publication
+  invariants and transfer. Full gate passed 238 Node and 61 Rust tests, builds and
+  Clippy (work/selected-download-gate.log). No real model calls or production writes.
