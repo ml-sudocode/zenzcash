@@ -352,6 +352,17 @@ It is an operator workflow requirement using the existing separate stages, not a
 that the CLI can authenticate user consent. Security acknowledgment/publication remain
 separate controls. Never manufacture either kind of approval.
 
+**Unexpected analysis spending (D-171).** Real CLI analysis requires a
+`spending-review.json` in the run directory, binding per-job/per-topic token ceilings
+and the total approved attempt allowance to the reviewed snapshot hashes. Default
+anomaly ceilings are twice each job's estimated upper input-plus-output tokens and
+150% of each topic's estimated upper total. Count cached input only as a subset of
+input. Token usage arrives after completion; held threads must make no further
+calls while other threads continue. Keep validated results and count in-flight calls
+against the total allowance. Ask the user before releasing a hold or raising limits;
+`releaseSpendingHold` records that reviewed decision and does not reset attempts.
+No automatic retry/resume may erase a hold. Report unknown usage explicitly.
+
 **Where things live.**
 - Technical overview: `ARCHITECTURE.md`. Decision ledger and progress: `WORKLOG.md`
   (append-only, `D-`/`F-`/`Q-`/`A-` ids, rationale included). Read the latest entries

@@ -29,6 +29,7 @@ import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
 import { replyAnalysisSince } from './lib/reply-window.mjs';
 import { checkSummarySectionPolicy,expandedJobs } from './lib/summary-sections.mjs';
 import { readDownloadSelection,selectionTopics } from './lib/download-selection.mjs';
+import { SPENDING_REVIEW } from './lib/spending-guard.mjs';
 
 export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, reviewNewThreads=true, reviewFile, selectionFile, clock = () => new Date().toISOString(), progress = console.log }) {
   if(selectionFile!==undefined&&(stage!=='fetch'||since!==undefined||thread!==undefined||reviewFile!==undefined))throw new Error('--selection applies only to fetch and cannot combine with timestamp, --thread or --review');
@@ -217,6 +218,7 @@ if (import.meta.main) {
   const store = new ImportStore(db,{readOnly:["preview","discover"].includes(options.stage)});
   try {
     const active=store.active();
+    if(options.stage==='analyze'&&(active===null||!existsSync(join(WORK_DIR,'imports',active.id,SPENDING_REVIEW))))throw new Error('Analysis requires a per-topic spending-review.json bound to the reviewed run');
     const settings=options.stage!=='fetch'&&active!==null?active.settings:{...readJsonStrict(join(REPO_ROOT,"tools/import-config.json")),prompts:{summary:promptText("summary"),marks:promptText("marks")}};
     await runImport({...options,store,root:join(WORK_DIR,"imports"),settings,get:forumClient(),server,modelRun:options=>runAgent({...options,subscriptionOnly:true})});
   } finally { store.close(); }

@@ -7,12 +7,15 @@ import { importAudit,estimateAnalysis,historicalAttempts,writeImportAudit } from
 import { assertLocalPreparation } from './preparation-boundary.mjs';
 import { datedReplies } from './reply-window.mjs';
 import { expandedJobs } from './summary-sections.mjs';
+import { inspectSpending,checkSpendingBeforeCall } from './spending-guard.mjs';
 
 export async function analyzeImportTopics({ state, root, maxCalls, modelRun, save, progress }) {
   assertLocalPreparation(root);
   if (!Number.isSafeInteger(maxCalls) || maxCalls < 1) throw new Error(`Analysis requires a positive global call limit, received ${maxCalls}`);
   let calls = 0;
+  let activeTopic=null;
   const run = async options => {
+    checkSpendingBeforeCall(state,root,activeTopic);
     if (calls >= maxCalls) throw Object.assign(new Error(`Global call limit ${maxCalls} reached; review preview then resume analyze with an explicit limit`),{notInvoked:true});
     calls++;
     return modelRun(options);
@@ -34,12 +37,23 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
   estimate();
   for (const topic of [...state.topics].sort((a,b)=>a.posts-b.posts || a.threadIds[0]-b.threadIds[0])) {
     if (["analyzed","published"].includes(topic.status)) continue;
+    activeTopic=topic.id;
+    const hold=inspectSpending(state,root)?.holds[topic.id];
+    if(hold){topic.status='held';topic.spending_hold=hold;save();progress(`Held ${topic.id}: ${hold.reason}. Continuing other topics.`);continue;}
+    delete topic.spending_hold;
     const snapshot = importSnapshot(join(root,state.id),topic);
     const candidate = join(root,state.id,topic.id,"candidate");
     const started = performance.now();
     const plans=expandedJobs(frozenJobs(snapshot,settings.prompts));
     progress(`Codex: ${topic.id}, ${topic.visible} visible posts; ${plans.filter(p=>p.reuse).length} retained replies and ${plans.filter(p=>p.summaryReuse).length} retained summaries (no model calls), ${plans.filter(p=>!p.summaryReuse&&p.job.task==='summary').length} fresh summary, ${plans.filter(p=>!p.reuse&&p.job.task==='marks').length} reply batches`);
-    topic.analysis = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run,progress,concurrency:settings.concurrency});
+    try {
+      topic.analysis = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run,progress,concurrency:settings.concurrency});
+    } catch(error) {
+      if(!error.spendingHold)throw error;
+      topic.status='held';topic.spending_hold=inspectSpending(state,root).holds[topic.id];save();
+      progress(`Held ${topic.id}: ${topic.spending_hold.reason}. Continuing other topics.`);continue;
+    }
+    inspectSpending(state,root);
     const checked = await audit.measure('analysis.validation',{topic:topic.id},()=>validateCandidate(candidate,snapshot,settings.prompts));
     topic.analysis_ms = performance.now()-started;
     audit.record('analysis.topic',{topic:topic.id,status:'complete',elapsed_ms:topic.analysis_ms});

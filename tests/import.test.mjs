@@ -26,6 +26,7 @@ import { acknowledgeReview,FINDINGS_FILE } from '../tools/lib/content-review.mjs
 import { importReviewInput } from '../tools/lib/import-review.mjs';
 import { readDownloadSelection } from '../tools/lib/download-selection.mjs';
 import { historicalAttempts } from '../tools/lib/import-audit.mjs';
+import { releaseSpendingHold } from '../tools/lib/spending-guard.mjs';
 
 function harness({reviews=false}={}) {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -402,6 +403,23 @@ function miniOptions(h, topicCount=1, postCount=1) {
   return {calls,requests,published,prompts,options:{store:h.store,root:h.root,reviewNewThreads:false,settings:{...settings,concurrency:3},get,modelRun,
     server:async(command,...args)=>command==="publish-import"?mockPublication(h,readJsonStrict(args[1]),data=>{published.push(data.topic.id);return sha256(`fixture-${data.topic.id}`);}):'',clock:()=>end,progress:()=>{}}};
 }
+
+test('anomalous topic pauses after retaining accepted output while another topic completes, then resumes only after review',async()=>{
+  const h=harness(),m=miniOptions(h,2);
+  try{
+    const state=await runImport({...m.options,since:start});
+    writeJsonAtomic(join(h.root,state.id,'spending-review.json'),{format:'zforum-spending-review-1',run:state.id,attempt_limit:5,topics:state.topics.map(t=>({id:t.id,snapshot_sha256:t.snapshot_sha256,max_tokens:100,jobs:[{name:`summary-${t.id}`,max_tokens:t.id==='thread-7'?14:100},{name:`marks-${t.threadIds[0]}-1-1`,max_tokens:100}]}))});
+    const held=await runImport({...m.options,stage:'analyze',maxCalls:5});
+    assert.deepEqual(held.topics.map(t=>[t.id,t.status]),[['thread-7','held'],['thread-8','analyzed']]);
+    assert.deepEqual(m.calls,['summary-thread-7','summary-thread-8','marks-8-1-1']);
+    assert.equal(readJsonStrict(join(h.root,state.id,'thread-7','candidate','summary-thread-7.json')).output.topic,'thread-7');
+    await runImport({...m.options,stage:'analyze',maxCalls:2});assert.equal(m.calls.length,3);
+    releaseSpendingHold(held,h.root,{topic:'thread-7',maxTokens:100,jobLimits:[],reason:'User reviewed the 15-token summary and approved continuation'});
+    const completed=await runImport({...m.options,stage:'analyze',maxCalls:2});
+    assert.deepEqual(completed.topics.map(t=>t.status),['analyzed','analyzed']);
+    assert.deepEqual(m.calls,['summary-thread-7','summary-thread-8','marks-8-1-1','marks-7-1-1']);
+  }finally{h.close();}
+});
 
 test("remote import transfers only artifacts, validates against production, and preserves account state",async()=>{
   const h=harness(),m=miniOptions(h,2),local=mkdtempSync(join(tmpdir(),"zforum-worker-"));

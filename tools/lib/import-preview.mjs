@@ -36,7 +36,7 @@ export function writeImportPreview(state, root, progress) {
     })));
     const manifest = join(candidate,"manifest.json");
     const attempts = existsSync(manifest) ? readJsonStrict(manifest).attempts : [];
-    return { id:topic.id,status:topic.status,titles:snapshot.threads.map(thread=>thread.title),posts:topic.posts,visible:topic.visible,
+    return { id:topic.id,status:topic.status,...(topic.spending_hold===undefined?{}:{spending_hold:topic.spending_hold}),titles:snapshot.threads.map(thread=>thread.title),posts:topic.posts,visible:topic.visible,
       changes:topic.changes,changed_posts:posts,jobs,dated_replies:datedReplies(snapshot).size,
       source_coverage:snapshot.threads.filter(thread=>thread.source_coverage!==undefined).map(thread=>({thread:thread.id,...thread.source_coverage})),
       candidate:checked === null ? null : {title:checked.data.topic.card.title,overview:checked.data.topic.overview,
@@ -58,6 +58,7 @@ export function writeImportPreview(state, root, progress) {
   for (const topic of topics) {
     lines.push(`${topic.id} — ${topic.status}`);
     if (topic.status === "pending") continue;
+    if(topic.spending_hold)lines.push(`  SPENDING HOLD: ${topic.spending_hold.reason}; awaiting the user's decision.`);
     for(const coverage of topic.source_coverage)lines.push(`  Partial history ${coverage.thread}: opening plus latest ten replies at first selection and subsequent replies; ${coverage.omitted_posts} currently available middle posts omitted. Summaries cover only supplied posts.`);
     lines.push(reviewJson(sourceReview(importSnapshot(directory,state.topics.find(item=>item.id===topic.id)).threads.map(thread=>({id:thread.id,title:thread.title})))),
       `  ${topic.posts} posts (${topic.visible} visible); +${topic.changes.added.length} new, ${topic.changes.changed.length} changed, ${topic.changes.unavailable.length} newly unavailable`,

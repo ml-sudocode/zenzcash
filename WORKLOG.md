@@ -3845,3 +3845,19 @@ Implementation in progress; user verification remains pending.
   Ask the user about held topics with measured usage and remaining work. Do not
   restart held work or increase its limits without approval. Keep monitoring the
   current process during setup; no costly anomaly has been observed so far.
+- **F-195 — Persistent spending holds implemented; current usage remains normal.**
+  CLI analysis now requires a snapshot-bound spending review. Checks count lifetime
+  attempts (including in-flight calls), test per-call/cumulative token ceilings,
+  persist holds under an exclusive file lock and continue other topics. Validated
+  outputs survive holds. A reviewed release records the acknowledged attempts and
+  revised ceilings without resetting the total attempt allowance; it refuses a
+  release while that topic has in-flight work. Preview includes hold reasons.
+  All 243 Node tests pass (work/spending-guard-node-gate.log), including pause/skip/
+  resume integration and no repeat of the paid accepted summary. Rust is unchanged.
+  Current legacy process started before these checks loaded: attach a read-only-
+  until-anomaly supervisor to its manifests, then adopt the guarded runner if a
+  pending topic triggers a hold. Count any interrupted in-flight attempt and report
+  unavailable metrics explicitly. Do not duplicate an existing active runner.
+  Initial spending review covers the exact 90 snapshots / 218 planned jobs.
+  At installation, 16 attempts had started and 282,544 completed input-plus-output
+  tokens were recorded; no holds. All work remains local, publication unapproved.

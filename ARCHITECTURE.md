@@ -22,6 +22,12 @@ It uses a read-only local database copy and leaves the published cutoff unchange
 After approved sources are fetched, a second review approves analysis scope and
 spending. Neither review authorizes publication.
 
+Analysis also checks a run-specific spending review before each model call. A token
+spike holds further work on that topic while other topics continue. The hold and
+total attempt count survive restarts; releasing a hold requires a recorded user
+decision. Usage is available after a call finishes, so already-running calls may
+complete before a hold takes effect.
+
 Approved downloads use `fetch --selection FILE --db LOCAL_DRAFT`. The selection
 embeds the discovery packet and its hash, exact topic choices and history scope;
 the importer checks the published baseline and grouped membership before fetching.
