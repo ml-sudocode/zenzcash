@@ -3681,3 +3681,14 @@ Implementation in progress; user verification remains pending.
   Existing general identity instructions and machine-path redactions are unchanged.
   GitHub has no prior checks for this PR head; inspect the first run after pushing.
   No application code change, deployment, analysis spending or PR comment.
+- **D-166 — Start the next pull with review before full-thread downloads.** User
+  confirms the revised workflow: discover active threads using minimal metadata,
+  present proposed selections, and wait before downloading histories. Implement and
+  test an explicit discovery-only import stage, then run it against a fresh local
+  copy of production. Read production only to obtain/verify that backup; do not use
+  the outdated default local database. Preserve published content and personal data.
+  Discovery may read paginated forum listings but must not fetch thread histories,
+  profiles or invoke models. Reuse prior exclusions and local metadata; uncertain
+  titles stay for review. Selection approval, D-146 analysis scope/attempt approval
+  and publication approval remain separate. No deployment or publication is authorized
+  by this request; stop with a concrete review and timing/request audit.
