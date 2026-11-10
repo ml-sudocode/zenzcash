@@ -3713,3 +3713,25 @@ Implementation in progress; user verification remains pending.
   2026-11-06T03:51:56.235Z, no unfinished import. Source SHA
   02a755555ef857bf64d613a7c935c81b1729b0bfa1e295770915aec414bc9ecf.
   Temporary remote copy removed only after checksum verification; no live DB mutation.
+- **F-191 — First discovery-only pull ready for download selection.** Security
+  review of 784bae7 found no new issue: fixed read-only SQL, listing-path allowlist,
+  local preparation guard and source-labelled/escaped private review output. Ran
+  discover against the verified Nov 9 local backup. Window
+  2026-11-06T03:46:56.235Z through 2026-11-10T03:25:08.908Z, including normal overlap.
+  Two identical discovery passes: 97 active threads over five pages each. **10 HTTP
+  requests, no retries, 9,184 ms elapsed, zero thread/profile downloads and zero
+  importer model calls/tokens.** Operator conversation/coding usage is not exposed
+  by this audit and is not claimed to be zero. Found 95 topic candidates after
+  grouping and the existing music-thread exclusion. Backup SHA remains unchanged;
+  no local import created, cutoff unchanged, live release IDs and cutoff match backup.
+  Packet/audit: work/imports/discovery-1bfb5e73-68c4-4b68-ab0e-04cd93e01c0a/.
+  Operator proposals: work/pull-20261109-recommendations.json and
+  work/pull-20261109-selection-review.txt. Recommend 86 candidates (31 existing,
+  55 new with 289 listed historical posts); separate approval for four substantive
+  new histories totaling 525 posts: 44220, 45359, 53533, 55210. Propose deferring
+  five lower-priority/mixed topics this pull: 8, 29765, 56891, 57228, 58858. These
+  are title/retained-metadata judgments, not new-text assessments or permanent
+  exclusions. All decision fields remain pending. Await explicit download selection;
+  then constrain fetching to that scope, followed by D-146 analysis review. Do not
+  run the legacy unscoped fetch or mark deferred work as completed coverage. No
+  deployment, Git push, production publication, analysis spending or model work.
