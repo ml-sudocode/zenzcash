@@ -4288,3 +4288,15 @@ Implementation in progress; user verification remains pending.
   check and discovery log share that prefix. Await user's download selection
   under D-166; analysis scope/cost review follows fetching. No model spending,
   publication, deployment or GitHub push. Diff reviewed: ledger only, no secrets.
+- **D-186 — Download the approved November 11 selection.** User explicitly
+  approves the inline 73-topic proposal from F-212: 40 existing topics (including
+  Veylor visibility reconciliation), 33 new topics and full histories for all
+  78 selected source threads. Bind the download packet to discovery review SHA
+  b71c9a671c9915e30841c1f4413bd53b627f50746941c487963e656d3cf7ae06 and preserve
+  the six-thread zcg group. Keep all proposed deferrals and existing exclusions;
+  do not expand the two unselected partial histories. Fetch into a separate local
+  draft made from the verified production snapshot. Validate sources, retained
+  work and personal/public baseline preservation, then present the per-topic
+  analysis scope and estimated attempts/tokens/time inline for review. Retain
+  the current six-month individual-analysis policy for new topics. Download
+  approval does not authorize model spending, publication or deployment.
