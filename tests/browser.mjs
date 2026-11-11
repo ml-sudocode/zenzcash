@@ -431,6 +431,8 @@ try {
   await click("3 days");
   assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
   assert.deepEqual(await evaluate("[...document.querySelector('[aria-label=\"Actions for selected posts\"]').children].map(b=>b.textContent)"),['Listen to selected posts','Export selected posts','Copy prompt + selected posts','Copy post links only']);
+  // Check the single-row layout on a wide desktop; system font widths vary by host.
+  await send("Emulation.setDeviceMetricsOverride",{width:1920,height:900,deviceScaleFactor:1,mobile:false});
   await evaluate("document.querySelector('#selection-workflows').scrollIntoView(); window.scrollBy(0,-document.querySelector('.site-header').getBoundingClientRect().height-16)");
   assert.equal(await evaluate("new Set([...document.querySelector('[aria-label=\"Actions for selected posts\"]').children].map(b=>b.getBoundingClientRect().top)).size"),1);
   await capture('zenzcash-actions-desktop.png');

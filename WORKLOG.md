@@ -4246,3 +4246,14 @@ Implementation in progress; user verification remains pending.
   and rerun the browser and passkey suites. This changes test conditions only;
   application layout remains responsive. Outline discovery/selection, scoped
   downloads, analysis spending review, preview and reviewed publication next.
+- **F-211 — Wider action-row check passes; browser readiness restored.** Set the
+  action-row test viewport to 1920x900 immediately before its existing single-row
+  assertion. The rest of the suite retains 1280-pixel desktop and 390-pixel mobile
+  coverage. Full browser/cache/export checks and the separate passkey suite now
+  pass; inspected the desktop screenshot and confirmed all four actions fit.
+  Logs: work/readiness-20261111-browser-wide.log and passkeys-wide.log. Earlier
+  unchanged Rust/Node/build/Clippy/runtime checks passed in F-209; did not repeat
+  those for this two-line test-only change. Reviewed diff: test viewport only, no
+  application/security behavior changes. Next operational step is forum discovery
+  using the verified fresh snapshot, followed by the required download selection
+  and analysis spending reviews. No new forum/model calls or deployment.
