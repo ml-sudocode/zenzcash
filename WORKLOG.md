@@ -4192,3 +4192,31 @@ Implementation in progress; user verification remains pending.
   unavailable. Set fly.toml initial_size to 10gb for future provisioning; Fly
   configuration validation passes. Reviewed this configuration-only diff: no
   credential, authorization or application security changes. No code deployment.
+- **F-209 — Migrated data/access verified; deployment browser gate has one failure.**
+  Read ~/handoff.md and migration checksum evidence. Both retained databases pass
+  integrity/foreign-key checks, all 90 latest-run snapshots/candidates validate,
+  and the prepared bundle SHA still matches F-202. GitHub read access, Fly app/SSH,
+  issuance and use of a fresh five-minute app-scoped deploy credential, and a
+  signed HEAD request to the latest Tigris backup object succeed. Secret values
+  were not logged. Active Codex subscription format passes; access token expires
+  November 21 and a refresh token is present. Bubblewrap starts Codex 0.167.1;
+  no model request was used to test service access.
+  Obtained a consistent fresh production snapshot at
+  work/readiness-20261111-production.sqlite (mode 600); local/remote SHA matches
+  8c985d4b2a3001e42b79999c23ef81a54dcf46191c47307add03db2a0dc8b0b5.
+  Integrity/foreign keys pass: schema 11, 181 topics, 12,779 posts, six accounts.
+  Every published topic/release pair matches the current HTTPS catalog. Removed
+  only the verified temporary remote snapshot after transfer. Full-poll cutoff
+  remains November 6; use this fresh snapshot for the next local discovery.
+  Installed official Google Chrome 157.0.8103.50 and rebuilt local test binaries.
+  Deployment gate passed builds, Clippy, 61 Rust and 243 Node tests, runtime smoke
+  and cached-deployment checks, then failed tests/browser.mjs:435: selected-post
+  action buttons have two distinct row positions at desktop width instead of one.
+  No assertion or application code changed; root cause has not been established.
+  Independent passkey browser checks pass, including enrollment, returning login,
+  recovery and revocation. Deployment is not gate-ready until the layout failure
+  is resolved. Data/credential readiness permits beginning discovery and its user
+  selection review. No new forum requests, model spending, content publication,
+  code deployment or GitHub push. Evidence: work/readiness-20261111-verification.json,
+  live-catalog.json, deploy-gate.log, passkeys.log and chrome-install.log under the
+  same prefix. Documentation/config diffs reviewed; no security issues found.
