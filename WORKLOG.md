@@ -4263,3 +4263,28 @@ Implementation in progress; user verification remains pending.
   run the listing-only discover stage and recommend exact topic/history choices.
   Preserve the database and cutoff; wait for download selection before fetching
   histories and for a separate analysis spending review before model jobs.
+- **F-212 — November 11 discovery ready for exact download selection.** Rechecked
+  the verified snapshot against all 181 live topic/release pairs and the cutoff;
+  no active local import. Discovery window is 2026-11-06T03:46:56.235Z through
+  2026-11-11T17:12:06.936Z. Two matching passes found 145 active forum threads:
+  12 listing HTTP requests, no retries/429s, 11,239 ms, no histories/profiles or
+  importer model calls. Grouping/exclusion yields 142 topic candidates and the
+  existing music-thread exclusion (20456). Local snapshot SHA remains F-209's
+  exact value; no import registration, cutoff advance or production mutation.
+  Recommend 73 topics / 78 source threads: 39 existing topics with newer listed
+  activity, Veylor (59040) to reconcile its listed count falling from four to
+  three, and 33 new topics totaling 162 listed posts. Use full histories for
+  this selection and retain all six members of the existing zcg group. Defer
+  62 topics without newer listed activity, including the unchanged partial
+  Avalanche/Zingo-PC coverage. Defer seven lower-priority candidates: prior
+  deferrals 8, 29765, 56891, 57228, 58858, plus daily-radbro 58709 and NFT-related
+  59199. These are proposals for this pull, not permanent exclusions. Zkool's
+  144-listed/143-published mismatch also existed in the previous discovery and
+  has no newer bump; no inferred new reply. Unbumped edits remain unknown.
+  Packet/audit: work/imports/discovery-3b35dc1c-02db-48eb-a6cf-26ac1a1a6070/;
+  parsed review SHA b71c9a671c9915e30841c1f4413bd53b627f50746941c487963e656d3cf7ae06.
+  Exact IDs, priorities, reasons, URLs and proposed coverage are in
+  work/pull-20261111-recommendations.json and selection-review.txt; the baseline
+  check and discovery log share that prefix. Await user's download selection
+  under D-166; analysis scope/cost review follows fetching. No model spending,
+  publication, deployment or GitHub push. Diff reviewed: ledger only, no secrets.
