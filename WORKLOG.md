@@ -4161,3 +4161,13 @@ Implementation in progress; user verification remains pending.
   selection/spending/security approval gates and deployment/publication workflow.
   Evidence is in ~/migration-20261110 on sandlab. No production mutation, new forum
   requests, model calls or GitHub push. Migration is ready for user verification.
+
+- **D-181 — Check migrated pull and deployment readiness.** User asks to read the
+  home-directory handoff and verify the data and credentials needed for a new
+  forum pull and production update. Inspect retained artifacts, local tooling,
+  subscription credential format/expiry, GitHub/Fly access, production health and
+  backup access. Obtain a fresh consistent local production snapshot if space
+  permits; temporary backup preparation does not publish or alter live content.
+  A short-lived app deployment credential may be tested without deploying code.
+  Do not make analysis calls or reuse the previous run's publication approval.
+  Report missing prerequisites and preserve the selection/spending/review gates.
