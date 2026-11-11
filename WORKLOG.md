@@ -4135,3 +4135,29 @@ Implementation in progress; user verification remains pending.
   Explain pull selection, analysis spending reviews, deployment/publication gates,
   credential locations and latest live state. Migration authorizes no new analysis,
   publication or production deployment.
+
+- **F-207 — Development workspace copied and verified on sandlab.** Migrated the
+  full checkout and private work tree to /home/sandsharks/zforum, plus zforum-fixes,
+  security-audit-zforum-20261105 and additional audit records under
+  ~/migration-20261110/source-audit. Main transfer: 134,637 regular files,
+  19,269,191,257 logical bytes including hardlinks; additional audit: 378 files,
+  3,921,321 bytes. Full rsync checksum comparison found no file-content differences
+  (only the top-level directory timestamp differed). Local originals retained.
+  Transferred Fly configuration, source Codex auth/config backup and repository SSH
+  key privately; retained existing destination Codex login and SSH authorized_keys.
+  Fly authentication/app status and read-only GitHub access succeed from sandlab.
+  Private credentials and ~/handoff.md are mode 600 under private directories.
+  Archived source ARM target trees in ~/migration-20261110/source-builds and rebuilt
+  both Rust release binaries for x86_64. Runtime smoke passed HTTP/health, HTTPS
+  passkey challenge, private paths, durable restart and missing-verifier rejection.
+  Current analysis DB and full publication rehearsal pass integrity/foreign-key
+  checks: schema 11, six accounts; rehearsal has 181 topics and 12,779 posts.
+  Existing destination subscription credential format passes the import check;
+  isolated bubblewrap Codex --version succeeds without model requests. Installed
+  build prerequisites, bubblewrap, Chromium and matching Fly CLI v0.5.6. Full
+  browser/deployment gate was not run; tests expect google-chrome-stable, which
+  still needs installing before that gate. Home handoff documents this, data
+  provenance, historical absolute paths, credential locations, fresh-backup pulls,
+  selection/spending/security approval gates and deployment/publication workflow.
+  Evidence is in ~/migration-20261110 on sandlab. No production mutation, new forum
+  requests, model calls or GitHub push. Migration is ready for user verification.
