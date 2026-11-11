@@ -4220,3 +4220,22 @@ Implementation in progress; user verification remains pending.
   code deployment or GitHub push. Evidence: work/readiness-20261111-verification.json,
   live-catalog.json, deploy-gate.log, passkeys.log and chrome-install.log under the
   same prefix. Documentation/config diffs reviewed; no security issues found.
+- **F-210 — Browser failure measured as font-dependent action wrapping.** User
+  asks whether the old VM's display changed the browser width. The November 10
+  deployment log at work/release-20261110-checks.log:1591 records the full browser
+  suite passing. The unchanged test uses headless Chrome and explicitly emulates
+  1280x900 on both environments; migration had not run this full suite.
+  Paused the unmodified test immediately before the failing assertion using the
+  Node debugger and inspected Chrome through a separate CDP connection. Actual
+  innerWidth/innerHeight are 1280/900 with DPR 1; the action container is 819 CSS
+  pixels wide. Chrome reports DejaVu Sans for the first button. Four buttons plus
+  three 8-pixel gaps need 861.25 pixels; the last button wraps. Screenshot inspected.
+  Changing only button font-family to Arial in this disposable page reduces the
+  required width to about 760.27 pixels and produces one row at the same viewport.
+  Increasing viewport width to 1920 instead gives an 874-pixel container and one
+  row with the original font. Restoring font and viewport reproduces the original
+  two rows and the unchanged assertion fails again. These experiments establish
+  font/available-width sensitivity; the old VM's exact rendered font is unrecorded.
+  No application/test changes or production action. Evidence: ignored operational
+  probe work/readiness-layout-probe.mjs and work/readiness-20261111-layout.json,
+  layout.png and layout-probe.log. Documentation diff reviewed; no secrets added.
