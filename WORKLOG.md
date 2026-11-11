@@ -4257,3 +4257,9 @@ Implementation in progress; user verification remains pending.
   application/security behavior changes. Next operational step is forum discovery
   using the verified fresh snapshot, followed by the required download selection
   and analysis spending reviews. No new forum/model calls or deployment.
+- **D-185 — Begin the next forum discovery and selection review.** User says
+  “please proceed” after the readiness checks and proposed staged pull workflow.
+  Verify the fresh local snapshot still matches the live published catalog, then
+  run the listing-only discover stage and recommend exact topic/history choices.
+  Preserve the database and cutoff; wait for download selection before fetching
+  histories and for a separate analysis spending review before model jobs.
