@@ -4121,3 +4121,17 @@ Implementation in progress; user verification remains pending.
   both launch and return the expected errors for missing/invalid input. This is a
   binary startup check, not an end-to-end browser/passkey test. Both current release
   trees and all forum data, backups and audit artifacts remain. No deployment.
+
+- **D-180 — Migrate the development workspace to sandlab.** User explicitly
+  authorizes SSH to sandsharks@sandlab.zenzcash.com and uploading all development
+  data, uncommitted pull/deployment artifacts and credentials, including Fly.io.
+  Copy the complete checkout and private work tree to ~/zforum, retain local copies,
+  and preserve the existing destination ~/zenzcash checkout. Include related older
+  development/audit directories and private credential files; preserve destination
+  login/SSH settings when already configured. Verify transfer contents. Source is
+  aarch64 and destination x86_64: copied native build outputs require rebuilding.
+  The user specifically requests ~/handoff.md for the destination Codex agent;
+  this is an explicit exception to the usual prohibition on separate handoff files.
+  Explain pull selection, analysis spending reviews, deployment/publication gates,
+  credential locations and latest live state. Migration authorizes no new analysis,
+  publication or production deployment.
