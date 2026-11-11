@@ -4171,3 +4171,10 @@ Implementation in progress; user verification remains pending.
   A short-lived app deployment credential may be tested without deploying code.
   Do not make analysis calls or reuse the previous run's publication approval.
   Report missing prerequisites and preserve the selection/spending/review gates.
+- **D-182 — Increase production storage headroom.** User requests increasing the
+  volume after the readiness check reports only 951 MiB free. Expand the existing
+  encrypted zforum_data volume vol_vp2eyql6gdqxgjj4 in sjc from 3 GB to 10 GB,
+  retaining its attachment to Machine e823213f175598 and its contents. Verify
+  filesystem capacity and public health afterward. Latest successful scheduled
+  offsite backup completed 2026-11-11T15:22:56.753Z with 181 topics, 12,779 posts
+  and six accounts. This storage change does not authorize content publication.
