@@ -4357,3 +4357,54 @@ Implementation in progress; user verification remains pending.
   152,133 tokens and release its hold. No additional model work for this topic,
   new scope, per-job ceiling changes or increase to the 186 total attempt cap.
   Other approved topics continue. Record this bounded decision before release.
+- **F-215 — All 73 approved topics analyzed and validated.** D-187 run
+  574a635a-8c68-4952-a67d-7f58a0ecda28 completed analysis in 11,346,742 ms
+  (189.1 minutes). All 155 planned jobs accepted using 159 attempts, within the
+  186 allowance; four rejected outputs were corrected, with no process failures,
+  incomplete calls or unknown usage. Measured 3,564,432 input tokens (including
+  1,823,104 cached input) and 573,950 output tokens: 4,138,382 total. Retries fixed
+  an oversized claims array (58488), card byline (58583), non-verbatim evidence
+  (59133) and overview paragraph (43855). Seven valid post assessments from the
+  partially rejected batch were retained; only its invalid post was retried.
+  D-188 released the sole modest topic overrun; no active spending holds remain.
+  Both requested brief updates are complete: guidelines 44284 used two calls /
+  39,579 tokens; Zillions 58532 used two calls / 30,503 tokens. Reused 1,493
+  accepted assessments; retained 293 dated originals without new individual
+  analysis. All 73 candidate validations pass and no model jobs remain.
+  Spot checks against supplied sources found no correction needed in sampled
+  Ledger, mock-lightwalletd, road-trip and WSJ-advertisement summaries; claims
+  remain attributed and proposals distinguished from completed work. This does
+  not establish correctness of every interpretation. All 25 protected draft
+  tables still match the baseline; integrity/foreign keys pass, with 181 published
+  topics, 12,779 current posts and six accounts unchanged. Evidence: run audit,
+  analysis log and work/pull-20261111-analysis-verification.json.
+- **F-216 — Prepared bundle and staging rehearsal pass; human review pending.**
+  Prepared work/pull-20261111-prepared.json (78,667,159 bytes), SHA
+  611622ddd33e4e684d044adb839ef9dcf378eaa2961821b5fb8db7e28735ee0b.
+  Rehearsed all 73 candidates using the real staging workflow and a consistent
+  isolated baseline copy at work/rehearsals/pull-20261111-HDuq0O/zforum.sqlite,
+  under the production 512 MiB Node heap limit; peak RSS 832,948 KiB. All fourteen
+  personal tables, five public tables and full-poll cutoff remain unchanged by
+  staging. Expected publication: 214 topics, comprising 33 new, 40 refreshed and
+  141 retained. Production HTTPS health and all 181 release pairs were rechecked
+  at 20:26Z and still match the preparation baseline; no unavailable topics.
+  Final candidate digest
+  f404d15ad338d8d1345516d3d6101c36adcb2483606328d0085878d4ea11aa7a
+  has 12 scan matches across two existing posts: four copies of public wallet-
+  recovery advice mentioning private keys (46044/234), and eight copies of a
+  U+200D emoji joiner in original/retained quoted text (58656/169). Reviewed these
+  as data; no malicious operator instruction identified in the matched excerpts.
+  Source and staged findings are identical. Staged report digest is
+  655c0c82a3265699358f8affaa8b9c192af59cb4cadc8d61319612d0e53f67cd.
+  Verified publication refuses the candidate without exact-report human
+  acknowledgment; no acknowledgment was manufactured. The same gate prevents
+  publication into the local application-preview database. No rendered staged
+  preview is claimed. Present these findings inline and request delegated human
+  acknowledgment plus production publication approval for this exact bundle.
+  Evidence: work/pull-20261111-rehearsal.json, publication-review.json and
+  live-verification.json. No production staging/publication, code deployment or
+  GitHub push. Operational preparation initially caught a missing await in its
+  checksum assertion; corrected both checksum uses before any staging and reran
+  successfully. Ledger/operational-script review found no secrets or application
+  security changes. Existing successful deployment checks remain applicable;
+  no runtime code changed during this pull.
