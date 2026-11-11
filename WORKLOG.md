@@ -4348,3 +4348,12 @@ Implementation in progress; user verification remains pending.
   D-173 for modest overruns. Validate completed candidates and prepare the actual
   application/publication preview. Production publication and deployment still
   require their separate review/approval. Record approval before any model job.
+- **D-188 — Accept the completed minutes topic's modest retry overrun.** During
+  D-187 analysis, thread-58488's opening-post assessment returned 61 claims where
+  the schema permits at most 50. Its correction passed; the summary and other
+  replies remained accepted. All jobs for this topic are complete. Four attempts
+  used 152,133 tokens, 6.8% above the 142,479 topic review ceiling. Apply standing
+  D-173 flexibility to raise this completed topic's ceiling only to its measured
+  152,133 tokens and release its hold. No additional model work for this topic,
+  new scope, per-job ceiling changes or increase to the 186 total attempt cap.
+  Other approved topics continue. Record this bounded decision before release.
