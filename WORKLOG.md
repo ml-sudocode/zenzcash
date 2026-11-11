@@ -4300,3 +4300,37 @@ Implementation in progress; user verification remains pending.
   analysis scope and estimated attempts/tokens/time inline for review. Retain
   the current six-month individual-analysis policy for new topics. Download
   approval does not authorize model spending, publication or deployment.
+- **F-213 — Approved downloads completed and validated.** Run
+  574a635a-8c68-4952-a67d-7f58a0ecda28 fetched all 73 approved topics / 78 source
+  threads into work/pull-20261111-draft.sqlite. Fetch took 669,456 ms with 236
+  thread requests and 406 public-profile requests, zero retries/429s and zero
+  importer model calls. Retained 2,027 source records (2,018 visible), including
+  242 additions: 158 in the discovery window and 84 historical backfill. Four
+  source records changed and two became unavailable (Veylor 59040/3 and Town
+  Square 59049/11). Requests stayed within selected source threads. Database
+  integrity/foreign keys pass; original snapshot SHA matches F-209. Public and
+  personal tables in the draft exactly match the baseline, including 181 topics,
+  12,779 published posts and six accounts. Full-poll cutoff remains November 6.
+  Evidence: run report/audit/snapshots and
+  work/pull-20261111-fetch-verification.json. No publication or deployment.
+- **F-214 — Analysis proposal ready; spending approval pending.** Recommend 71
+  downloaded topics (38 existing, 33 new), deferring guidelines 44284 and Zillions
+  58532 because their only added replies are brief praise. This proposal has not
+  changed the 73-topic fetched run. Proposed gpt-6.1-sol subscription analysis:
+  71 fresh summaries and 80 reply batches covering 230 posts, 151 planned calls,
+  with a proposed total allowance of 182 attempts across retries/resumes. Reuse
+  1,434 accepted post assessments; retain 293 dated originals as summary context.
+  Scope includes 156 in-window additions, 84 historical additions, four changed
+  records and two unavailable posts. All request sizes are known: 5,788,683 total
+  prompt characters; no section jobs currently planned. Estimates use 614 prior
+  measured samples, comparable task/prompt sizes and reply counts, not character
+  conversion: 2,696,712–4,127,455 input and 404,441–786,802 output tokens before
+  retries; 181–342 minutes with two reply workers and sequential topics. Ranges
+  are uncertain; subscription dollar costs/quota remaining are unavailable.
+  The largest summary prompt is the retained six-thread zcg group. Per-topic
+  requests, retained work, priorities, reasons and empirical estimates are in
+  work/pull-20261111-analysis-review.json and .txt; sample and planning evidence
+  share that prefix. Present the proposal inline under D-146. No spending review
+  authorization has been created and no model job has run. Publication security
+  acknowledgment and production approval remain separate. Ledger diff reviewed:
+  no secrets or application/security changes.
