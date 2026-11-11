@@ -4334,3 +4334,17 @@ Implementation in progress; user verification remains pending.
   authorization has been created and no model job has run. Publication security
   acknowledgment and production approval remain separate. Ledger diff reviewed:
   no secrets or application/security changes.
+- **D-187 — Analyze all 73 downloaded topics.** After the inline spending review
+  and explanation of attempts/retries/omissions, user requests including the two
+  brief congratulatory updates and says "agreed on the rest, go ahead". Include
+  guidelines 44284 and Zillions 58532 alongside the proposed 71 topics; retain
+  every other agreed deferral, exclusion and dated-post policy. This adds four
+  planned calls to the reviewed plan: 73 summaries plus 82 reply batches for
+  232 posts, 155 calls total. Authorize 186 total attempts across all resumes,
+  preserving the proposed 31-call contingency. Use the reviewed gpt-6.1-sol
+  subscription model and concurrency two; bind per-job ceilings at twice each
+  estimated upper token total and per-topic ceilings at 150% of upper totals
+  to all 73 frozen snapshot hashes. Preserve valid results on failures and follow
+  D-173 for modest overruns. Validate completed candidates and prepare the actual
+  application/publication preview. Production publication and deployment still
+  require their separate review/approval. Record approval before any model job.
