@@ -4161,3 +4161,13 @@ Implementation in progress; user verification remains pending.
   selection/spending/security approval gates and deployment/publication workflow.
   Evidence is in ~/migration-20261110 on sandlab. No production mutation, new forum
   requests, model calls or GitHub push. Migration is ready for user verification.
+
+- **D-181 — Push the complete current repository to GitHub.** Following the
+  migration, user explicitly requests that the Zforum repository be fully pushed.
+  Publish all current main commits with a normal fast-forward push; retain the
+  intentionally local-only identity backup branch under D-163's privacy decision.
+  Existing research-prototype-final tag already matches GitHub. Worktree is clean;
+  main is 30 commits ahead and zero behind after fetching origin. Diff whitespace
+  and common credential-pattern checks pass. Private ignored development data and
+  credentials remain on the migrated server. Synchronize the server checkout with
+  the published main afterward; no production deployment is requested.
