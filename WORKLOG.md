@@ -4184,3 +4184,11 @@ Implementation in progress; user verification remains pending.
   preparation within D-181: rebuild disposable native test outputs as needed,
   preserve migrated data and retain validation logs. No code deployment or new
   model analysis is part of this check.
+- **F-208 — Production volume expanded and health verified.** Fly successfully
+  extended vol_vp2eyql6gdqxgjj4 to 10 GB without restarting the Machine. The
+  mounted filesystem reports 9.8 GiB total, 1.8 GiB used and 7.6 GiB available
+  (20% use). Machine version/image and attachment are unchanged; Fly health and
+  public HTTPS health pass, and the catalog still has 181 topics with none
+  unavailable. Set fly.toml initial_size to 10gb for future provisioning; Fly
+  configuration validation passes. Reviewed this configuration-only diff: no
+  credential, authorization or application security changes. No code deployment.

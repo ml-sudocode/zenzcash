@@ -18,7 +18,7 @@ kill_timeout = "30s"
 [[mounts]]
   source = "zforum_data"
   destination = "/data"
-  initial_size = "3gb"
+  initial_size = "10gb"
   snapshot_retention = 14
 
 [http_service]
