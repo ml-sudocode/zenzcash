@@ -4178,3 +4178,9 @@ Implementation in progress; user verification remains pending.
   filesystem capacity and public health afterward. Latest successful scheduled
   offsite backup completed 2026-11-11T15:22:56.753Z with 181 topics, 12,779 posts
   and six accounts. This storage change does not authorize content publication.
+- **D-183 — Finish local readiness prerequisites.** Resolve the missing Google
+  Chrome executable identified in the handoff using Google's official Linux
+  package, then run the existing complete deployment gate locally. This is
+  preparation within D-181: rebuild disposable native test outputs as needed,
+  preserve migrated data and retain validation logs. No code deployment or new
+  model analysis is part of this check.
