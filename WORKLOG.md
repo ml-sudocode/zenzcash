@@ -4239,3 +4239,10 @@ Implementation in progress; user verification remains pending.
   No application/test changes or production action. Evidence: ignored operational
   probe work/readiness-layout-probe.mjs and work/readiness-20261111-layout.json,
   layout.png and layout-probe.log. Documentation diff reviewed; no secrets added.
+- **D-184 — Use a wider viewport for the desktop action-row test.** User explicitly
+  requests widening the browser test viewport after F-210's measurements and asks
+  for the next forum-pull/deployment steps. Use 1920 pixels for the single-row
+  action-button check, retain its exact assertion and existing 1280/mobile coverage,
+  and rerun the browser and passkey suites. This changes test conditions only;
+  application layout remains responsive. Outline discovery/selection, scoped
+  downloads, analysis spending review, preview and reviewed publication next.
