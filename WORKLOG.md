@@ -4460,3 +4460,9 @@ Implementation in progress; user verification remains pending.
   rerun blindly after a failure: inspect its durable output and live import state.
   Retrieve results/backup evidence, verify live APIs/browser and unchanged Machine,
   then run/verify an offsite backup. No additional model work is needed.
+- **D-191 — Resume the approved publication.** User says "Ok continue", ending
+  D-190's pause. Continue D-189 from the verified uploaded files and successful
+  local publication rehearsal. Recheck access/file hashes, run the bounded
+  production publisher under the import lock as zforum, and complete live and
+  backup verification. The exact bundle and delegated acknowledgment approval
+  remain unchanged; no additional confirmation or model work is required.
