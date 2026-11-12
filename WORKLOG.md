@@ -4466,3 +4466,24 @@ Implementation in progress; user verification remains pending.
   production publisher under the import lock as zforum, and complete live and
   backup verification. The exact bundle and delegated acknowledgment approval
   remain unchanged; no additional confirmation or model work is required.
+- **F-218 — Approved content is live and its offsite restore verifies.** Publication
+  completed at 2026-11-12T01:18:44.529Z with 214 topics and 13,019 current posts.
+  All release IDs match the local rehearsal; 141 unselected topics, all fourteen
+  personal tables (six accounts), and prior history are preserved. Live APIs,
+  authentication availability and Chrome rendering pass. The running image was
+  unchanged. Fresh rollback snapshot matches the verified original production
+  copy. Offsite archive zforum/2026-11-12T01-19-16.394Z-d8b3bcd1-cbb5-4ecc-a9f3-fd60e60eba34.tar.gz
+  uploaded and restored successfully; checksum, schema 11, integrity and counts
+  verify. Evidence is in work/release-20261112-{published.json,live-verification.json,
+  offsite-backup.log,offsite-verify.log}. The visible home-page date still reads
+  the older full-poll checkpoint because selected runs correctly preserve it.
+- **D-192 — Derive the visible refresh date from published content.** User requests
+  that the date update for selected pulls too and reflect the content in the
+  database automatically. Show the newest published topic snapshot_at as
+  "Latest forum content refresh", independent of search/filter settings. Hide the
+  line only when there are no published topics. Validate snapshot timestamps at
+  the catalog boundary and test refreshes with unchanged/null full-poll checkpoints,
+  differing topic dates and empty catalogs. Keep the importer's full-poll checkpoint
+  semantics intact so deferred work is not skipped. Implement, run deployment
+  checks, inspect the actual application preview, and deploy/verify the UI fix
+  under the user's existing approval. No additional forum or model calls.
