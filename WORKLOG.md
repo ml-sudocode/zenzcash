@@ -4527,3 +4527,13 @@ Implementation in progress; user verification remains pending.
   or GitHub push. Post-commit security review found no issues: text-only rendering,
   validated timestamps, unchanged authorization and persistence behavior. User
   visual confirmation remains pending; refresh the Topics page to see the change.
+- **D-193 — Start a new pull with discovery and download selection.** User requests
+  another pull on November 12. Obtain and verify a fresh consistent production
+  database snapshot, then run the listing-only discovery workflow against that
+  local copy. Compare candidates with current published content and prior exclusions,
+  including per-topic refresh dates so already imported activity is not mistaken
+  for new replies. Present a concrete selection inline before full-history downloads,
+  as required by D-166. Earlier analysis/publication approvals applied to the prior
+  bundle; no new model calls or publication are authorized at this discovery stage.
+  Preserve the user's preference to include inexpensive brief replies in proposed
+  updates. Record findings and the next selection checkpoint in this ledger.
