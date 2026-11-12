@@ -4423,3 +4423,40 @@ Implementation in progress; user verification remains pending.
   Preserve all agreed exclusions and partial coverage; no new forum/model calls,
   additional confirmation or GitHub push is needed. No runtime code change is
   required for this content update.
+- **F-217 — Local publication and real application preview pass.** D-189's
+  delegated acknowledgment was recorded for the exact staged scan. Local atomic
+  publication completed with 214 topics and 13,019 current posts; all fourteen
+  personal tables (six accounts) and prior history rows are preserved. Exact
+  release IDs are in work/release-20261112-published-rehearsal.json. Served the
+  actual application on localhost:8019 with its real APIs/authentication helper;
+  health, catalog release equality and authentication availability pass. Chrome
+  screenshot of the new Ledger topic inspected: real summary, source links,
+  filters and pull timestamp render. Local authentication origin is localhost,
+  not the production domain. Evidence: release-20261112-preview.png, .html and
+  preview-verification.json under work/. No runtime code changes or image rollout.
+  Production Machine e823213f175598 remains started on the prior image, with
+  3 GiB RAM and 7.6 GiB free disk. A one-hour app deploy token was minted privately
+  at work/release-20261112-deploy.token; refresh it if expired on resume.
+  Uploaded the approved bundle and release-20261112-{publish.mjs,approval.json,
+  published-rehearsal.json} into /data/transfers/; remote/local SHA checks match
+  and ownership is zforum. Publisher script SHA is
+  4cfa39778b346c64555bf3cf2bcc72f6d47c04a95fd2c19e6a04e8ca327e3dd0;
+  approval SHA 75487eea5cfef529b958fca64d2060bd555470dfc7140e52bf8c37b76503077c;
+  rehearsal SHA 791ace4f1fdb95a5da35fa580dfc4362b513e784f7dc04e9751ded2f8715ae13.
+  Reviewed operational scripts: fixed argument arrays, bundle/candidate/findings
+  hashes enforced, no secrets logged, and no forum/model calls on publication.
+- **D-190 — Pause before production publication for tmux.** User interrupts with
+  "pause i want to put you in a tmux". Stop deployment work now. Production backup,
+  staging, acknowledgment and publication have NOT started; live content remains
+  unchanged. Only transfer files were uploaded/chowned. Stop the temporary local
+  preview server. D-189 approval persists; do not ask again when user resumes.
+  Next authorized action after resume: use work/fly-release-20261112.mjs (source
+  ~/migration-20261110/env.sh as needed), refresh its private token if necessary,
+  then run the uploaded publisher in production mode as zforum, with a bounded
+  timeout and /data/work/import.lock held. The script makes the fresh consistent
+  /data/backups/release-20261112-before.sqlite backup, checks all baselines, stages,
+  binds the user's acknowledgment to the actual scan, atomically publishes, and
+  verifies exact rehearsal releases plus personal/history preservation. Do not
+  rerun blindly after a failure: inspect its durable output and live import state.
+  Retrieve results/backup evidence, verify live APIs/browser and unchanged Machine,
+  then run/verify an offsite backup. No additional model work is needed.
