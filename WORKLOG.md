@@ -4537,3 +4537,31 @@ Implementation in progress; user verification remains pending.
   bundle; no new model calls or publication are authorized at this discovery stage.
   Preserve the user's preference to include inexpensive brief replies in proposed
   updates. Record findings and the next selection checkpoint in this ledger.
+- **F-221 — November 12 discovery and download proposal ready.** Fresh consistent
+  production snapshot work/pull-20261112-production.sqlite verifies schema 11,
+  integrity, foreign keys, 214 topics, 13,019 posts and six accounts; SHA
+  a07af7a12b0e71638e26339e7c3007be4b310a576288f1b26eae638c2ef7bde8.
+  Every published release and full-poll checkpoint matches the live catalog.
+  Discovery through 2026-11-12T17:04:08.822Z completed two matching passes over
+  167 active source threads (14 listing requests, zero retries/429s, 13.27 seconds).
+  Grouping gives 164 candidates and the music-thread exclusion 20456. Recommend
+  40 topics / 45 source threads: 18 existing topics with newer activity, Zblind
+  58405 for its listed count falling from 11 to 10, and 21 topics new to the site
+  totaling 389 listed posts. Positive count differences across selected existing
+  threads total 63; these are not verified new replies. Full histories proposed,
+  preserving all six zcg members. Price Speculation 16488 has 7,449 listed posts;
+  retain paid outputs and assess analysis scope/cost after downloads. New topics
+  include older revived discussions; their listed posts are not all recent.
+  Defer 117 candidates without newer activity, including the unchanged partial
+  Avalanche/Zingo-PC histories and longstanding Zkool count mismatch. Carry forward
+  seven lower-priority deferrals: 8, 29765, 56891, 57228, 58709, 58858, 59199.
+  Recommendations are proposals, not permanent exclusions or source-content
+  assessments. Brief replies remain eligible per user preference. Exact choices,
+  titles and reasons: work/pull-20261112-recommendations.json. Discovery packet:
+  work/imports/discovery-ddf3a9f9-48bf-426b-8d19-923fadf779de/selection-review.json;
+  parsed SHA bd67d291ce64a45860e3df56138f1335ce8c1dce6b6670f4bf6ed6bd05ea15e9.
+  Snapshot SHA unchanged after discovery, no active import, checkpoint unchanged.
+  No full-history/profile downloads, importer model calls, production publication
+  or deployment. Await download selection under D-166; D-146 spending review follows
+  fetching. Operational review: production snapshot is read-only/consistent, files
+  private, scoped app token not logged, untrusted titles/excerpts treated as data.
