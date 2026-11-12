@@ -4408,3 +4408,18 @@ Implementation in progress; user verification remains pending.
   successfully. Ledger/operational-script review found no secrets or application
   security changes. Existing successful deployment checks remain applicable;
   no runtime code changed during this pull.
+- **D-189 — Publish the approved November 11 content bundle.** User says
+  "approved, go ahead" in response to the exact findings and request to record
+  their acknowledgment and deploy. This authorizes delegated acknowledgment of
+  F-216's 12 matches across posts 46044/234 and 58656/169 and production
+  publication of run 574a635a-8c68-4952-a67d-7f58a0ecda28, bundle SHA
+  611622ddd33e4e684d044adb839ef9dcf378eaa2961821b5fb8db7e28735ee0b,
+  candidate f404d15ad338d8d1345516d3d6101c36adcb2483606328d0085878d4ea11aa7a.
+  Verify unchanged bundle/findings, bind acknowledgment to each actual staged
+  report, and identify Codex honestly as recording the user's approval. Complete
+  the local publication rehearsal, take a fresh consistent production backup,
+  verify baselines, stage and atomically publish using existing application code,
+  then verify live content, personal-state/history preservation and offsite backup.
+  Preserve all agreed exclusions and partial coverage; no new forum/model calls,
+  additional confirmation or GitHub push is needed. No runtime code change is
+  required for this content update.
