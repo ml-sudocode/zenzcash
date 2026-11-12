@@ -4509,3 +4509,21 @@ Implementation in progress; user verification remains pending.
   no authentication/database-write changes. Deploy the committed checkout with
   the previously working remote builder (--depot=false), then verify live APIs,
   exact published releases, runtime and Chrome rendering.
+- **F-220 — Refresh-date fix deployed and live rendering verified.** Commit
+  b5779b8 deployed as registry.fly.io/zencash:deployment-01M76NZQD6YFP03KXNCGBTN30F
+  to the existing sjc Machine e823213f175598. The first remote build failed before
+  any production change (builder startup HTTP 408, h2c transport HTTP 500).
+  Retrying with --depot=false --wg=true succeeded, including image runtime smoke
+  and Fly health/DNS checks. Startup performs the existing blocking backup; an
+  early live probe timed out during startup, then passed after health became ready.
+  At 2026-11-12T01:33:45.330Z, live health, authentication availability, exact 214
+  published release IDs, sample content and local/remote runtime equality pass.
+  Live Chrome screenshot inspected; DOM assertion confirms
+  "Latest forum content refresh: Nov 11, 2026, 05:30 PM UTC", derived from
+  2026-11-11T17:30:02.231Z. Reader timezone controls formatting. The old cutoff
+  label is absent; the internal full-poll checkpoint remains unchanged. Evidence:
+  work/release-20261112-refresh-{deploy-wg.log,verification.json,live.png,live.html},
+  plus release-20261112-live-verification.json. No additional forum/model calls
+  or GitHub push. Post-commit security review found no issues: text-only rendering,
+  validated timestamps, unchanged authorization and persistence behavior. User
+  visual confirmation remains pending; refresh the Topics page to see the change.
