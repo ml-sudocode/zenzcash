@@ -4487,3 +4487,25 @@ Implementation in progress; user verification remains pending.
   semantics intact so deferred work is not skipped. Implement, run deployment
   checks, inspect the actual application preview, and deploy/verify the UI fix
   under the user's existing approval. No additional forum or model calls.
+- **F-219 — Content refresh display and deployment checks pass.** The topics page
+  derives its date from the newest published snapshot, including selected pulls
+  with an unchanged/null full-poll checkpoint. Catalog parsing validates snapshot
+  dates, preserving the retained whole-second UTC format and current millisecond
+  timestamps. Generated maximum-date/order tests and exact rendered tests cover
+  filters, empty catalogs and later refreshes; browser checks assert the new label.
+  All 214 live listings pass the parser; newest snapshot is
+  2026-11-11T17:30:02.231Z. Actual local application preview with the published
+  rehearsal database shows the correct date and 214 topics; screenshot inspected
+  (work/release-20261112-refresh-preview.png). Local origin differs for passkeys.
+  Full check-deploy gate passes: 61 Rust tests, 245 Node tests, Clippy, auth build,
+  runtime smoke, cached deployment, browser and real passkey checks. Initial gate
+  hit an existing verifier test-helper race: reading a just-created PID file before
+  its contents were written produced ParseIntError Empty at verifier_tests.rs:48.
+  No tests or authentication code were changed to address that failure; the full
+  unchanged gate passed on rerun. Both logs retained under work/ as
+  release-20261112-refresh-checks{,-retry}.log. Runtime revision
+  b41dc958f11b3bdaa9f7ea383baf95fab7c84f1477c5851e84cd793fc7691316.
+  Review: timestamps render via DOM text, no credentials or new dependencies,
+  no authentication/database-write changes. Deploy the committed checkout with
+  the previously working remote builder (--depot=false), then verify live APIs,
+  exact published releases, runtime and Chrome rendering.

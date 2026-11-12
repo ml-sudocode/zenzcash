@@ -37,6 +37,10 @@ and range, add new replies, and recheck retained posts for edits/removals. Priva
 previews and model inputs carry the coverage limitation. Discovery responses may
 include a forum-provided opening batch; only selected post bodies enter snapshots.
 
+The topics page shows the newest published topic snapshot as its latest content
+refresh date. This includes selected pulls and is independent of the internal
+full-poll checkpoint and the reader's search or interest filters.
+
 1. **Summarize the discussion.** Models produce topic summaries with questions,
    competing views and citations. Long histories are summarized in sections,
    then combined into a topic summary.

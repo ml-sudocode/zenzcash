@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { corpusData } from './corpus-fixture.mjs';
-import { parseCatalog, parseTopicContent, catalogRoute, catalogRevision } from "../site/js/catalog.js";
-import { listingFixture } from './helpers.mjs';
+import { parseCatalog, parseTopicContent, catalogRoute, catalogRevision, latestContentRefresh } from "../site/js/catalog.js";
+import { listingFixture, random } from './helpers.mjs';
 import { renderTopics } from "../site/js/home.js";
 import { installDom, nodes } from "./recorded-dom.mjs";
 import { shortDate } from "../site/js/logic.js";
@@ -48,17 +48,47 @@ test("catalog pull cutoff is null or exactly one canonical UTC timestamp",()=>{
     assert.throws(()=>parseCatalog(invalid),{message:`Invalid topic catalog last_pull_cutoff ${JSON.stringify(value)}: expected null or a canonical UTC timestamp`},JSON.stringify(value));
   }
 });
-test("topics page states the last forum pull cutoff directly below the introduction, only when one is recorded",t=>{
+test("catalog validates snapshot dates including retained whole-second snapshots",()=>{
+  for(const value of ['2026-11-11T17:30:00Z','2026-11-11T17:30:00.123Z']) {
+    const catalog=fixture();catalog.topics[0].snapshot_at=value;
+    assert.equal(parseCatalog(catalog).topics[0].snapshot_at,value);
+  }
+  for(const value of [null,undefined,42,{},'', '2026-02-30T00:00:00Z','2026-02-30T00:00:00.000Z','2026-11-11','2026-11-11T17:30:00+00:00','2026-11-11T17:30:00.1Z']) {
+    const catalog=fixture();catalog.topics[0].snapshot_at=value;
+    assert.throws(()=>parseCatalog(catalog),{message:`Invalid listing snapshot_at ${JSON.stringify(value)} in ${catalog.topics[0].topic.id}: expected a UTC timestamp with seconds or milliseconds`});
+  }
+});
+test("latest refresh is the maximum published snapshot across generated dates and orderings",()=>{
+  const rng=random(192);
+  assert.equal(latestContentRefresh({topics:[]}),null);
+  for(let run=0;run<300;run++) {
+    const dates=Array.from({length:rng.int(1,50)},()=>rng.int(-2208988800000,4102444800000));
+    // Include equal seconds and fractional seconds: lexical comparison would choose wrongly.
+    dates.push(0,1,999,1000);
+    const topics=dates.map(time=>({snapshot_at:time%1000===0?new Date(time).toISOString().replace('.000Z','Z'):new Date(time).toISOString()}));
+    const expected=Math.max(...dates);
+    assert.equal(Date.parse(latestContentRefresh({topics})),expected);
+    assert.equal(Date.parse(latestContentRefresh({topics:topics.toReversed()})),expected);
+  }
+  assert.equal(latestContentRefresh({topics:[{snapshot_at:'2026-11-11T00:00:00Z'},{snapshot_at:'2026-11-11T00:00:00.001Z'}]}),'2026-11-11T00:00:00.001Z');
+});
+test("topics page shows published refresh independent of the import checkpoint and filters",t=>{
   installDom(t);
-  const render=catalog=>renderTopics(parseCatalog(catalog),{interests:[]},{setSettings(){}},{featured:[],interests:{}},{query:"",sort:"recent"});
-  const hero=nodes(render(fixture()),"hero")[0];
-  assert.deepEqual(hero.children.map(child=>child.attributes.get("class")??child.tag),["h1","lede","pull-cutoff small muted"]);
-  assert.equal(hero.children[2].textContent,`Last forum pull cutoff: ${shortDate("2026-11-06T03:51:56.235Z")}`);
-  const none=fixture();none.last_pull_cutoff=null;
-  const unrecorded=render(none);
-  assert.deepEqual(nodes(unrecorded,"hero")[0].children.map(child=>child.attributes.get("class")??child.tag),["h1","lede"]);
-  assert.equal(nodes(unrecorded,"pull-cutoff").length,0);
-  assert.equal(unrecorded.textContent.includes("pull cutoff"),false);
+  const render=(catalog,query='',interests=[])=>renderTopics(parseCatalog(catalog),{interests},{setSettings(){}},{featured:[],interests:{}},{query,sort:"recent"});
+  for(const cutoff of [null,'2026-11-06T03:51:56.235Z','2026-11-12T00:00:00.000Z']) {
+    const catalog=fixture();catalog.last_pull_cutoff=cutoff;
+    catalog.topics[0].snapshot_at='2026-11-11T17:30:00.123Z';
+    catalog.topics[1].snapshot_at='2026-11-07T12:00:00Z';
+    for(const [query,interests] of [['',[]],['Konclave',['protocol']],['No matches',[]]]) {
+      const hero=nodes(render(catalog,query,interests),'hero')[0];
+      assert.deepEqual(hero.children.map(child=>child.attributes.get('class')??child.tag),['h1','lede','content-refresh small muted']);
+      assert.equal(hero.children[2].textContent,`Latest forum content refresh: ${shortDate('2026-11-11T17:30:00.123Z')}`);
+    }
+    catalog.topics[1].snapshot_at='2026-11-12T01:00:00Z';
+    assert.equal(nodes(render(catalog),'content-refresh')[0].textContent,`Latest forum content refresh: ${shortDate('2026-11-12T01:00:00Z')}`);
+    catalog.topics=[];
+    assert.deepEqual(nodes(render(catalog),'hero')[0].children.map(child=>child.attributes.get('class')??child.tag),['h1','lede']);
+  }
 });
 test("home renders every available real topic and applies interest filters",t=>{
   installDom(t);

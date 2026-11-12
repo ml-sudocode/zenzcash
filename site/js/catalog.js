@@ -13,6 +13,9 @@ export function parseCatalog(value) {
   for (const data of value.topics) {
     if (data.format !== 'zforum-topic-listing-1' || !Array.isArray(data.topic?.threads) || data.topic.threads.length === 0 || typeof data.release_id !== 'string' || typeof data.visibility_pending !== 'boolean') throw new Error("Invalid topic listing in catalog");
     add(data.topic.id);
+    const snapshot = data.snapshot_at;
+    // Published snapshots include legacy whole-second UTC dates as well as milliseconds.
+    if (!(isCanonicalTimestamp(snapshot) || (typeof snapshot === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(snapshot) && isCanonicalTimestamp(`${snapshot.slice(0,-1)}.000Z`)))) throw new Error(`Invalid listing snapshot_at ${JSON.stringify(snapshot)} in ${data.topic.id}: expected a UTC timestamp with seconds or milliseconds`);
     for (const thread of data.topic.threads) {
       if (!Number.isSafeInteger(thread.id) || thread.id <= 0 || threads.has(thread.id) || Object.hasOwn(thread, 'posts')) throw new Error(`Invalid or duplicate listing thread in ${data.topic.id}`);
       threads.add(thread.id);
@@ -24,6 +27,10 @@ export function parseCatalog(value) {
   }
   value.unavailable.forEach(add);
   return value;
+}
+
+export function latestContentRefresh(catalog) {
+  return catalog.topics.reduce((latest, data) => latest === null || Date.parse(data.snapshot_at) > Date.parse(latest) ? data.snapshot_at : latest, null);
 }
 
 export function parseTopicContent(data, id) {

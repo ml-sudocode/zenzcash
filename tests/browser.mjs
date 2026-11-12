@@ -176,7 +176,8 @@ try {
   const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
   assert.equal(catalog.topics.every(data=>data.topic.threads.every(thread=>!Object.hasOwn(thread,'posts'))),true);
   assert.equal(catalog.last_pull_cutoff,pullCutoff);
-  assert.equal(await evaluate("document.querySelector('.hero .lede').nextElementSibling.textContent"),`Last forum pull cutoff: ${shortDate(pullCutoff)}`);
+  const newestSnapshot = new Date(Math.max(...catalog.topics.map(data=>Date.parse(data.snapshot_at)))).toISOString();
+  assert.equal(await evaluate("document.querySelector('.hero .lede').nextElementSibling.textContent"),`Latest forum content refresh: ${shortDate(newestSnapshot)}`);
   const fullTopics = await Promise.all(catalog.topics.map(async data=>(await fetch(`http://localhost:8017/data/${data.topic.id}.json`)).json()));
   assert.deepEqual([...new Set(contentRequests)],['/data/topics.json']);
   for(const data of fullTopics) assert.deepEqual(catalog.topics.find(item=>item.topic.id===data.topic.id).stats,topicStats(data.topic,data.snapshot_at));

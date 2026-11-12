@@ -4,6 +4,7 @@ import { h } from "./dom.js";
 import { topicCountLabel, shortDate } from "./logic.js";
 import { INTERESTS } from "./vocab.js";
 import { directoryInterests, topicDirectory } from "./topic-directory.js";
+import { latestContentRefresh } from "./catalog.js";
 
 function statLines(stats) {
   return [
@@ -35,6 +36,7 @@ function realCard(data, curation) {
 export function renderTopics(catalog, settings, actions, curation, directory) {
   const wanted = settings.interests;
   const results = topicDirectory(catalog, curation, wanted, directory);
+  const refreshedAt = latestContentRefresh(catalog);
   const cards = (topics) => h("div", { class: "board" }, topics.map((data) => realCard(data, curation)));
   const toggle = (id) => actions.setSettings({ interests: wanted.includes(id) ? wanted.filter((other) => other !== id) : [...wanted, id] });
   return h(
@@ -43,7 +45,7 @@ export function renderTopics(catalog, settings, actions, curation, directory) {
     h("section", { class: "hero" },
       h("h1", {}, "What's happening on the Zcash forum"),
       h("p", { class: "lede" }, "Choose a topic for a short summary, original posts, and optional neutral re-writes."),
-      catalog.last_pull_cutoff === null ? null : h("p", { class: "pull-cutoff small muted" }, `Last forum pull cutoff: ${shortDate(catalog.last_pull_cutoff)}`)),
+      refreshedAt === null ? null : h("p", { class: "content-refresh small muted" }, `Latest forum content refresh: ${shortDate(refreshedAt)}`)),
     h("div", { class: "directory-controls" },
       h("label", {}, "Search topic titles", h("input", { id: "topic-search", type: "search", value: directory.query, "aria-label": "Search topic titles", on: { input: (event) => actions.setDirectory({ query: event.target.value }) } })),
       h("label", {}, "Sort topics", h("select", { id: "topic-sort", on: { change: (event) => actions.setDirectory({ sort: event.target.value }) } },
