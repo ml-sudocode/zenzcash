@@ -4573,3 +4573,32 @@ Implementation in progress; user verification remains pending.
   revised exact selection inline. This authorizes discovery, not the still-pending
   history downloads, model spending or publication; retain the prior proposal as
   comparison evidence rather than treating it as an approved selection.
+- **F-222 — Refreshed discovery proposes fifteen additions, fifty-five total.**
+  Fresh production copy work/pull-20261113-production.sqlite passes integrity and
+  foreign keys: schema 11, 214 topics, 13,019 posts, seven accounts; SHA
+  7bcd91d1cd9aa599f4f6977af44c76cd9574c317f133bcbc4a6b1e94acaeec99.
+  All published releases match both the current live catalog and F-221's snapshot;
+  personal state has changed, so this new copy is the preparation baseline.
+  Discovery through 2026-11-13T01:21:37.576Z took two matching passes over 176
+  active threads: 14 listing requests, zero retries/429s, 13.20 seconds. There are
+  173 grouped candidates and the unchanged music exclusion. Keep all forty prior
+  proposed choices and add nine new-to-site topics: Nozy wallet 52417,
+  zec-agent-wallet 59248, zkMarketer 59250, ZTrace 59254, Governance in a Shielded
+  World 59256, Paeyme 59257, ZecBlock Private 59258, LeoDex 59261, shielded
+  subscriptions 59263. Add six existing topics with newer activity: red-bridge
+  launch 55840, Zcash Daily 57219, FROST co-signing 58172, Zafe beta 58636,
+  Ode to Rough Consensus 58990 and ZCG Lockbox 59027. Full-history proposal totals
+  55 topics (25 existing, 30 new-to-site), 60 source threads with six zcg members.
+  New-to-site topics have 459 listed posts including older history; positive listed
+  count differences for selected existing threads total 113, not verified additions.
+  Keep the Zblind count-decrease check; Price Speculation now lists 7,451 posts.
+  Defer 111 candidates without newer activity and the same seven lower-priority
+  candidates as F-221. No partial-history expansions. Exact replacement proposal:
+  work/pull-20261113-recommendations.json. Discovery packet is under
+  work/imports/discovery-93d075b3-fc58-47d4-9f10-77fae23c46c5/; parsed review SHA
+  d6dbe5bac82ddbb14cf7b280bba248f281455ec8f774128915c144e895cae744.
+  Snapshot SHA reverified unchanged, no active import or cutoff advance. No full
+  history/profile downloads, importer model calls or production publication.
+  Await revised download selection under D-166. Review found no secrets in tracked
+  changes, no application security changes, and no instructions followed from
+  untrusted forum titles; private operational evidence stays under ignored work/.
