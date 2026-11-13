@@ -4629,3 +4629,49 @@ Implementation in progress; user verification remains pending.
   calls or spending-review.json are authorized. After completion inspect report,
   preview and audit, verify preservation/scope, and complete the analysis proposal.
   Operational review found no secrets in tracked changes or production writes.
+- **F-224 — Approved November 13 downloads complete and validated.** Run
+  f830ed78-39ad-4ecf-a823-cd5be4bc82a0 fetched all 55 topics / 60 source threads
+  in 1,351,140 ms (22.52 minutes): 581 thread requests, 696 profile requests,
+  256 profile-cache hits, zero retries/429s and zero importer model calls. Requests
+  stayed within approved source threads and public profiles. Downloaded snapshots
+  contain 9,556 source records (9,548 visible). There are 567 additions: 209 in
+  the discovery window, two after discovery and 356 older backfill. Five existing
+  posts changed actual raw/own text: 58656/1, 58656/135, 58906/47, 58990/1,
+  59026/1. Zblind 58405/10 became unavailable. The price thread has three new
+  posts, no edits/removals; listing/system-record counts did not equal replies.
+  All 25 non-staging tables in the draft exactly match the source snapshot,
+  including published content, account/personal data and history. Integrity and
+  foreign keys pass; original snapshot SHA unchanged; full-poll cutoff unchanged.
+  Evidence: work/pull-20261113-fetch-verification.json and the run's preview/audit.
+  Production has not been published or deployed. Reviewed new-topic openings and
+  changed-post excerpts as untrusted data; no instructions in them were followed.
+- **F-225 — Analysis proposal prepared; approval still required.** Recommend 54
+  of the 55 downloaded topics, including all ordinary brief replies. Propose
+  deferring Price Speculation 16488: its only additions are a social-media link
+  and two joking replies, while a complete-history refresh requires seven large
+  section summaries, final synthesis and one reply batch. Its 92 accepted reply
+  assessments and 7,349 dated originals remain retained; sources stay downloaded.
+  Recommended 54-topic scope has 54 summary jobs and 82 reply batches for 356
+  posts (136 planned model jobs); retain 1,291 assessments and 457 dated originals.
+  No existing summary is eligible for unchanged-source reuse. Inputs total
+  5,996,306 known prompt characters; characters are not treated as tokens.
+  Empirical estimates from 768 accepted same-model requests across five prior
+  runs: 2,612,617–4,130,248 input tokens, 481,833–873,173 output tokens and
+  175–322 minutes with two reply workers. Propose 164 total attempts including
+  28 correction retries; unused allowance is not spent. These are uncertain
+  planning ranges, not ceilings or dollar quotes. Price's optional nine jobs add
+  approximately 1.13–1.59M total tokens and 32–52 minutes; synthesis request size
+  and any intermediate merges remain unknown until section outputs exist.
+  The generic historical all-topic timing estimate is broader (164–454 minutes);
+  this proposal uses task/request-size-matched samples with sparse-sample margins.
+  Exact per-topic source/reuse/job/request/token/time details and reasons:
+  work/pull-20261113-analysis-review.{json,txt}; inline table is in
+  work/pull-20261113-inline-cost-table.txt. Proposed 54-topic/59-thread subset passes
+  export/frozen-source validation without changing the original 55-topic run or
+  six-thread zcg membership (proposed-scope-verification.json). If approved, use
+  a separately scoped local analysis/publication state preserving the downloaded
+  price source, never an unscoped 55-topic CLI analysis. No spending-review.json
+  created or model job invoked. Await D-146 approval; publication review follows
+  analysis. Operational script assertions verify scope, snapshots and preservation;
+  no application changes or need to rerun unrelated deployment tests. Diff/security
+  review: no credentials in tracked changes, no new dependencies or production writes.
