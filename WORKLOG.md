@@ -4793,3 +4793,28 @@ Implementation in progress; user verification remains pending.
   full-poll checkpoint. Verify the live catalog and automatic refresh timestamp
   after publishing. No new forum analysis or application-image deployment is
   authorized or required by this content publication.
+- **F-230 — Approved local publication, rendered preview and transfer verified.**
+  D-197 acknowledgment recorded against the exact rehearsal scan. Actual local
+  publication completed at 2026-11-13T06:16:21.535Z with 244 topics / 13,582 posts;
+  all fourteen personal tables (seven snapshot accounts), prior history rows and
+  190 unselected releases preserved. Catalog release equality, six representative
+  topic APIs, removed Zblind-post handling, six-thread grants group, authentication
+  availability and runtime equality pass. Actual application served on localhost:8019;
+  passkey origin is localhost rather than production. Inspected Chrome screenshots
+  of the catalog and new FROST escrow topic; full refresh date renders as
+  "Nov 13, 2026, 01:51 AM UTC" and catalog shows 244 topics. The initial one-off
+  DOM expectation omitted the displayed year and failed; corrected that expected
+  literal after inspecting the output, then verified the full string. No app or
+  repository test changes. Evidence: work/release-20261113-{local-publish.log,
+  published-rehearsal.json,local-verification.json,preview.png,topic-preview.png}.
+  Production remains healthy on the same image with 6.2 GiB volume space free.
+  Four files transferred to /data/transfers/, owned by zforum, mode 0600: the
+  approved bundle and release-20261113-{publish.mjs,approval.json,published-rehearsal.json}.
+  Initial upload shell exited 143 after two successful transfers; remote inspection
+  confirmed the remaining two absent, then individually uploaded them. All four
+  remote SHA-256 hashes now match local files (transfer-hashes.txt/remote-hashes.txt).
+  Publisher verifies bundle, exact topic IDs, candidate/findings hashes and live
+  baseline; forbids forum/model calls, backs up before staging, checks personal
+  data/history and exact rehearsal releases. Operational syntax checks and actual
+  local execution pass. Ready to run bounded production publisher under import
+  lock as zforum. Documentation/security review found no secrets or app changes.
