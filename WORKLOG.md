@@ -4675,3 +4675,18 @@ Implementation in progress; user verification remains pending.
   analysis. Operational script assertions verify scope, snapshots and preservation;
   no application changes or need to rerun unrelated deployment tests. Diff/security
   review: no credentials in tracked changes, no new dependencies or production writes.
+- **D-196 — Analyze the approved fifty-four-topic scope within 164 attempts.**
+  User says "yes" to F-225's exact 54-topic analysis proposal and maximum of
+  164 attempts. Exclude Price Speculation 16488; preserve its downloaded source
+  without new analysis or publication. Scope is the recommended topic IDs and
+  snapshot hashes in work/pull-20261113-analysis-review.json: 136 planned jobs,
+  28 retry slots, configured subscription model gpt-6.1-sol, two reply workers.
+  Materialize the validated subset in a separate local draft/root while retaining
+  the original 55-topic fetch intact. Keep the same source dates and hashes,
+  six-thread zcg group, unchanged full-poll checkpoint and all exclusions. Bind
+  spending ceilings to those reviewed job estimates and enforce the total across
+  retries/resumes. Preserve paid outputs; apply D-173's bounded modest-overrun
+  flexibility only with a recorded basis, seek approval for material expansion.
+  Run and validate the approved analysis, prepare the bundle and faithful local
+  rehearsal, then present publication findings for the separate required approval.
+  This is analysis approval, not source-scan acknowledgment or production publication.
