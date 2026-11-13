@@ -4690,3 +4690,22 @@ Implementation in progress; user verification remains pending.
   Run and validate the approved analysis, prepare the bundle and faithful local
   rehearsal, then present publication findings for the separate required approval.
   This is analysis approval, not source-scan acknowledgment or production publication.
+- **F-226 — Approved analysis scope materialized and checked.** Separate database
+  work/pull-20261113-analysis/zforum.sqlite and root
+  work/pull-20261113-analysis/imports contain the exact approved 54-topic/59-thread
+  subset of run f830ed78-39ad-4ecf-a823-cd5be4bc82a0. Source snapshot hashes and
+  six-thread zcg membership are unchanged. Price's baseline remains intact; its
+  downloaded source stays in the original 55-topic draft/root. All 25 non-staging
+  tables exactly match the verified production snapshot, including seven accounts.
+  Scoped spending-review.json binds 136 reviewed jobs to snapshot hashes, with
+  twice estimated upper total tokens per job, 150% per topic, and 164 total
+  attempts. Initial inspection reports zero attempts and no holds. Subscription
+  authentication mode checked without logging credentials. Operational runner
+  work/pull-20261113-analyze.mjs verifies exact IDs and remaining persistent
+  allowance, refuses forum fetches/publication, and calls existing isolated
+  subscription analysis. Run it under work/import.lock; do not invoke the ordinary
+  CLI against the original 55-topic draft. Progress pointer:
+  work/pull-20261113-analysis-plan.json; monitor:
+  node work/pull-20261113-analysis-status.mjs. Review found no secrets, application
+  changes, new dependencies or production writes. Preparation assertions and
+  syntax checks pass. Original download run and its audit remain untouched.
