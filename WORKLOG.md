@@ -4602,3 +4602,14 @@ Implementation in progress; user verification remains pending.
   Await revised download selection under D-166. Review found no secrets in tracked
   changes, no application security changes, and no instructions followed from
   untrusted forum titles; private operational evidence stays under ignored work/.
+- **D-195 — Download the approved refreshed fifty-five-topic selection.** User
+  says "yes let's go" to F-222's revised download proposal. Approve all 55 exact
+  choices in work/pull-20261113-recommendations.json: 25 existing and 30 new-to-site
+  topics, full histories across 60 source threads, preserving all six zcg members.
+  Bind selection to discovery review SHA
+  d6dbe5bac82ddbb14cf7b280bba248f281455ec8f774128915c144e895cae744 and use a separate
+  draft of the verified November 13 production snapshot. Preserve exclusions and
+  unselected partial histories. Fetch, validate, compare source changes and retained
+  work, and present a per-topic analysis/spending proposal inline before model calls.
+  Brief replies remain included. Download approval does not authorize analysis
+  spending or production publication; do not repeat the download approval question.
