@@ -4565,3 +4565,11 @@ Implementation in progress; user verification remains pending.
   or deployment. Await download selection under D-166; D-146 spending review follows
   fetching. Operational review: production snapshot is read-only/consistent, files
   private, scoped app token not logged, untrusted titles/excerpts treated as data.
+- **D-194 — Refresh discovery before choosing downloads.** User notes the elapsed
+  time since F-221 and asks to check for additional topics. Obtain a fresh verified
+  production snapshot and rerun listing-only discovery through the current time.
+  Compare against the November 12 forty-topic proposal, preserving prior deferrals
+  while considering newer activity and changed counts. Present the additions and
+  revised exact selection inline. This authorizes discovery, not the still-pending
+  history downloads, model spending or publication; retain the prior proposal as
+  comparison evidence rather than treating it as an approved selection.
