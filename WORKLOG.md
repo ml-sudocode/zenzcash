@@ -4613,3 +4613,19 @@ Implementation in progress; user verification remains pending.
   work, and present a per-topic analysis/spending proposal inline before model calls.
   Brief replies remain included. Download approval does not authorize analysis
   spending or production publication; do not repeat the download approval question.
+- **F-223 — Approved scoped download is running in the local draft.** Run
+  f830ed78-39ad-4ecf-a823-cd5be4bc82a0 uses work/pull-20261113-draft.sqlite and
+  work/pull-20261113-selection.json, validated for exactly 55 topics / 60 threads.
+  Original production snapshot SHA matches F-222; it remains separate and untouched.
+  Initial preparation opened the draft read-only for selection validation, but the
+  validator tests registration with a rolled-back write transaction. That failed
+  before any forum calls. Reopened only the draft writable and validated successfully;
+  no validator or application changes. Fetch log: work/pull-20261113-fetch.log;
+  durable operational pointer: work/pull-20261113-current-plan.json. Importer estimate
+  is 20–60 minutes (1,184 baseline requests at one/second). The large price thread
+  is first; it has 7,460 available source IDs versus 7,451 listed posts, which may
+  include system records filtered during parsing. Do not infer additional replies
+  from that difference. Fetch remains bounded to the approved selection. No model
+  calls or spending-review.json are authorized. After completion inspect report,
+  preview and audit, verify preservation/scope, and complete the analysis proposal.
+  Operational review found no secrets in tracked changes or production writes.
