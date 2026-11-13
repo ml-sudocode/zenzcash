@@ -4818,3 +4818,33 @@ Implementation in progress; user verification remains pending.
   data/history and exact rehearsal releases. Operational syntax checks and actual
   local execution pass. Ready to run bounded production publisher under import
   lock as zforum. Documentation/security review found no secrets or app changes.
+- **F-231 — November 13 content published and live/offsite checks pass.**
+  Production publication completed at 2026-11-13T06:21:26.327Z under D-197:
+  54 topics published (30 new, 24 refreshed), 244 total topics, 13,582 current
+  posts, seven accounts. All production release IDs match the local rehearsal;
+  190 unselected releases, all fourteen personal tables and all prior history
+  rows are preserved. Fresh pre-publication backup at
+  /data/backups/release-20261113-before.sqlite has SHA-256
+  7bcd91d1cd9aa599f4f6977af44c76cd9574c317f133bcbc4a6b1e94acaeec99,
+  matching the verified baseline snapshot (214 topics / 13,019 posts / seven
+  accounts). Actual production scan was compared to the approved candidate and
+  findings, then acknowledged on the user's behalf; report digest
+  f7469787fc8684fb55f9adedea4601a2cb22a3ac89cab24f34aa4c11a2cd2c1c.
+  Public health/catalog/topic APIs, authentication availability and runtime-file
+  equality pass. Inspected live Chrome screenshot and asserted the full display:
+  "Latest forum content refresh: Nov 13, 2026, 01:51 AM UTC", with 244 topics.
+  Timestamp is 2026-11-13T01:51:17.898Z and displays in each reader's timezone.
+  Internal full-poll cutoff remains 2026-11-06T03:51:56.235Z as required for this
+  selected pull. Price Speculation remains unchanged. Machine e823213f175598 is
+  healthy on the unchanged deployment-01M76NZQD6YFP03KXNCGBTN30F image; no image
+  deployment or new model calls. Local preview server stopped after inspection.
+  Offsite backup uploaded at 2026-11-13T06:22:55.311Z:
+  zforum/2026-11-13T06-21-52.577Z-11ceb0be-a788-495a-81cf-2757ab3ac980.tar.gz,
+  SHA-256 0ca5db34de5abbaa54fbf0c7f789367845d5e78944797321367282d6a03d3030.
+  Download/restore check passes checksum, schema 11, integrity, foreign keys and
+  exact database counts. Evidence: work/release-20261113-{published.json,
+  backup.json,production-verification.json,browser-verification.json,live.png,
+  backup-verification.json,offsite-backup.log,offsite-verify.log}. Analysis and
+  publication review pointers now record published-and-verified status. User
+  visual verification remains pending; operational publication work is complete.
+  Commit security review: documentation only, no secrets or executable changes.
