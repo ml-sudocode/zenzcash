@@ -4727,3 +4727,57 @@ Implementation in progress; user verification remains pending.
   but must wait for all 54 topics and no holds; publication/acknowledgment remain
   pending. Host has about 250 GiB free disk and 14 GiB available memory. No
   application changes, credentials in tracked text, or production writes.
+- **F-228 — Approved analysis completed with three successful corrections.**
+  All 54 selected topics / 59 source threads validated in 186.9 minutes. There
+  are 136 accepted jobs (54 summaries, 82 reply batches), 139 total attempts
+  against 164 approved, no failed/incomplete jobs and no spending holds. Usage,
+  including rejected attempts: 3,652,507 input plus 652,703 output tokens =
+  4,305,210 total; 1,879,936 cached input is a subset, not additional usage.
+  No unknown usage. Corrections: Nozy 52417/26 used unsupported claim type
+  "experience"; Shielded Labs overview had 420 characters against a 400 limit;
+  grants post 58656/302 had a non-verbatim evidence span. Existing validation
+  rejected each; correction attempts passed without changing validation rules.
+  Partial repair retained eleven valid post assessments from rejected batches.
+  Price Speculation remains deferred. A fresh read-only comparison confirmed all
+  25 non-staging tables in the analysis database still match the production
+  snapshot, whose SHA is unchanged: work/pull-20261113-analysis-preservation.json.
+  The user's later status question found the analysis already finished; no new
+  model calls or scope changes were needed. No production publication occurred.
+- **F-229 — Prepared bundle and staging rehearsal pass; publication review ready.**
+  work/pull-20261113-prepared.json is 73,245,234 bytes, SHA-256
+  864d71bc0db3e1b482704b5d0f20ec20b815882581b16e315d0471eda8d4ac65.
+  Staged through the actual importer/server validation into separate full-catalog
+  database work/rehearsals/pull-20261113-UugyRX/zforum.sqlite, root imports/ in
+  that directory. All 54 topics validated; integrity/foreign keys pass. Staging
+  preserved all 14 checked personal tables, five public tables, seven snapshot
+  accounts and the full-poll cutoff 2026-11-06T03:51:56.235Z. Rehearsal evidence:
+  work/pull-20261113-rehearsal.json; peak process RSS 792,336 KiB with 512 MiB
+  JavaScript heap limit. Catalog projection is 244 topics (30 new, 24 refreshed,
+  190 retained) and 13,582 current posts, based on 13,019 baseline minus 1,549
+  replaced records plus 2,112 candidate records (2,104 visible). The five source
+  edits and one newly unavailable Zblind post remain represented by the prepared
+  source changes. Latest selected snapshot is 2026-11-13T01:51:17.898Z; publication
+  will make the existing automatic content-refresh display show that timestamp.
+  Full-poll checkpoint intentionally stays unchanged. Projection evidence:
+  work/pull-20261113-catalog-projection.json.
+  Final source/candidate scan is complete: 24 matches, all across four posts:
+  46044/234 wallet-recovery advice mentioning private-key extraction; 51247/73
+  two U+200B spaces; 54399/1 a U+00AD soft hyphen; 58656/169 a U+200D emoji
+  joiner, repeated in retained evidence quotes. Reviewed all matches as untrusted
+  forum data; no source instructions followed. Recommend acknowledging these
+  benign-context matches and publishing the exact prepared scope. Candidate digest
+  6b36187f4a0ab17aa44528c81868fdd05ea93e6c72c613b34a23d4e197457346;
+  analysis report digest
+  1035096b4fdc272b9f2493c28a2fb737bb3e1f4b4a693c59bb40a63f5ae9cf8e;
+  staged report digest
+  a430695cafee47091a7dab1e967d4ab448f7b40648ace4c450009d71f5bc3df7.
+  Rescans have different scan IDs/report hashes; candidate digest and finding
+  count match. No human acknowledgment manufactured. Rendered publication preview
+  remains gated on acknowledgment; staging is not a published UI preview.
+  Await separate user acknowledgment/publication approval under CLAUDE.md. After
+  approval, record it before action, publish/review the local full-catalog preview,
+  obtain a fresh consistent production backup, verify the live baseline and apply
+  the prepared bundle while preserving current personal data; then verify the live
+  catalog and refresh display. No image/code deployment is needed for this content
+  update. No application changes or unrelated test reruns. Security diff review:
+  documentation only, no credentials or new executable behavior.
