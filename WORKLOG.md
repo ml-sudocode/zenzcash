@@ -4709,3 +4709,21 @@ Implementation in progress; user verification remains pending.
   node work/pull-20261113-analysis-status.mjs. Review found no secrets, application
   changes, new dependencies or production writes. Preparation assertions and
   syntax checks pass. Original download run and its audit remain untouched.
+- **F-227 — Analysis midpoint and limited source checks.** At November 13
+  03:11 UTC, 27 of the approved 54 topics are analyzed; 55 jobs accepted on their
+  first attempt, one in flight, 56 total attempts against 164. Recorded usage is
+  1,240,021 input-plus-output tokens; no unknown completed-job usage, failures,
+  rejections or spending holds. Same bounded runner remains active; no scope or
+  spending amendment. Limited manual checks compare completed FROST escrow and
+  Zebra security summaries with supplied originals, including grant amounts and
+  deployment/security limitations. Governance spot-checks preserve attributed
+  proposals, disagreement over mutual concessions, and uncertainty about a claimed
+  agreement; they do not invent adoption or consultation outcomes. Evidence:
+  work/pull-20261113-spotchecks.json. These supplement structural/source-reference
+  validation and do not independently verify linked external project claims.
+  A read-only spot-check initially requested thread-59026's candidate before
+  assembly and returned ENOENT; after topic completion the candidate was read
+  successfully. No pipeline failure or retry resulted. Preparation helper is ready
+  but must wait for all 54 topics and no holds; publication/acknowledgment remain
+  pending. Host has about 250 GiB free disk and 14 GiB available memory. No
+  application changes, credentials in tracked text, or production writes.
