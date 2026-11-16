@@ -4856,3 +4856,42 @@ Implementation in progress; user verification remains pending.
   partial-history limits. Present a concrete download selection before fetching
   histories; analysis/spending and publication remain later separate reviews.
   Earlier approvals apply to their completed November 13 pull, not this new run.
+- **F-232 — November 16 discovery complete; download proposal awaits selection.**
+  Fresh consistent production snapshot verified at 2026-11-16T02:46:32.118Z:
+  schema 11, 244 topics, 13,582 posts, seven accounts, integrity/foreign keys and
+  all live catalog releases match, no unfinished import. Snapshot
+  work/pull-20261116-production.sqlite SHA-256
+  5230132fc0ca00f91ad186b1d858622c04fe8085c05915e4f363e684087bda0f.
+  Discovery through 2026-11-16T02:46:32.336Z found 212 active source threads in
+  two matching nine-page passes: 18 listing requests, zero retries/model calls,
+  209 grouped candidates and the configured music-thread exclusion (20456).
+  Compared activity to each published snapshot, not just the old full-poll
+  checkpoint. Proposed 69 topics / 74 source threads: 25 new-to-site topics
+  (147 listed posts) and 44 existing topics. Existing selection includes two
+  removal checks: Name Service 55737 and Türkiye outreach 59200 each now list
+  one fewer post than their published coverage and prior discovery. The other
+  selected existing topics show 226 positive listed-count differences; these
+  are not verified new replies. Preserve all six ZCG group members and include
+  brief replies. Download full histories for selected topics; do not expand
+  deferred partial histories 44220/45359. Price Speculation is selected only
+  for download/reassessment; its prior costly analysis deferral still informs
+  the later spending review.
+  Defer 129 candidates without newer activity, the prior seven low-priority
+  candidates (8,29765,56891,57228,58709,58858,59199), and four additional
+  listing-based lower-priority candidates: watching/entertainment 34554,
+  Radbro price plan 53598, Liberate radbro 59311, creative people 59330.
+  New-topic relevance remains provisional until approved histories are read.
+  Exact proposal: work/pull-20261116-recommendations.json. Discovery review:
+  work/imports/discovery-b4a6d490-5998-47fa-a0ba-1cd5298c53f4/selection-review.json,
+  parsed review SHA-256
+  7468129dba730ce28ec789b83c74f3abe1b5a49f25e856f7fe37e9a6573947a0.
+  Verified frozen-choice schema, baseline hash, release IDs, published grouping,
+  exclusions, unchanged discovery and no active run. Initial register dry-run
+  check failed on its temporary writes to the read-only database; replaced
+  that check with direct read-only membership assertions. No snapshot writes.
+  Evidence: work/pull-20261116-{snapshot.log,baseline-verification.json,discovery.log}
+  and discovery audit.json. No histories fetched, model spending, publication
+  or cutoff advancement. Download selection is the next user checkpoint under
+  CLAUDE.md/D-166; analysis and publication require later separate reviews.
+  Security review: documentation and ignored operational evidence only; no
+  secrets or application changes. Source text remains untrusted data.
