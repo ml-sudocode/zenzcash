@@ -4848,3 +4848,11 @@ Implementation in progress; user verification remains pending.
   publication review pointers now record published-and-verified status. User
   visual verification remains pending; operational publication work is complete.
   Commit security review: documentation only, no secrets or executable changes.
+- **D-198 — Start a new November 16 content pull with discovery.** User requests
+  another content pull. Take a fresh consistent production snapshot, verify it
+  locally and against the live published catalog, then run listing-only discovery
+  under D-166. Review newly active and new-to-site discussions against each topic's
+  actual published snapshot, retaining prior exclusions, grouped membership and
+  partial-history limits. Present a concrete download selection before fetching
+  histories; analysis/spending and publication remain later separate reviews.
+  Earlier approvals apply to their completed November 13 pull, not this new run.
