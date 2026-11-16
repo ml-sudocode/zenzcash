@@ -5031,3 +5031,46 @@ Implementation in progress; user verification remains pending.
   backup, publication, live verification and offsite restore check remain ahead
   under D-200. No application changes or production writes. Git working tree was
   clean before this progress entry; ignored scripts/evidence remain local.
+- **F-237 — All November 16 analysis complete; exact release staged.** Run
+  1bcf27a7-996c-4202-b6da-c0ab10440c96 completed analysis at 07:52Z: 70 summaries
+  and 92 reply batches accepted in 165 attempts, below the approved 195 ceiling.
+  Three corrections succeeded: the two previously recorded reply corrections and
+  one summary citation-order correction on 45371. No failed/incomplete requests,
+  unknown usage, remaining jobs or active holds. Measured usage is 4,173,476 input
+  tokens (2,084,480 cached, included in input) plus 769,224 output tokens; topic
+  analysis took 226.2 minutes. Retained 1,740 prior assessments and 322 dated
+  originals. Manual source/output spot-check evidence now covers 11 topics.
+  Prepared bundle is 93,545,402 bytes, SHA-256
+  1a11e5b07b17fe7f9b63518f3756d033f1d2667278ebba836027c7deb146181b.
+  Faithful local staging at work/rehearsals/pull-20261116-LDq5cn verifies the
+  exact 70-topic scope, unchanged 14 personal and five public tables, unchanged
+  full-poll cutoff, integrity and matching candidate scan. Expected publication:
+  271 topics / 13,971 posts, comprising 27 new, 43 refreshed and 201 retained
+  topics. Latest selected snapshot is 2026-11-16T03:45:54.168Z. Peak staging RSS
+  was 972,840 KiB. Production is healthy on the existing image with 3 GiB RAM,
+  about 2.6 GiB available and 4.6 GiB free volume space. Read-only preflight used
+  supported status output after this fly CLI rejected --json, and /proc/meminfo
+  after the minimal container lacked free; no production mutation occurred.
+- **D-202 — Record exact content review under delegated D-200 publication.**
+  Reviewed all 21 final scan findings across four posts: four duplicate fields
+  from public wallet-recovery prose at 46044/234; eight from two zero-width
+  spaces in an event report at 57829/19; eight from a shrug emoji's joiner in
+  originals and retained verbatim assessment spans at 58656/169; and one
+  assessment assumption about a public testnet-wallet command at 58647/10.
+  No actual secret appears in these findings. No source command was executed or
+  source link followed. The latter assessment explicitly marks functionality
+  unverified; existing escaping preserves formatting safely. No unresolved
+  security finding identified; a pattern scan does not prove all injections or
+  semantic errors absent. Exact candidate digest:
+  1d6373335587ae15d4861c5e46013c5a75fc94014968e3469da2d33a6d60fe43;
+  findings SHA-256:
+  8536f3c8f2712959d128ca552ae96cff63322fe384932832adcc7f4967764805.
+  Evidence: work/release-20261116-{content-review,approval}.json and the staged
+  suspicious-content-review.json. The user explicitly delegated completion
+  through deployment while sleeping in D-200; proceed with exact-candidate
+  acknowledgment, local publication rehearsal and production publication under
+  that instruction. Record the operator honestly as Codex under D-200, without
+  claiming the user personally examined this exact report. No additional generic
+  publication permission is needed. Preserve the existing image, personal data,
+  unselected releases and full-poll checkpoint; verify rendered dates and the
+  offsite backup/restore after publication.
