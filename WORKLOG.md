@@ -5284,3 +5284,31 @@ Implementation in progress; user verification remains pending.
   fresh prepublication snapshot and publication, followed by live and offsite
   backup/restore verification. Evidence: work/release-20261116b-{published-rehearsal,
   local-verification,local-browser}.json and local screenshots. No app changes.
+- **F-244 — Afternoon content published; production and backup verified.**
+  D-206 publication completed at 2026-11-16T18:34:07.141Z. Production contains
+  exactly 279 topics / 14,146 posts / seven accounts; all release IDs match the
+  rehearsal. Published eight new and 14 refreshed topics, preserving all 257
+  unselected releases, 14 personal tables, prior history rows and the full-poll
+  checkpoint. Fresh prepublication backup at
+  /data/backups/release-20261116b-before.sqlite matches the reviewed baseline
+  SHA-256 115ec1875ac951b3030fb7630c1a382fd69516103e4893d83b69adb23f9e15da.
+  Live API checks pass for health, catalog, authentication availability, exact
+  runtime assets and 15 representative topics. Chrome at 1600x1100 reports no
+  runtime exceptions and displays 279 topics with "Latest forum content refresh:
+  Nov 16, 2026, 04:39 PM UTC". Live catalog, Radbro and new-topic screenshots
+  inspected. The three Radbro releases remain intact.
+  A manual backup attempt exited 75 because the scheduled backup held the shared
+  import lock. Inspected the resulting postpublication backup and reused it
+  without a duplicate upload. The minimal VM lacks ps; inspected /proc and backup
+  metadata instead. Downloaded and restored archive
+  zforum/2026-11-16T18-34-07.274Z-7dea8733-4678-48e9-b76a-69e154772add.tar.gz;
+  SHA-256 636396acd861235b5559e6e8c3587e5a7063401566ae9c8db3bd2bee2966c8cb.
+  Archive checksum, manifest, schema, integrity, foreign keys and exact restored
+  database counts match the published release. Restore scratch was cleaned.
+  Fly remains healthy on deployment-01M76NZQD6YFP03KXNCGBTN30F with about 2.6 GiB
+  available RAM and 3.2 GiB free volume space. Production publication peak RSS
+  was 1,246,080 KiB. Local preview stopped; all operational commands exited.
+  Evidence: work/release-20261116b-{published,backup,production-verification,
+  production-browser,offsite-backup,restored,backup-verification}.json and logs.
+  Current and analysis plans record published-and-verified. No application
+  changes or further model calls. User visual verification remains pending.
