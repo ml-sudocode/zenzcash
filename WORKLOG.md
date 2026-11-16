@@ -5172,3 +5172,38 @@ Implementation in progress; user verification remains pending.
   discovery hash and baseline; no all-topic fetch. Validate source changes and
   preview, then present the separate D-146 analysis scope and spending review.
   This approval does not authorize new model calls or publication.
+- **F-241 — Afternoon sources verified; analysis proposal ready.** Run
+  1c232f89-2168-4a0f-af04-e257e030994a fetched all 22 approved topics / 27
+  threads in 5.5 minutes: 112 thread requests, 208 profile requests and 115
+  profile-cache hits; zero retries, rate limits or model calls. Preview and
+  source comparison identify 175 added visible posts: 56 within the discovery
+  window, one zero-indexer reply arriving during fetch, and 118 older backfill
+  posts from Security Lead (57) and Community Note Taker (61). Five original
+  edits: 58656/311, 59310/11 and 59325/12, /19, /20. Most are wording/typo
+  corrections; /20 clarifies the common reserve formula. No newly unavailable
+  posts. The ZCG group has 15 added posts plus one edit; treasury caps has three
+  additions plus three edits. Read bounded opening/latest excerpts for all eight
+  newly included threads and inspected all five original-text changes. PEPL
+  59357 is a link-only grant announcement; retain it with explicit missing-detail
+  limitations rather than inventing linked proposal contents. Brief replies stay
+  included. No source commands executed or links followed.
+  Recommend analysis of all 22 topics: 22 fresh summaries plus 26 reply batches
+  assessing 88 posts. Reuse 1,188 accepted assessments; retain 92 dated originals
+  for reading and full-history summaries without individual model work. Proposed
+  total allowance is 58 attempts: 48 base requests plus 10 correction/retry slots.
+  All request sizes are known, 7,573–839,983 characters, 2,751,003 total.
+  Using 1,063 measured historical requests, estimate 1,055,090–1,588,408 input
+  tokens plus 160,261–286,358 output tokens and 66–118 minutes with two reply
+  workers. Cached input is included in input; token estimates exclude retries,
+  while the upper time estimate includes contingency. Dollars and remaining
+  subscription quota are unknown. No spending-review authorization is installed.
+  Full per-topic reasons, priority, deltas, backfill, reuse, request sizes, jobs
+  and time/token ranges: work/pull-20261116b-analysis-review.{json,txt}.
+  Verification confirms all 25 non-staging tables unchanged, frozen selection,
+  six-thread membership, selected-only requests, integrity/foreign keys, baseline
+  checksum and unchanged full-poll cutoff. Draft still publishes 271 topics /
+  13,971 posts / seven accounts. Projected eventual publication is 279 topics /
+  14,146 posts (eight new, 14 refreshed, 257 retained), subject to rehearsal.
+  Evidence: work/pull-20261116b-{fetch.log,fetch-verification.json,current-plan.json}
+  and run preview/audit. Await D-146 approval of analysis scope and 58-attempt
+  allowance; publication remains separate. No production content changes.
