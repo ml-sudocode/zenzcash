@@ -5122,3 +5122,14 @@ Implementation in progress; user verification remains pending.
   production-{catalog,radbro}.png and publication/backup/restore logs. Current
   and analysis plan pointers record published-and-verified. Operational work is
   complete; user visual verification remains pending. No application changes.
+- **D-203 — Start another November 16 pull with fresh discovery.** User requests
+  another content pull after F-239. Use the separate operational prefix
+  work/pull-20261116b to preserve the completed morning run. Take a fresh
+  consistent production snapshot, verify integrity and live release IDs, then
+  run listing-only discovery and compare activity with each published snapshot.
+  Preserve the user's preference to include Radbro when recommending topics,
+  grouped membership, exclusions and existing partial-history limits. Present
+  the concrete download selection under D-166 before fetching histories; obtain
+  the separate D-146 review before new model spending. Prior run-specific scope
+  and spending approvals do not authorize this new run. No production content
+  change or full-poll cutoff advancement during discovery.
