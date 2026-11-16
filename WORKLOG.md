@@ -5266,3 +5266,21 @@ Implementation in progress; user verification remains pending.
   Preserve accounts, prior history, 257 unselected releases and the full-poll
   checkpoint. The content refresh display should advance to the newest published
   snapshot, 2026-11-16T16:39:59.275Z. No further model calls or forum downloads.
+- **F-243 — Afternoon publication rehearsal and browser checks pass.** Local
+  publication under D-206 yields exactly 279 topics / 14,146 posts / seven
+  accounts. All 14 personal tables, prior history rows, 257 unselected releases
+  and the full-poll cutoff are preserved. Actual Rust-server API checks confirm
+  every release ID, authentication availability, zero unavailable topics and
+  representative new, refreshed, Radbro and deferred topics. Chrome at 1600x1100
+  renders the expected catalog refresh "Nov 16, 2026, 04:39 PM UTC" with no runtime
+  exceptions. Catalog, Radbro and new security-grant screenshots inspected.
+  The temporary browser verifier initially checked the new topic's card title
+  against its h1; implementation inspection confirmed h1 uses the headline.
+  Corrected the check to the exact expected headline and reran successfully.
+  Local origin is localhost; production checks will use https://zenzcash.com.
+  Production remains healthy on the same image with about 2.6 GiB available RAM
+  and 3.9 GiB free volume space. Exact bundle, approval, publisher and rehearsed
+  releases transferred privately for production. Proceed under D-206 with the
+  fresh prepublication snapshot and publication, followed by live and offsite
+  backup/restore verification. Evidence: work/release-20261116b-{published-rehearsal,
+  local-verification,local-browser}.json and local screenshots. No app changes.
