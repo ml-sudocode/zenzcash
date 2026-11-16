@@ -5207,3 +5207,12 @@ Implementation in progress; user verification remains pending.
   Evidence: work/pull-20261116b-{fetch.log,fetch-verification.json,current-plan.json}
   and run preview/audit. Await D-146 approval of analysis scope and 58-attempt
   allowance; publication remains separate. No production content changes.
+- **D-205 — Approve afternoon analysis for all 22 topics.** User approves F-241's
+  analysis proposal: 22 summaries and 26 reply batches for 88 posts, 48 planned
+  requests with a total ceiling of 58 attempts including corrections/retries.
+  Preserve 1,188 accepted assessments, 92 dated originals and the full six-thread
+  ZCG group. Bind per-job and per-topic spending limits to the exact reviewed
+  snapshot hashes under D-171/D-173; preserve paid results and count attempts
+  across resumes. Analyze only these 22 topics, then validate, review and prepare
+  the faithful local publication rehearsal. Production publication remains a
+  separate approval; do not infer it from this analysis-only confirmation.
