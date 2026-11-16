@@ -5216,3 +5216,42 @@ Implementation in progress; user verification remains pending.
   across resumes. Analyze only these 22 topics, then validate, review and prepare
   the faithful local publication rehearsal. Production publication remains a
   separate approval; do not infer it from this analysis-only confirmation.
+- **F-242 — Afternoon analysis and staging complete; publication review ready.**
+  Run 1c232f89-2168-4a0f-af04-e257e030994a accepted all 22 summaries and 26
+  reply batches in exactly 48 attempts, within D-205's 58 ceiling. No retries,
+  failed/incomplete requests, unknown usage, remaining jobs or active holds.
+  Measured usage: 1,343,131 input tokens (589,184 cached, included in input)
+  plus 204,657 output tokens. Topic analysis took 65.5 minutes. Preserved
+  1,188 accepted assessments and 92 dated originals; 88 posts freshly assessed.
+  Manual source/output spot checks cover 13 topics, including all eight newly
+  included discussions, brief replies, treasury formula edits and ZCG's latest
+  indirect-adoption clarification. Link-only PEPL remains explicitly limited;
+  Note Taker's 2025 recruitment is historical, not a current opening.
+  Validated prepared bundle: work/pull-20261116b-prepared.json, 58,737,019 bytes,
+  SHA-256 3e7276221b6a2d5e929ac954bf31b3c61af9a245c6208de9ff8e825fc01fa6a1.
+  Staged through the real import workflow against the full production copy at
+  work/rehearsals/pull-20261116b-5bMUjA. All 14 personal and five published tables
+  remain unchanged by staging; analysis preserves all 25 checked non-staging
+  tables. Baseline checksum, integrity, foreign keys and unchanged full-poll
+  cutoff verify. Projected catalog: 279 topics / 14,146 posts, with eight new,
+  14 refreshed and 257 retained topics, including all three Radbro releases.
+  Latest content refresh will be 2026-11-16T16:39:59.275Z. A temporary verifier
+  initially rejected digits in the valid feedback_clears_signed_v1 table name;
+  corrected its identifier check and reran the complete verification successfully.
+  Reviewed all 81 final pattern findings: 72 repeated matches for 18 U+200B
+  spacing characters in the Omeka workshop announcement 53913/42; eight matches
+  for a shrug emoji joiner in 58656/169 and retained verbatim evidence spans;
+  one retained assessment assumption about running a public testnet-wallet
+  command at 58647/10. No unresolved finding identified. No source commands
+  executed or linked content fetched; scan review does not prove all injection
+  attempts or semantic errors absent. Exact candidate digest:
+  d8e392f83fe3ef574cf17bfc6583ef1b4235269033cb11c00398bf193d35e491.
+  Staged report digest:
+  821c1e825ae43ee3cd972fe6995d49254d6ac409ff2605d366358cd5a9b8df08.
+  Evidence: work/pull-20261116b-{final-verification,rehearsal,spotchecks}.json,
+  work/release-20261116b-content-review.json and analysis/prepare/final-check logs.
+  No acknowledgment or publication approval manufactured. Await the user's exact
+  review acknowledgment and publication decision; then perform local publication
+  and actual-app browser rehearsal, fresh production backup, publication, live
+  checks and offsite backup/restore verification. No production writes or app
+  changes in this run; all operational commands have exited.
