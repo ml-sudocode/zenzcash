@@ -5255,3 +5255,14 @@ Implementation in progress; user verification remains pending.
   and actual-app browser rehearsal, fresh production backup, publication, live
   checks and offsite backup/restore verification. No production writes or app
   changes in this run; all operational commands have exited.
+- **D-206 — Acknowledge afternoon review and approve publication.** User says
+  "go ahead i approve" in response to F-242's exact release proposal and the
+  explanation of all 81 scan matches. Record acknowledgment for candidate
+  d8e392f83fe3ef574cf17bfc6583ef1b4235269033cb11c00398bf193d35e491
+  and the matching reviewed findings. Publish only the approved 22-topic bundle
+  3e7276221b6a2d5e929ac954bf31b3c61af9a245c6208de9ff8e825fc01fa6a1.
+  Complete the actual-app local publication/browser rehearsal, fresh production
+  backup, production publication, live checks and offsite backup/restore check.
+  Preserve accounts, prior history, 257 unselected releases and the full-poll
+  checkpoint. The content refresh display should advance to the newest published
+  snapshot, 2026-11-16T16:39:59.275Z. No further model calls or forum downloads.
