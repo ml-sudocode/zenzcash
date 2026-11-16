@@ -5133,3 +5133,33 @@ Implementation in progress; user verification remains pending.
   the separate D-146 review before new model spending. Prior run-specific scope
   and spending approvals do not authorize this new run. No production content
   change or full-poll cutoff advancement during discovery.
+- **F-240 — Afternoon discovery verified; recommend 22 topics for download.**
+  Fresh production copy at work/pull-20261116b-production.sqlite verifies
+  schema 11, integrity/foreign keys, 271 topics, 13,971 posts, seven accounts,
+  no active import and all live release IDs. SHA-256:
+  115ec1875ac951b3030fb7630c1a382fd69516103e4893d83b69adb23f9e15da.
+  Listing-only discovery through 2026-11-16T15:30:07.936Z completed two matching
+  nine-page passes: 18 requests, no retries/rate limits/model calls. Found 221
+  active source threads, 218 grouped candidates and the music-thread exclusion.
+  Recommend full histories for 22 topics / 27 threads: 14 existing topics with
+  40 positive listed-count differences and eight new-to-site topics with 137
+  listed posts. Two revived histories, Ecosystem Security Lead 47541 and
+  Community Note Taker 50450, account for 121 of those 137; distinguish historical
+  backfill from fresh material after approved fetch. The other six are
+  zero-indexer security findings 59342, scam-safety exercises 59347, programmable
+  Zcash 59349, December ZCG elections 59350, privacy-event pilot 59357 and ZYRO
+  prediction markets 59361. Existing selections: 44284,45371,53913,56404,56836,
+  57655, six-thread zcg group, 58647,59035,59049,59123,59124,59310,59325.
+  Defer 187 candidates without newer listed activity, eight unchanged prior
+  lower-priority candidates, and Price Speculation, whose listing activity/count
+  is unchanged since this morning's completed download and analysis deferral.
+  All three Radbro topics remain current by listing metadata. Preserve partial
+  histories 44220/45359; the 51139 count difference is unchanged, and 55737's
+  missing record was already confirmed hidden. Listings do not rule out silent
+  edits or establish exact new-reply counts. Proposal validates exact baseline,
+  scope and six-thread grouping; database checksum remains unchanged.
+  Review: work/imports/discovery-64acf72d-7fcb-4f33-99de-1ce02fb9515d/selection-review.json,
+  parsed SHA-256 6f66b6b5c8232bc93d2f1406aa7f61c201ae081e995bda3875681bb0f057a8d7.
+  Recommendations and baseline evidence: work/pull-20261116b-{recommendations,
+  baseline-verification,current-plan}.json. Await download selection under D-166;
+  no full histories fetched, new analysis spending or production publication.
