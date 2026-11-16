@@ -5008,3 +5008,26 @@ Implementation in progress; user verification remains pending.
   release its hold with that recorded basis. No further work on the topic,
   additional scope, attempt reset or increase to the 195-attempt run ceiling.
   Other topics continue normally; this reconciles completed authorized work.
+- **F-236 — November 16 analysis reaches 60 topics; release checks prepared.**
+  At 2026-11-16T06:47Z, 60 of 70 approved topics are analyzed. Ledger records
+  130 attempts against D-200's 195 ceiling, 127 accepted outputs, two rejected
+  outputs followed by successful corrections, one running summary, no failed
+  requests, unknown completed usage or active spending holds. The second
+  correction was for 57253/18: 54 claims exceeded the 50-entry format limit and
+  one evidence span was not verbatim; the other six valid assessments were
+  retained. No new scope or allowance was required. All three Radbro topics are
+  analyzed. Manual source/output spot-checks cover nine topics, including brief
+  Radbro replies, attributed moderation claims, grant amounts and uncertainties,
+  and the distinction between proposed treasury rules, planned technical support
+  and an adopted funding decision. Evidence: work/pull-20261116-spotchecks.json.
+  Assessment review flags concerning unavailable external evidence remain visible;
+  claims have not been independently verified. Some outputs note inability to
+  read a local rubric file: the runner disables tools and supplies the complete
+  rubric inline (tools/lib/prompt.mjs), so the rubric is not missing from inputs.
+  Prepared bounded operational scripts for exact-candidate staging, preservation
+  checks, local/production publication, API verification and 1600x1100 browser
+  checks. Syntax checks pass; publication scripts have not yet been executed.
+  Final candidate security review, faithful local rehearsal, fresh production
+  backup, publication, live verification and offsite restore check remain ahead
+  under D-200. No application changes or production writes. Git working tree was
+  clean before this progress entry; ignored scripts/evidence remain local.
