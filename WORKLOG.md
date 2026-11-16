@@ -4978,3 +4978,23 @@ Implementation in progress; user verification remains pending.
   partial history boundaries, and the full-poll cutoff. No application-image
   changes are planned. Complete validation, preview, backup and restoration checks
   before reporting the resulting production status to the user.
+- **F-235 — Approved scoped analysis initialized and running.** Built a separate
+  local analysis database at work/pull-20261116-analysis/zforum.sqlite and root
+  work/pull-20261116-analysis/imports for the same run ID. Verified exact 70-topic /
+  75-thread membership, all reviewed snapshot hashes, both deferred source
+  baselines, six-thread grants group, all 25 non-staging tables, integrity and
+  unchanged full-poll cutoff. Original 72-topic download and production snapshot
+  remain preserved. Installed reviewed per-job/per-topic spending limits and the
+  195-attempt run ceiling; initial ledger has zero attempts/holds. Subscription
+  authentication check passes without exposing credentials. Analysis started
+  2026-11-16T04:06Z under the import lock with a nine-hour process bound and
+  per-request 900-second bounds. The runner recomputes remaining allowance on
+  each resume, forbids forum fetching/publication and preserves paid outputs.
+  The first summary validated. Projection from exact selected source counts is
+  271 topics / 13,971 stored posts (27 new, 43 refreshed, 201 retained topics),
+  subject to final candidate and rehearsal verification. Evidence:
+  work/pull-20261116-{analysis-plan.json,analysis-scope-verification.json,
+  scope-analysis.log,analysis.log}; operational scripts use the existing pipeline.
+  An early status check preceded setup completion and reported a missing plan;
+  no analysis ran from that failed command. Waited for successful setup before
+  launching the runner. No application changes or production writes.
