@@ -5074,3 +5074,19 @@ Implementation in progress; user verification remains pending.
   publication permission is needed. Preserve the existing image, personal data,
   unselected releases and full-poll checkpoint; verify rendered dates and the
   offsite backup/restore after publication.
+- **F-238 — November 16 publication rehearsal and rendered preview pass.**
+  Local publication produced exactly 271 topics and 13,971 posts, preserving all
+  14 personal tables, prior history rows, 201 unselected releases and the
+  full-poll cutoff. Faithful Rust-server API checks pass for every release ID,
+  authentication availability, zero unavailable topics, runtime assets, all
+  three Radbro topics, six-thread grouping, removals and both deferred releases.
+  Chrome at 1600x1100 reports no runtime exceptions and renders 271 topics with
+  "Latest forum content refresh: Nov 16, 2026, 03:45 AM UTC". Catalog and Radbro
+  screenshots inspected; layout, summary and reading filters display correctly.
+  Evidence: work/release-20261116-{published-rehearsal,local-verification,
+  local-browser}.json and local-{catalog,radbro}.png. Local publication peak RSS
+  was 1,693,436 KiB; use a 1536 MiB Node heap limit for the bounded production
+  publication process within the existing 3 GiB VM. This process-local setting
+  does not change the serving application or machine configuration. Proceed
+  under D-200/D-202 with the same hash-bound bundle and fresh prepublication
+  backup; no further analysis or forum requests during publication.
