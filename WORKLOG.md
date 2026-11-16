@@ -4895,3 +4895,14 @@ Implementation in progress; user verification remains pending.
   CLAUDE.md/D-166; analysis and publication require later separate reviews.
   Security review: documentation and ignored operational evidence only; no
   secrets or application changes. Source text remains untrusted data.
+- **D-199 — Approve November 16 downloads, including Radbro threads.** User
+  approves F-232 with the instruction to leave Radbro material in. Add the
+  Radbro price plan 53598, Liberate radbro 59311 and daily-radbro 58709 to the
+  proposed 69 topics: 72 topics / 77 source threads, 27 new and 45 existing.
+  All selected histories are full; preserve six-thread ZCG membership, existing
+  exclusions and deferred partial histories. Fetch into a separate local draft,
+  validate and preview, then present the D-146 analysis scope/spending review.
+  No model spending or production publication is authorized yet. Clarified that
+  the 129 deferred topics have no listing activity newer than their individual
+  latest published snapshots, which can be from later pulls, not necessarily
+  initial deployment; listing timestamps do not prove absence of silent edits.
