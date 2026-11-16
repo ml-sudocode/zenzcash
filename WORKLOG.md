@@ -5163,3 +5163,12 @@ Implementation in progress; user verification remains pending.
   Recommendations and baseline evidence: work/pull-20261116b-{recommendations,
   baseline-verification,current-plan}.json. Await download selection under D-166;
   no full histories fetched, new analysis spending or production publication.
+- **D-204 — Approve afternoon downloads for the proposed 22 topics.** User says
+  "go ahead" in response to F-240's exact download proposal: 22 topics / 27
+  threads, comprising 14 existing topics and eight new-to-site discussions.
+  Fetch full selected histories into a separate local draft from the verified
+  production snapshot. Preserve all six ZCG members, unselected releases,
+  existing partial histories and exclusions. Bind the selection to F-240's
+  discovery hash and baseline; no all-topic fetch. Validate source changes and
+  preview, then present the separate D-146 analysis scope and spending review.
+  This approval does not authorize new model calls or publication.
