@@ -4922,3 +4922,43 @@ Implementation in progress; user verification remains pending.
   snapshot was not yet saved; do not manufacture a completed snapshot from the
   checkpoint. Evidence: work/pull-20261116-{selection.json,current-plan.json,
   fetch.log} and this run's audit-events.json. No application changes.
+- **F-234 — Approved downloads verified; November 16 analysis proposal ready.**
+  Run 1bcf27a7-996c-4202-b6da-c0ab10440c96 fetched all 72 approved topics /
+  77 source threads. Both fetch invocations total 31.8 minutes: 998 thread and
+  723 profile requests, including 375 repeated thread requests and the retried
+  profile after F-233's socket closure; no rate-limit responses or model calls.
+  Downloaded scope contains 392 added visible posts (313 in the discovery
+  window, six arriving during downloads, 73 historical backfill), four edits
+  and three newly unavailable posts. The six-thread ZCG group has 64 additions,
+  one edit and one unavailable post; funding-process thread 58906 has 39
+  additions, two edits and one unavailable post. Türkiye outreach 59200 has one
+  newly unavailable post. Name Service 55737 only dropped an already-hidden
+  record; its visible content is unchanged. All three Radbro selections fetched.
+  Recommend analysis of 70 topics / 75 threads: 27 new topics and 43 existing.
+  Defer Price Speculation 16488 (four minor additions versus eight summary
+  section/synthesis jobs plus one reply batch, approximately 1.13–1.61 million
+  input-plus-output tokens and 31–54 minutes) and Name Service 55737 (no visible
+  change; avoid regenerating its summary solely for an absent hidden record).
+  Included scope: 388 added visible posts (309 in-window, six after discovery,
+  73 backfill), four edits, three newly unavailable; retain 1,740 assessments.
+  Keep 322 dated originals for reading and summary context without individual
+  model work. Proposed fresh work: 70 summaries plus 92 reply batches assessing
+  349 posts, 162 planned requests; proposed total allowance 195 attempts including
+  33 correction/retry attempts. This allowance is not yet approved. All included
+  request sizes are known: 7,846–817,505 prompt characters, 6,957,781 total;
+  characters are not token estimates. From 902 measured historical requests,
+  estimate input 3,093,865–4,804,821 tokens, output 537,597–988,223 tokens and
+  208–383 minutes with two reply workers. Token estimates exclude retries;
+  time includes upper contingency. Subscription dollar cost/quota is unknown.
+  Private preview, frozen hashes/membership, selected-only requests, database
+  integrity/foreign keys and all 25 tables outside import staging verified.
+  Baseline file hash unchanged; 244 published topics / 13,582 current posts /
+  seven accounts and full-poll cutoff unchanged in the draft. No spending-review
+  authorization file, analysis calls or publication. Exact per-topic scope,
+  reasons, source deltas, reuse, jobs and estimates are in
+  work/pull-20261116-analysis-review.{json,txt}; verifier/builder:
+  work/pull-20261116-analysis-review.mjs. Evidence also includes
+  work/pull-20261116-{fetch-resume.log,fetch-verification.json,current-plan.json}
+  and the run's preview.json/audit.json. Await D-146 analysis/spending approval;
+  publication remains a later separate review. Documentation/security review:
+  no secrets or application changes; forum text handled as untrusted data.
