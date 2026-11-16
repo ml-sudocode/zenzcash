@@ -5090,3 +5090,35 @@ Implementation in progress; user verification remains pending.
   does not change the serving application or machine configuration. Proceed
   under D-200/D-202 with the same hash-bound bundle and fresh prepublication
   backup; no further analysis or forum requests during publication.
+- **F-239 — November 16 content published and production verified.** Published
+  run 1bcf27a7-996c-4202-b6da-c0ab10440c96 at 2026-11-16T08:01:01.645Z on
+  zencash/e823213f175598: 70 selected topics (27 new, 43 refreshed), with 201
+  unselected releases retained. Production now has 271 topics, 13,971 posts and
+  seven accounts, schema 11. All 14 personal tables and prior source/release/
+  rendition history rows were preserved. Full-poll cutoff remains unchanged;
+  latest content refresh is 2026-11-16T03:45:54.168Z. All three Radbro selections
+  are included. Fresh prepublication backup at
+  /data/backups/release-20261116-before.sqlite matches the original production
+  snapshot SHA-256 5230132fc0ca00f91ad186b1d858622c04fe8085c05915e4f363e684087bda0f.
+  All four transferred artifacts matched local checksums. Publication used
+  1,270,816 KiB peak RSS and made no source/model calls or application-image
+  change. Live API checks match all rehearsal release IDs, show no unavailable
+  topics, preserve authentication and runtime assets, and verify sampled
+  removals, six-thread grouping and deferred releases. Live Chrome at 1600x1100
+  has no runtime exceptions; catalog and Radbro screenshots were inspected and
+  match the rehearsal, including the automatic November 16 03:45 UTC refresh.
+  Offsite backup completed at 2026-11-16T08:03:58.150Z:
+  zforum/2026-11-16T08-02-48.555Z-63971169-95c7-44f1-a243-163365b9c36f.tar.gz,
+  SHA-256 7847448d47b37bae52663b12d1f304d05da050f97fa89686bce624f29e2459db.
+  The local backup command exited 143 before reporting completion; inspection
+  showed the remote backup had continued and saved its completed manifest.
+  No duplicate upload was needed. A separate bounded download/restore verified
+  this exact key and checksum, integrity, foreign keys, schema and database
+  counts. Restore scratch space was cleaned by the existing verifier; volume
+  has 4.4 GiB free afterward. Final health check passes and machine image remains
+  deployment-01M76NZQD6YFP03KXNCGBTN30F. Local preview server was stopped; all
+  operational commands have exited. Evidence: work/release-20261116-{published,
+  backup,production-verification,production-browser,backup-verification}.json,
+  production-{catalog,radbro}.png and publication/backup/restore logs. Current
+  and analysis plan pointers record published-and-verified. Operational work is
+  complete; user visual verification remains pending. No application changes.
