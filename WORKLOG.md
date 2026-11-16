@@ -4998,3 +4998,13 @@ Implementation in progress; user verification remains pending.
   An early status check preceded setup completion and reported a missing plan;
   no analysis ran from that failed command. Waited for successful setup before
   launching the runner. No application changes or production writes.
+- **D-201 — Reconcile a completed topic's modest token overrun.** The Q4 grant
+  review-period post 59298 produced 69 claim entries against the format's maximum
+  of 50. Its one correction attempt, already covered by D-200's contingency,
+  validated successfully. Topic 59298 is analyzed with no remaining jobs; all
+  three completed requests have measured usage. Total 116,324 tokens exceeds its
+  109,424 monitoring ceiling by 6.3%. Under D-173's existing authorization for
+  modest overruns, raise only this topic ceiling to the measured 116,324 and
+  release its hold with that recorded basis. No further work on the topic,
+  additional scope, attempt reset or increase to the 195-attempt run ceiling.
+  Other topics continue normally; this reconciles completed authorized work.
