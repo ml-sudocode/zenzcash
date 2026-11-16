@@ -4962,3 +4962,19 @@ Implementation in progress; user verification remains pending.
   and the run's preview.json/audit.json. Await D-146 analysis/spending approval;
   publication remains a later separate review. Documentation/security review:
   no secrets or application changes; forum text handled as untrusted data.
+- **D-200 — Approve analysis and delegate completion through deployment.** User
+  approves the F-234 proposal: 70 topics / 75 threads, 162 planned model requests,
+  a total ceiling of 195 attempts including correction/retry headroom. Exclude
+  Price Speculation 16488 and Name Service 55737; include all three selected
+  Radbro topics. Bind per-job and per-topic spending limits to the reviewed
+  snapshot hashes under D-171/D-173, retain paid outputs and count all attempts
+  across resumes. Then user explicitly requests going all the way to deployment
+  while they sleep. This authorizes end-to-end review, local rehearsal, production
+  content publication and live/offsite verification for this exact approved scope,
+  superseding the earlier plan to stop for a separate publication permission.
+  Perform the actual source/output safety review and record its findings and any
+  acknowledgment basis; do not fabricate a review or ignore unresolved security
+  findings. Preserve unselected releases, accounts and personal data, grouped and
+  partial history boundaries, and the full-poll cutoff. No application-image
+  changes are planned. Complete validation, preview, backup and restoration checks
+  before reporting the resulting production status to the user.
