@@ -4906,3 +4906,19 @@ Implementation in progress; user verification remains pending.
   the 129 deferred topics have no listing activity newer than their individual
   latest published snapshots, which can be from later pulls, not necessarily
   initial deployment; listing timestamps do not prove absence of silent edits.
+- **F-233 — November 16 fetch interrupted by a remote socket closure.** Approved
+  selection validates as 72 topics / 77 threads; local draft starts from the
+  verified production snapshot. Run 1bcf27a7-996c-4202-b6da-c0ab10440c96 stopped
+  at 2026-11-16T03:23:36.630Z after 11.2 minutes: Node fetch reported
+  UND_ERR_SOCKET / "other side closed" during an author-profile request.
+  All 375 Price Speculation thread requests succeeded; 260 profiles completed
+  before the failed 261st profile request. No HTTP rate limits, model calls or
+  publication. Its completed source checkpoint shows four added posts, no edits
+  or removals: the previous three minor replies plus a music/price-celebration
+  post. Proposed analysis deferral remains separate from download approval;
+  explicitly selected Radbro topics remain included. Resume the same approved
+  frozen selection with a bounded fetch command, retaining cached profiles.
+  The importer refetches the unfinished topic's post history because its final
+  snapshot was not yet saved; do not manufacture a completed snapshot from the
+  checkpoint. Evidence: work/pull-20261116-{selection.json,current-plan.json,
+  fetch.log} and this run's audit-events.json. No application changes.
