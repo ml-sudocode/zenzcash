@@ -5321,3 +5321,44 @@ Implementation in progress; user verification remains pending.
   analysis spending and publication retain their separate review checkpoints;
   earlier run-specific approvals do not authorize this new scope. No production
   content change or full-poll cutoff advancement during discovery.
+- **F-245 — November 18 discovery verified; propose 57 topics for download.**
+  Fresh production snapshot work/pull-20261118-production.sqlite verifies
+  schema 11, integrity/foreign keys, 279 topics / 14,146 posts / seven accounts,
+  no active import and every live release ID. SHA-256:
+  f27704ba3ff8e2bdef581c6a86d98a0ec920f39e201edf2c8dca3210a0078769.
+  Latest published content remains 2026-11-16T16:39:59.275Z. Discovery through
+  2026-11-18T00:44:35.524Z completed two matching ten-page passes: 20 listing
+  requests, no retries, rate limits or model calls. Found 248 active threads,
+  244 grouped candidates and one configured music-thread exclusion.
+  Recommend full downloads for 57 topics / 62 source threads: 36 existing topics
+  with newer listed activity and 21 new-to-site discussions. Existing listings
+  show 183 positive post-count differences; new topics list 80 posts. These are
+  not verified new replies. Three revived histories (CipherScan 54151, Zchat
+  54543, mining economics 56460) contribute 51 listed posts; distinguish older
+  backfill after approved fetching. Include unchanged-count topics 59049/59204
+  because their activity advanced. Preserve all six ZCG members even though
+  four appear active in this discovery window. Prioritize 38 topics for technical,
+  security, governance and grant relevance; 19 normal-priority updates included.
+  Existing selections: 43855,45371,51247,54291,54721,55267,56324,56545,56890,
+  57219,57253,57800,57807,58172,58393,zcg,58600,58647,58724,58841,58906,58936,
+  59027,59035,59046,59049,59133,59204,59273,59299,59310,59325,59337,59349,
+  59350,59357. New selections: 54151,54543,56460,59362,59363,59365,59366,59367,
+  59368,59369,59370,59371,59372,59382,59384,59394,59402,59405,59417,59419,
+  59420. New-topic relevance remains provisional from listing titles; do not
+  infer linked contents, verified releases, grants awarded or community consensus.
+  Defer 178 existing topics without activity newer than their own published
+  snapshots; this includes all three Radbro topics, retained in the catalog.
+  Keep eight prior lower-priority deferrals: 8,29765,34554,56891,57228,58858,
+  59199,59330. Welcome 8 gained three listed posts since the prior review; the
+  other seven are unchanged. Price Speculation 16488's listing is also unchanged
+  since its November 16 download/review and analysis deferral. Preserve partial
+  histories 44220/45359, known 51139 count discrepancy and previously hidden
+  record at 55737. Listings cannot rule out silent edits.
+  Exact review: work/imports/discovery-2ba99c2f-797d-4767-9d47-90d3d1114f84/selection-review.json;
+  parsed SHA-256 c64cb43431c36baf5c76d598dc39a9da534b8acd33c0f6f45b03ec52faac27c3.
+  Evidence: work/pull-20261118-{baseline-verification,candidate-comparison,
+  recommendations,current-plan}.json, discovery/recommend logs and audit.
+  Recommendation validates scope, baseline releases, grouping and unchanged
+  database checksum. Await D-166 download selection, then fetch and present
+  D-146's separate analysis review. No histories fetched, analysis spending,
+  production content changes or full-poll cutoff advancement.
