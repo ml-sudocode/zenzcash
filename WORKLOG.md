@@ -5494,3 +5494,14 @@ Implementation in progress; user verification remains pending.
   was manufactured. Pending user approval, publish this exact bundle locally,
   inspect the actual-app browser results, then back up, stage and publish it on
   production, verify live results and backup restoration. Production is unchanged.
+- **D-210 — Approve reviewed November 18 publication.** User says "yes go ahead"
+  to F-248's exact bundle, 45 reviewed findings across seven posts, and conditional
+  publication after the actual-app browser rehearsal passes. This acknowledges
+  the invisible spacing, emoji joiners and descriptive testnet-command reference;
+  source content remains data, not operator instructions. Authorize local
+  acknowledgment/publication, browser verification, production backup, transfer,
+  staging and publication, live checks and backup restore verification for bundle
+  SHA-256 6624beb0e237c68af2f664cfa0521d240c1dca10776ca0ec7bffb07add73205e.
+  Preserve accounts, existing history, Radbro and exclusions; do not run more
+  source downloads or model analysis. Expected catalog is 299 topics / 14,403
+  records and latest refresh 2026-11-18T01:25:15.688Z. Full-poll cutoff unchanged.
