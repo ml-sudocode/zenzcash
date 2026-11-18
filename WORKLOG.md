@@ -5429,3 +5429,19 @@ Implementation in progress; user verification remains pending.
   review suspicious-content findings and prepare the actual-app deployment
   preview. Security acknowledgment and production publication remain separate
   approvals; neither is granted by this analysis decision.
+- **F-247 — Approved analysis copy and spending policy verified.** Prepared
+  work/pull-20261118-analysis/zforum.sqlite and its imports directory for exactly
+  56 topics / 61 source threads, excluding 56460 and preserving source hashes,
+  all six ZCG members, 25 non-staging tables and the full-poll cutoff. Baseline
+  SHA-256 remains unchanged. Subscription login check passes. Installed the
+  persistent 144-attempt policy, per-job ceilings at twice estimated upper tokens
+  and per-topic ceilings at 150%. Reuse-only 59049/59204 have empty allowed-job
+  lists; the spending schema requires positive topic ceilings, so these use one
+  token rather than zero, authorizing no jobs. Initial setup rejected the zero
+  ceilings before any model call. The first recovery check also rejected a table
+  name containing digits; corrected the operational identifier assertion to the
+  existing canonical identifier pattern and reran all preservation checks.
+  Final inspectSpending passes with zero attempts and no holds. Original fetch
+  draft remains intact. Evidence: work/pull-20261118-analysis-{plan,scope-verification}.json
+  and setup logs. Start subscription-only bounded analysis under D-209; source
+  fetching and production writes are explicitly disabled in the runner.
