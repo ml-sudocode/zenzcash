@@ -5505,3 +5505,23 @@ Implementation in progress; user verification remains pending.
   Preserve accounts, existing history, Radbro and exclusions; do not run more
   source downloads or model analysis. Expected catalog is 299 topics / 14,403
   records and latest refresh 2026-11-18T01:25:15.688Z. Full-poll cutoff unchanged.
+- **F-249 — Local publication and actual-app preview pass; preserve transfer copies compressed.**
+  D-210 local publication completed: 299 topics / 14,403 records, all 14 personal
+  tables unchanged and all prior release/rendition/source-history rows preserved.
+  API verification matches every release; 15 sampled topics include all Radbro
+  entries, new topics, all six ZCG threads and hidden/deferred content checks.
+  Chrome at 1600x1100 has no runtime exceptions. Inspected catalog, Radbro and
+  new poll screenshots; latest refresh renders November 18, 2026, 01:25 AM UTC.
+  Localhost uses its own origin/RP ID; production retains zenzcash.com.
+  Production health passes with the prior 279-topic catalog. Volume has 2.7 GiB
+  free, including 2.9 GiB of transfer files. To make room for the publication
+  safety copy and restore verification, compress only the inactive transfer
+  snapshots /data/transfers/pull-20261116b-production.sqlite and
+  /data/transfers/pull-20261118-production.sqlite using the existing verified
+  compression helper. Require empty WALs, unchanged source size/mtime and an
+  exact SHA-256 match after decompression before removing either uncompressed
+  copy. Preserve both archives, live database, backups and import history.
+  This reversible storage preparation is within the approved deployment work;
+  no volume expansion or additional service cost. Evidence will be recorded in
+  work/release-20261118-space.json. Proceed to the approved production publication
+  after verified compression and transfer checks.
