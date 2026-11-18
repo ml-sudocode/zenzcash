@@ -5414,3 +5414,18 @@ Implementation in progress; user verification remains pending.
   Await explicit D-146 scope/spending approval before preparing a scoped analysis
   copy and installing D-171 ceilings. No spending review installed, model calls,
   security acknowledgment or production publication authorized by this proposal.
+- **D-209 — Approve November 18 analysis scope and spending.** User says
+  "approved" to F-246's concrete 56-topic proposal and maximum 144 model calls.
+  Scope is exactly recommended_scope.topic_ids in
+  work/pull-20261118-analysis-review.json: 20 new, 34 changed existing and two
+  reuse-only topics, preserving all six ZCG source threads. Exclude mining-sales
+  topic 56460 from the analysis copy while retaining its downloaded originals.
+  Planned work is 54 summaries and 66 reply batches for 235 posts; 24 additional
+  attempts are contingency, not required spending. Record every attempt against
+  the persistent 144 limit across resumes. Install reviewed per-job and per-topic
+  token ceilings under D-171, with only D-173's recorded bounded flexibility for
+  modest overruns. Use subscription-only analysis on the separate local database;
+  prohibit additional forum requests and production writes. Validate outputs,
+  review suspicious-content findings and prepare the actual-app deployment
+  preview. Security acknowledgment and production publication remain separate
+  approvals; neither is granted by this analysis decision.
