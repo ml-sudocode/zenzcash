@@ -5371,3 +5371,46 @@ Implementation in progress; user verification remains pending.
   actual additions, edits, removals and backfill, then present D-146's separate
   per-topic analysis review and spending allowance. This authorizes downloads,
   not new model calls or production publication.
+- **F-246 — November 18 downloads verified; analysis proposal ready.** D-208's
+  exact 57 topics / 62 source threads fetched into the separate local draft in
+  7.5 minutes: 205 thread and 224 profile requests, no retries/rate limits and
+  zero model invocations. Run 261d608c-b3a2-4781-b940-90c141108247. Selection
+  preflight initially used a read-only draft handle, but its rollback validation
+  requires a write transaction; corrected to the writable local draft before
+  fetching. No production modification. All 25 non-staging tables, baseline
+  SHA-256 and full-poll cutoff verify unchanged; draft remains schema 11 with
+  279 published topics / 14,146 posts / seven accounts.
+  Fetched sources contain 264 added visible posts (212 within the discovery
+  window, eight arriving after discovery, 44 older backfill), eight raw-text
+  edits and no newly unavailable posts. Opening/latest bounded excerpts checked
+  for all 21 new topics and Speak-ez; all eight edited originals compared with
+  published sources. Notable edits: the parsing-vulnerability request increases
+  from $37,500 to $56,250 with another disclosure, polling closes December 1 at
+  02:59 UTC, ZAP wording changes and Mylo's candidacy is added. Speak-ez now has
+  substantive proposal text beyond its previously link-only opening. Linked
+  applications, releases and claims remain unverified; source commands and links
+  were not executed/followed. Brief appreciation replies remain included.
+  Recommend 56 topics: 20 new, 34 changed existing and two unchanged reuse-only
+  topics (59049/59204). Defer new topic 56460: the mining-economics opening is
+  an equipment advertisement and its latest post requests bulk pricing, matching
+  the prior mining-sales deferral. Its originals stay in the local draft.
+  Recommended scope has 254 additions (211 within window, eight after discovery,
+  35 backfill), eight edits, 1,680 retained assessments, two retained summaries
+  and 96 dated originals retained without individual analysis. Priorities are
+  36 high / 18 normal / two reuse-only. Radbro releases and earlier deferrals
+  remain intact; no full-poll completion claim.
+  Proposed work: 54 summaries and 66 reply batches for 235 posts, 120 planned
+  model calls; propose 144 total attempts including 24 contingency calls.
+  Known requests total 6,054,431 prompt characters, with no unknown-size jobs;
+  individual requests span 7,777–887,449 characters. Empirical estimates from
+  1,111 accepted gpt-6.1-sol jobs: 2,470,479–3,922,409 input tokens (cached input
+  included), 406,171–733,819 output tokens and 164–300 minutes with two reply
+  workers. Token range excludes retries; time includes upper contingency.
+  Characters are not converted to tokens; these are uncertain planning ranges,
+  not guarantees. Subscription quota and dollar costs are unknown. No API-key
+  billing proposed. Operator planning usage is separate from importer usage.
+  Evidence: work/pull-20261118-{analysis-review,fetch-verification,source-review,
+  estimate-samples,current-plan}.json, analysis-review.txt and fetch/build logs.
+  Await explicit D-146 scope/spending approval before preparing a scoped analysis
+  copy and installing D-171 ceilings. No spending review installed, model calls,
+  security acknowledgment or production publication authorized by this proposal.
