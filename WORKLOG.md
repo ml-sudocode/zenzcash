@@ -5445,3 +5445,52 @@ Implementation in progress; user verification remains pending.
   draft remains intact. Evidence: work/pull-20261118-analysis-{plan,scope-verification}.json
   and setup logs. Start subscription-only bounded analysis under D-209; source
   fetching and production writes are explicitly disabled in the runner.
+- **F-248 — November 18 analysis complete; reviewed bundle staged for publication decision.**
+  D-209's exact 56 topics / 61 source threads finished in about 187 minutes.
+  All 54 summaries and 66 reply batches validate: 120 accepted model responses
+  from 123 attempts against the approved 144 limit. Three rejected outputs were
+  repaired: 59350 summary citation order, 59349 post 9 claim type, and 54151
+  post 24 claim type. Partial repairs retained 12 already-valid assessments.
+  No failed calls, unknown usage, spending holds or scope expansion. Usage:
+  3,243,586 input tokens including 1,156,096 cached input, plus 583,450 output;
+  cached input is a subset, not additional usage. Subscription-only execution;
+  dollar cost remains unknown. No additional forum fetches or production writes.
+  Retained 1,680 existing assessments and two summaries; produced 235 fresh
+  assessments. Preserved 96 dated originals without individual assessment.
+  Compared summaries against supplied source changes for 38 topics, including
+  all 20 new topics and the funding, moderation, ZCG, ZECsy, FROST and timelock
+  updates. Revised poll close is December 1 at 02:59 UTC; Vizor fee retraction,
+  ZAP research clarification and unverified/disputed claims remain distinguished.
+  Brief appreciation replies are included. Source links and commands were not
+  followed/executed. Evidence: work/pull-20261118-spotchecks.json.
+  Prepared work/pull-20261118-prepared.json (95,900,152 bytes), SHA-256
+  6624beb0e237c68af2f664cfa0521d240c1dca10776ca0ec7bffb07add73205e.
+  Staged using the actual Rust application in the full separate production copy
+  work/rehearsals/pull-20261118-0LiNtz/zforum.sqlite. Expected catalog: 299 topics
+  (20 new, 34 updated, two reuse-only, 243 retained) and 14,403 post records.
+  Corrected preliminary record-count arithmetic: 254 added visible posts plus
+  three new hidden placeholders, not just 254 records. Selected candidates have
+  2,027 records, 2,011 visible; all 16 hidden records have null text, segments and
+  analysis. This is accounting clarification, not additional content or spending.
+  Baseline SHA and all reviewed snapshot hashes match. Analysis preserves all
+  25 non-staging tables; staging preserves 14 personal and five public tables.
+  Database integrity, foreign keys and schema checks pass. Radbro releases and
+  prior deferrals remain intact; 56460 is excluded and its original fetch retained.
+  Full-poll cutoff stays 2026-11-06T03:51:56.235Z. Expected latest content refresh
+  is 2026-11-18T01:25:15.688Z, derived from the newest candidate snapshot.
+  Final source and staged scans match: 45 findings across seven posts. Inspected
+  28 repeated U+200B spacing occurrences in 51247/73, 51247/75 and 56890/25;
+  16 repeated U+200D emoji joiners in 58656/169 and 58936/1–2; and one retained
+  assessment assumption about a testnet wallet/faucet command in 58647/10.
+  These are ordinary formatting, emoji and descriptive content; none was followed
+  as an operator instruction. Pattern review is not proof of absence of all
+  injection attempts or semantic errors. No unresolved flagged finding remains.
+  Candidate digest 270368487f405573a03789dee76903a53e1c952b10e5b07c07826f1b73a2fcda;
+  staged report digest c1d955ccd7e21e548fadc6b21d95bd9296020bf22b9084e16f41eb554edfb124.
+  Evidence: work/pull-20261118-{rehearsal,final-verification}.json and
+  work/release-20261118-content-review.json. Operational publication and 1600x1100
+  Chrome verification helpers are prepared and syntax-checked, not executed.
+  Security acknowledgment and publication remain unapproved; no acknowledgment
+  was manufactured. Pending user approval, publish this exact bundle locally,
+  inspect the actual-app browser results, then back up, stage and publish it on
+  production, verify live results and backup restoration. Production is unchanged.
