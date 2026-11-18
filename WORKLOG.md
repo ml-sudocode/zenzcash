@@ -5362,3 +5362,12 @@ Implementation in progress; user verification remains pending.
   database checksum. Await D-166 download selection, then fetch and present
   D-146's separate analysis review. No histories fetched, analysis spending,
   production content changes or full-poll cutoff advancement.
+- **D-208 — Approve November 18 downloads for the proposed 57 topics.** User
+  says "go ahead" in response to F-245's exact selection: 36 existing topics and
+  21 new-to-site discussions, 62 source threads including all six ZCG members.
+  Fetch the approved full histories into a separate local draft, bound to the
+  discovery hash and verified production baseline. Preserve deferred releases,
+  Radbro content, exclusions and existing partial-history limits. Validate the
+  actual additions, edits, removals and backfill, then present D-146's separate
+  per-topic analysis review and spending allowance. This authorizes downloads,
+  not new model calls or production publication.
