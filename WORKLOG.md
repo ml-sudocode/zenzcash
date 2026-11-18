@@ -5312,3 +5312,12 @@ Implementation in progress; user verification remains pending.
   production-browser,offsite-backup,restored,backup-verification}.json and logs.
   Current and analysis plans record published-and-verified. No application
   changes or further model calls. User visual verification remains pending.
+- **D-207 — Start November 18 pull with fresh discovery.** User requests another
+  pull after F-244. Use work/pull-20261118 for a fresh consistent production
+  snapshot and listing-only discovery. Verify the database and live release IDs,
+  compare each candidate with its published snapshot, and present the concrete
+  download recommendation under D-166. Preserve Radbro inclusion preferences,
+  grouped membership, prior exclusions and partial-history limits. Downloads,
+  analysis spending and publication retain their separate review checkpoints;
+  earlier run-specific approvals do not authorize this new scope. No production
+  content change or full-poll cutoff advancement during discovery.
