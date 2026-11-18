@@ -5525,3 +5525,32 @@ Implementation in progress; user verification remains pending.
   no volume expansion or additional service cost. Evidence will be recorded in
   work/release-20261118-space.json. Proceed to the approved production publication
   after verified compression and transfer checks.
+- **F-250 — November 18 production publication and restore verification pass.**
+  Published D-210's exact approved bundle on zencash machine e823213f175598,
+  completing 2026-11-18T13:40:53.557Z. All four transferred files matched local
+  SHA-256 hashes. A consistent pre-publication copy is retained at
+  /data/backups/release-20261118-before.sqlite. Publication ran as zforum under
+  the import lock with a bounded 1536-MiB Node heap; peak RSS was 1,403,416 KiB.
+  Final schema 11 has 299 topics, 14,403 post records and seven accounts. All
+  14 personal tables are unchanged; all prior release, rendition, source-revision
+  and source-pull rows remain. Every live release matches the local rehearsal.
+  Latest forum content refresh is 2026-11-18T01:25:15.688Z; internal full-poll
+  cutoff remains 2026-11-06T03:51:56.235Z. No additional fetch/model calls.
+  Live health, API catalog, 15 content samples, authentication availability and
+  origin, hidden content, six-member ZCG group, Radbro and runtime checks pass.
+  Chrome 1600x1100 reports no runtime exceptions. Inspected production catalog,
+  Radbro and new poll screenshots; refresh visibly reads Nov 18, 2026, 01:25 AM
+  UTC in the test browser. Actual users see their own local time zone. The local
+  preview server was stopped; no application code or image change was needed.
+  Fresh off-site backup completed 2026-11-18T13:43:03.767Z:
+  zforum/2026-11-18T13-41-40.038Z-f71c637c-d80a-4f0f-8569-d9c6976ffea0.tar.gz,
+  SHA-256 dfe92f55c46f1e0daea55c756ffe57974781afc861e16e1d509bb59c8403c827.
+  Download/restore verification passes exact archive hash, manifest, schema,
+  SQLite integrity, foreign keys and 299/14,403/7 counts. Temporary restore files
+  were removed. The two transfer snapshots retain byte-identical contents in
+  compressed archives, reclaiming 914,119,041 bytes; volume has 2.8 GiB free after
+  publication and restore cleanup. Live machine health check remains passing.
+  Evidence: work/release-20261118-{published,backup,offsite-backup,restored,final}.json,
+  production-{verification,browser}.json, production screenshots, transfer and
+  storage verification files. Current and analysis plans now point to the verified
+  publication. Technical verification is complete; user review remains pending.
