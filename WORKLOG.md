@@ -5564,3 +5564,59 @@ Implementation in progress; user verification remains pending.
   analysis spending and publication retain their separate review checkpoints.
   No production content changes or full-poll cutoff advancement are authorized
   by this discovery step. Operational artifacts use work/pull-20261121.
+- **F-251 — November 21 discovery verified; propose 79 topics for download.**
+  Fresh production snapshot work/pull-20261121-production.sqlite verifies schema
+  11, integrity/foreign keys, 299 topics / 14,403 records / eight accounts, no
+  active import and every live release ID. Snapshot SHA-256:
+  16b9e9055a831d8f0805a6e24d47535df47e510ddd941a1e29b6530bddb53fec.
+  Latest published refresh remains 2026-11-18T01:25:15.688Z. Production health
+  passes; volume had 2.8 GiB free before the 612,573,184-byte snapshot. The eighth
+  account is newer than the previous publication and must be preserved.
+  Metadata discovery through 2026-11-21T01:54:06.936Z completed two matching
+  eleven-page passes: 22 listing requests, no retries/rate limits/model calls,
+  287 active threads, 283 grouped candidates and one configured music exclusion.
+  Recommend 79 topics / 84 source threads: 46 existing topics with newer activity
+  than their individual published snapshots, plus 33 new-to-site discussions.
+  Listings show 343 positive count differences for existing selections and 282
+  posts in new-to-site topics, including older backfill; these are not verified
+  new-reply counts. Prioritize 52 technical, governance, security and grant topics;
+  include 27 normal-priority community/outreach updates and provisional reviews.
+  Existing selections: 45371,51247,53913,55210,55350,56324,56404,56890,57134,
+  57135,57219,57655,57807,57848,58172,58192,58213,zcg,58532,58641,58709,58836,
+  58901,58906,59027,59035,59046,59049,59116,59273,59310,59311,59325,59337,
+  59342,59349,59350,59357,59362,59367,59369,59372,59382,59402,59419,59420.
+  New selections: 3004,43305,53745,55878,56030,56274,57060,57226,57494,57606,
+  57726,57910,59421,59426,59427,59428,59436,59440,59442,59445,59450,59451,
+  59460,59464,59465,59466,59467,59478,59493,59495,59498,59500,59505.
+  Preserve all six ZCG source members. Include the two active Radbro threads
+  58709/59311; retain unchanged 53598. Brief replies remain in selected histories.
+  Two short new topics, "The good art of letting things rest" (59427, two posts)
+  and "Grow with the floe" (59500, eight), have ambiguous listing titles: propose
+  downloading originals to establish relevance before recommending model analysis.
+  Do not infer linked contents, verified releases or grant outcomes from titles.
+  Defer 191 reviewed existing topics without newer listed activity; this is relative
+  to each published snapshot, not the initial deployment. Topics outside the
+  discovery window also remain untouched. Silent edits cannot be ruled out.
+  Retain eight prior lower-priority deferrals: 8,29765,34554,56891,57228,58858,
+  59199,59330. Viewing discussion 34554 has newer activity; the other seven listings
+  are unchanged. Keep the prior price-thread deferral (16488), explicitly noting
+  it now lists 7,462 posts versus 7,441 published records. Keep mining economics
+  56460 deferred after November 18 originals showed equipment advertising and a
+  bulk-price query; its listing is unchanged. Also propose deferring new general
+  reading 40744, music/celebration 59457 and Thanksgiving greeting 59462. These
+  make 13 explicit scope deferrals, plus configured music exclusion 20456.
+  Existing partial histories 44220/45359 and known 51139/55737 discrepancies
+  remain untouched. Exact metadata review:
+  work/imports/discovery-ab7a7703-eb15-4c4a-bd90-434a4e8baa0a/selection-review.json;
+  parsed SHA-256 9ab7cac8e52463db8ef75e56de81f0c878640fefda4f831b0b760a59ddee8708.
+  Evidence: work/pull-20261121-{baseline-verification,candidate-comparison,
+  recommendations,proposed-selection,current-plan}.json and corresponding logs.
+  Recommendation checks exact membership, baseline releases, exclusions, scope
+  schema and unchanged snapshot hash. Initial helper validation called the CLI
+  selection reader against a read-only database and failed loudly because its
+  registration dry run performs writes before rollback. No database mutation
+  occurred. The helper now uses read-only scope/membership checks; they pass.
+  Proposed selection is prepared but unapproved. Await D-166 download selection;
+  then fetch approved originals and present D-146's separate analysis review.
+  No full histories downloaded, model jobs run, production content changed or
+  cutoff advanced. User review remains pending.
