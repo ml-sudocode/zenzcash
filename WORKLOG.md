@@ -5554,3 +5554,13 @@ Implementation in progress; user verification remains pending.
   production-{verification,browser}.json, production screenshots, transfer and
   storage verification files. Current and analysis plans now point to the verified
   publication. Technical verification is complete; user review remains pending.
+- **D-211 — Start November 21 pull with fresh discovery.** User requests another
+  pull after F-250. Obtain a consistent production snapshot under the import lock,
+  verify its hash, database integrity and live release IDs, then run metadata-only
+  discovery against that local copy. Compare activity against each topic's own
+  published snapshot and review new discussions and prior deferrals. Preserve
+  Radbro, brief replies, grouped membership and existing partial-history limits.
+  Present the concrete download selection before fetching histories under D-166;
+  analysis spending and publication retain their separate review checkpoints.
+  No production content changes or full-poll cutoff advancement are authorized
+  by this discovery step. Operational artifacts use work/pull-20261121.
