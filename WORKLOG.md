@@ -5701,3 +5701,22 @@ Implementation in progress; user verification remains pending.
   recommendations and concise notes. JSON remains a machine-readable companion;
   give the readable filename for SSH access. Add that rule to CLAUDE.md now and
   provide a readable companion for the current source review as well.
+- **F-253 — November 21 analysis started with persistent limits.** D-213 setup
+  passes in work/pull-20261121-analysis/zforum.sqlite and its separate imports
+  root. Exact reviewed 79 topics / 84 source threads, original snapshot hashes,
+  all 25 non-staging tables and deferred baselines are preserved. Subscription
+  authentication check passes. Installed spending-review.json binds 240 total
+  attempts, twice each estimated upper job usage and 150% of each topic's upper
+  estimate to the approved snapshots; the one provisional ZCG synthesis ceiling
+  uses F-252's reviewed estimate. No holds or previous attempts at start.
+  Analysis launched with a bounded 12-hour process at approximately 02:57 UTC;
+  the first topic completed validation. Progress: work/pull-20261121-analysis.log
+  and work/pull-20261121-analysis-status.mjs. No forum fetch or publication path
+  is available to that runner. Operational plan records D-213 and the call limit.
+  Readable source-review companion now exists at
+  work/pull-20261121-source-review.txt, mode 0600, covering all 79 topics with
+  headings, recommendations, concise notes and change counts. Inspected its
+  rendered plain text. Future reviews use this presentation under CLAUDE.md.
+  Derived expected candidate catalog: 332 topics / 15,024 records, comprising
+  33 new, 46 updated and 253 retained topics. Preparation helper is syntax-checked
+  but remains unexecuted until analysis completes. Publication not authorized.
