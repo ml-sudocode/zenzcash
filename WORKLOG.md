@@ -5737,3 +5737,17 @@ Implementation in progress; user verification remains pending.
   attempt and its known usage, while still requiring all 200 planned accepted
   calls and all 79 validated candidates. Security acknowledgment and publication
   remain unauthorized.
+- **F-255 — November 21 analysis complete; distinguish resume reuse in audit.**
+  All 79 topics finished with 200 accepted jobs and 204 total attempts, within
+  D-213's 240 limit. Besides F-254's malformed JSON, two summaries needed length
+  corrections (403 and 420 characters versus 400) and one reply evidence span
+  needed a verbatim-text correction. No unknown usage or spending holds.
+  All 79 output/source comparisons are recorded. Prepared bundle stages into a
+  separate full-catalog database with 332 topics / 15,024 records; public and
+  personal tables remain unchanged. The final operational helper stopped because
+  it classified summary-thread-59349's resume cache reuse as a prior-production
+  summary. Manifest evidence shows one newly accepted summary request in this run
+  and no duplicate request. Correct the helper to distinguish same-run cached
+  outputs by their accepted job identity, assert that exact resumed summary and
+  its usage, and keep the 200 accepted-job / 81 summary / 119 reply-batch checks.
+  This corrects audit classification, not candidate content or approval scope.
