@@ -5751,3 +5751,36 @@ Implementation in progress; user verification remains pending.
   outputs by their accepted job identity, assert that exact resumed summary and
   its usage, and keep the 200 accepted-job / 81 summary / 119 reply-batch checks.
   This corrects audit classification, not candidate content or approval scope.
+- **F-256 — November 21 candidates verified and ready for publication review.**
+  Final verification passes at 08:12 UTC: exact 79 topics / 84 threads, 81 summary
+  jobs and 119 reply batches, 528 fresh assessments, 1,852 retained assessments
+  and 188 dated originals. Total 204 attempts / 240 approved; 200 accepted, three
+  validation rejections and one recorded malformed-JSON failure, all recovered.
+  Usage: 5,626,721 input tokens including 2,265,600 cached; 1,103,932 output.
+  No unknown usage or holds. Original baseline SHA, all 25 non-staging tables,
+  eight local baseline accounts and the internal full-poll cutoff are unchanged.
+  All 79 source/output spotchecks complete, including fee-criticism retractions,
+  added election candidate, both active Radbro topics, brief replies and all six
+  grouped ZCG threads. All 21 hidden records have null bodies and assessments;
+  newly unavailable 45371/233 and 58656/334,341 expose no content.
+  Prepared bundle stages in work/rehearsals/pull-20261121-90S6o7/zforum.sqlite.
+  Expected publication: 332 topics / 15,024 records, 33 new, 46 updated, 253
+  retained; 619 added visible records, five source edits and three newly
+  unavailable records. Latest published refresh becomes 2026-11-21T02:35:27.235Z.
+  Bundle work/pull-20261121-prepared.json is 116,326,125 bytes, SHA-256
+  58f1258e652e4c751665e370595c6cb0791108e32b23673c157e6089af3f858b.
+  Candidate digest fa42bc7de134635b264d27a281ec7dc80963532245d923d67959bc27cbc3c5f8.
+  The scan has 141 formatting-character findings across eight posts: ordinary
+  U+200B spaces in announcements and U+200D emoji joiners. All groups reviewed;
+  none unresolved. Source and staged reports differ only in generated scan ID;
+  the review is bound to the staged report digest
+  db1ba00ca6c26db2fffbb00bf69c16f80bfff9b6e32018826555dce190bb82aa.
+  No acknowledgment recorded, source commands executed or source links followed.
+  Evidence: work/pull-20261121-final-verification.json, -spotchecks.json,
+  -rehearsal.json, and work/release-20261121-content-review.json. Plain-text
+  proposal: work/pull-20261121-publication-review.txt. Current and analysis plans
+  now say verified-awaiting-publication-approval. All analysis processes exited.
+  Recommend acknowledging the exact formatting findings and publishing, followed
+  by live catalog/date/account/browser checks and backup-restore verification.
+  Actual-app publication rehearsal, fresh production/storage checks, backup and
+  atomic publication follow explicit approval. Production remains unchanged.
