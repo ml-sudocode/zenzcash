@@ -5620,3 +5620,13 @@ Implementation in progress; user verification remains pending.
   then fetch approved originals and present D-146's separate analysis review.
   No full histories downloaded, model jobs run, production content changed or
   cutoff advanced. User review remains pending.
+- **D-212 — Approve November 21 recommended downloads.** User says "yes, let's
+  take your recommendations" in response to F-251: approve exactly 79 topics /
+  84 source threads (46 existing, 33 new-to-site), including both active Radbro
+  threads, brief replies and all six ZCG members. Retain the 13 explicit deferrals,
+  music exclusion and existing history limitations. Bind the selection to review
+  SHA-256 9ab7cac8e52463db8ef75e56de81f0c878640fefda4f831b0b760a59ddee8708
+  and the verified November 21 production snapshot. Fetch into a separate local
+  draft, validate sources, inspect provisional topics and prepare the per-topic
+  analysis proposal. This approves downloads, not new model jobs, security
+  acknowledgment or publication; those controls remain pending.
