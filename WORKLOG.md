@@ -5630,3 +5630,59 @@ Implementation in progress; user verification remains pending.
   draft, validate sources, inspect provisional topics and prepare the per-topic
   analysis proposal. This approves downloads, not new model jobs, security
   acknowledgment or publication; those controls remain pending.
+- **F-252 — November 21 sources verified; analysis review available before spending.**
+  D-212's exact 79 topics / 84 source threads fetched into the separate local
+  draft in 9.6 minutes. Run 65562682-41a9-4e58-a8f6-8d343e319ded used 264 thread
+  and 276 profile requests, no retries/rate limits and zero model invocations.
+  All 25 non-staging tables match the production baseline, including published
+  releases, history and personal data. Baseline hash and full-poll cutoff remain
+  unchanged. Draft integrity/foreign keys pass: schema 11, 299 published topics,
+  14,403 published records and eight accounts. Selected source snapshots contain
+  2,589 records / 2,568 visible posts. All 21 hidden records have null raw text,
+  own text and segments. Three previously visible source posts are unavailable:
+  45371/233, 58656/334 and 58656/341. Publication must reconcile their visibility.
+  Actual additions: 619 visible posts, comprising 447 in the discovery window,
+  one after discovery and 171 older backfill. Five raw-text edits: 58906/135,
+  /139, /165, /166 and 59350/2. Before/after text inspected for each edit.
+  Notably, fee-change criticisms in 58906 are withdrawn with apologies following
+  a reported miscommunication; preserve those retractions and distinguish them
+  from retained claims. Election candidate list adds Julian La Picque.
+  Bounded opening/latest excerpts inspected for all 33 new-to-site topics.
+  Recommend analyzing all 79: 46 updated existing and 33 new, retaining 52 high
+  and 27 normal priorities. No additional deferrals after source inspection.
+  Both provisional titles are relevant: 59427 discusses pausing before reactive
+  forum replies; 59500 discusses shared infrastructure and community funding.
+  Mining-pool directory 3004 has old entries and one current pool advertisement;
+  preserve dates without implying endpoints are verified. Retain both active
+  Radbro topics and their brief replies. All prior deferred releases stay intact.
+  Review notes distinguish the independent Konclave contributor's application
+  from DeegaLabs' own grant, preserve its unscheduled prerequisite and mainnet
+  exclusion, and retain limitations in wallet, beta, translation and outreach
+  claims. No source commands executed or linked documents followed. External
+  delivery, security and performance claims remain attributed, not verified.
+  Proposed model work: 81 summary/section/synthesis jobs and 119 reply batches
+  assessing 528 posts, 200 planned calls. Retain 1,852 accepted reply assessments;
+  188 dated originals remain readable and inform summaries without individual
+  analysis. No summaries are unchanged/reusable. ZCG alone needs two section
+  summaries and a final synthesis, plus 13 reply batches for 92 added posts.
+  Propose 240 total attempts, including 40 contingency calls for invalid-output
+  corrections or extra synthesis work. An attempt is one model request, not a
+  forum post; there are no mandatory retries. This is a proposal, not approval.
+  Empirical estimates from 1,229 accepted gpt-6.1-sol jobs: 4,129,619–6,977,493
+  input tokens including cached input, 790,893–1,420,520 output tokens and
+  282–522 minutes with two reply workers. Known requests total 9,412,339 prompt
+  characters, individually 8,166–512,276. One ZCG synthesis request has unknown
+  final size; its provisional token range uses measured large-summary requests.
+  Additional intermediate merges, if required, use contingency. Token estimates
+  exclude retries; upper time includes contingency. Characters are not tokens.
+  Provider dollar cost and remaining subscription quota are unknown; subscription
+  execution only, no API-key billing proposed. Operator planning usage is separate.
+  Evidence: work/pull-20261121-{analysis-review,fetch-verification,source-review,
+  source-inspection,hidden-verification,estimate-samples,current-plan}.json,
+  analysis-review.txt and fetch/build-review logs. Review artifacts are mode 0600.
+  User asked how to access the pre-analysis notes and confirmed terminal over SSH.
+  Pointed to /home/sandsharks/zforum/work/pull-20261121-analysis-review.txt using
+  less, with scp as the local-download option. Source review notes remain in the
+  corresponding source-review.json. Await explicit D-146 analysis scope/spending
+  approval. No spending-review installed, new model jobs, security acknowledgment
+  or production publication. User review remains pending.
