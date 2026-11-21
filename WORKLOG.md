@@ -5720,3 +5720,20 @@ Implementation in progress; user verification remains pending.
   Derived expected candidate catalog: 332 topics / 15,024 records, comprising
   33 new, 46 updated and 253 retained topics. Preparation helper is syntax-checked
   but remains unexecuted until analysis completes. Publication not authorized.
+- **F-254 — Preserve November 21 outputs and resume after one malformed reply.**
+  At 06:39 UTC, 68 of 79 topics are analyzed, with 151 accepted calls and one
+  failed attempt among 152 total. Job marks-59349-17-24 returned invalid JSON
+  (offset 15148, expected comma or closing brace). Its measured usage is retained:
+  42,005 input tokens including 29,312 cached, and 8,391 output tokens. The sibling
+  batch completed successfully before the bounded runner exited; no calls remain
+  in flight, no unknown usage and no spending holds. All accepted artifacts remain.
+  Resume the same run under D-213's existing 240-attempt allowance, using the
+  remaining 88 attempts for 49 planned missing jobs and contingency. Do not reset
+  manifests, limits or holds, and do not regenerate accepted outputs. This is the
+  first contingency attempt, not expanded scope or a new spending approval.
+  Output/source spotchecks for all 68 completed topics are saved in
+  work/pull-20261121-spotchecks.json; remaining comparisons follow completion.
+  The final operational verification must account for this recorded failed
+  attempt and its known usage, while still requiring all 200 planned accepted
+  calls and all 79 validated candidates. Security acknowledgment and publication
+  remain unauthorized.
