@@ -335,6 +335,11 @@ jobs, request sizes and estimated time/token use with uncertainty. Characters ar
 tokens; unknown estimates stay unknown. Use existing previews/audits and bounded source
 excerpts; do not spend model calls classifying priority for this checkpoint.
 
+**Readable source reviews (D-213).** Provide the user-facing source review as plain
+text with short topic headings, the recommendation and concise notes about changes
+or qualifications. Keep JSON as a machine-readable companion, not the primary
+document offered for review. Give the exact readable filename for SSH access.
+
 Wait for explicit user approval of the proposed analysis scope and spending allowance
 before running any new forum-analysis model job, including summaries and section/merge
 jobs. Approval to fetch, include a topic, finish a pull or work unattended is not itself

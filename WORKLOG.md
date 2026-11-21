@@ -5686,3 +5686,18 @@ Implementation in progress; user verification remains pending.
   corresponding source-review.json. Await explicit D-146 analysis scope/spending
   approval. No spending-review installed, new model jobs, security acknowledgment
   or production publication. User review remains pending.
+- **D-213 — Approve November 21 analysis and improve source-review readability.**
+  After reviewing F-252's files, user says the source-review JSON is hard to read,
+  asks for a more legible version next time, and says "else, go ahead and process".
+  Approve the reviewed 79 topics / 84 threads, 200 planned calls and 240 total
+  attempts, including the stated 40-call correction/synthesis contingency. Use
+  subscription-only gpt-6.1-sol, two reply workers, snapshot-bound job/topic token
+  ceilings under D-171 and the existing modest-overrun policy under D-173. Retain
+  validated work on retries and never reset attempts or erase spending holds.
+  Preserve all prior exclusions, Radbro, brief replies and source visibility.
+  Prepare and validate the candidate content and publication proposal after
+  analysis; security acknowledgment and production publication remain separate.
+  Future user-facing source reviews must be plain text with short topic headings,
+  recommendations and concise notes. JSON remains a machine-readable companion;
+  give the readable filename for SSH access. Add that rule to CLAUDE.md now and
+  provide a readable companion for the current source review as well.
