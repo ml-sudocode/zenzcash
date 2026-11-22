@@ -5838,3 +5838,19 @@ Implementation in progress; user verification remains pending.
   exactly one acknowledgment event, matching the approved candidate and actual
   production publication report, plus the publication-review binding. Retain all
   database and archive checks. No application behavior or content changes.
+- **F-260 — November 21 publication and off-site restore fully verified.**
+  Fresh backup completed 2026-11-22T01:30:09.767Z at
+  zforum/2026-11-22T01-28-45.085Z-f6de886c-ae74-4ddd-9982-a56779a38f9e.tar.gz,
+  SHA-256 2ebda9ed2195fb235efbb593c5034c7ed9385f63f55dc4857fa5516adbc38ade,
+  351,091,729 bytes. Downloaded from off-site storage, verified on production and
+  locally, and fully extracted into a private local directory. Schema 11,
+  integrity, foreign keys, manifest, 332 topics / 15,024 records / eight accounts,
+  all published releases, unchanged full-poll cutoff, completed import and exact
+  publication/acknowledgment audit bindings pass. Temporary extraction and remote
+  archive download removed; off-site object and local archive remain. Production
+  retains 1.8 GiB free. Final live health is OK. No additional model calls, source
+  fetch or application-image change. Both plans now say published-and-verified.
+  Evidence: work/release-20261121-{published,backup,offsite-backup,restored,final}.json,
+  production-{verification,browser}.json, screenshots, transfer verification and
+  final-space.txt. All bounded publication/verification processes and the local
+  preview server have exited. Technical work is complete; user review is pending.
