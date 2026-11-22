@@ -5784,3 +5784,14 @@ Implementation in progress; user verification remains pending.
   by live catalog/date/account/browser checks and backup-restore verification.
   Actual-app publication rehearsal, fresh production/storage checks, backup and
   atomic publication follow explicit approval. Production remains unchanged.
+- **D-214 — Publish the reviewed November 21 content.** On November 22, user
+  replies "ok let's publish!" to the explicit request to acknowledge the reviewed
+  formatting flags and publish F-256. Authorize acknowledgment of those exact
+  findings and publication of bundle
+  58f1258e652e4c751665e370595c6cb0791108e32b23673c157e6089af3f858b,
+  candidate fa42bc7de134635b264d27a281ec7dc80963532245d923d67959bc27cbc3c5f8.
+  Rehearse against the full local catalog using the actual app, check current
+  production baselines and storage, back up, publish atomically and verify the
+  live catalog, accounts, displayed refresh date and backup restore. Preserve
+  all deferred topics and user data. This is the reviewed content-only release;
+  no additional forum fetch or model analysis is authorized or needed.
