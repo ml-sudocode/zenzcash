@@ -5854,3 +5854,22 @@ Implementation in progress; user verification remains pending.
   production-{verification,browser}.json, screenshots, transfer verification and
   final-space.txt. All bounded publication/verification processes and the local
   preview server have exited. Technical work is complete; user review is pending.
+
+- **D-215 — Host isolated Sandlab staging on this server.** User requests a
+  containerized dev/staging instance at https://sandlab.zenzcash.com with a
+  Let's Encrypt certificate, without deploying to production. Use the dedicated
+  sandlab branch/worktree based on aee05ce, the existing application Dockerfile,
+  and a Caddy reverse proxy with persistent certificate storage and automatic
+  renewal. Open this host's HTTP/HTTPS ports as needed. Seed an independent
+  database from the already verified November 21 off-site backup, removing all
+  accounts, credentials, sessions, recovery material, personal feedback/history
+  and reading state before exposing it. Preserve published content and visibility
+  restrictions. Use the staging hostname as both origin and WebAuthn RP ID.
+  No production mutations, credentials, backup scheduler, forum fetches or model
+  calls; override the production supervisor with the real server command. Caddy
+  overwrites Fly-Client-IP with the connection peer to satisfy the existing trusted
+  proxy contract; the application port is private to its isolated Docker network.
+  Keep all staging deployment files in this branch and document rebuild, restart
+  and persistence operations in ARCHITECTURE.md. Verify HTTPS, content, account
+  flows, source isolation and restart persistence before handing over. The design
+  changes discussed in chat remain subsequent work, not part of this setup.
