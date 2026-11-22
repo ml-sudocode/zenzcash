@@ -5907,3 +5907,15 @@ Implementation in progress; user verification remains pending.
   Operation commands are in ARCHITECTURE.md. Local evidence:
   work/staging-content-verification.json, work/sandlab-browser.json and screenshots.
   User review of the running staging site is pending.
+
+- **D-216 — Protect Sandlab with server-local HTTP Basic Auth.** User requests
+  HTTP Basic Auth using the password supplied in chat, with no password committed
+  to the repository. Use username sandlab. Store only its bcrypt hash in a
+  root-owned mode-0600 configuration file under /etc/zenzcash-sandlab, outside
+  every checkout; mount it read-only into Caddy. Commit only the import/mount
+  wiring and operating instructions, never the password or its hash. Protect all
+  HTTPS application paths, keep HTTP-to-HTTPS and ACME certificate renewal working,
+  and remove the Basic Authorization header before proxying to the application.
+  Recreate only the proxy to add its mount. Verify missing/wrong credentials get
+  401, correct credentials reach the site and APIs, and app health stays green.
+  This supersedes the public-access statement in F-261. Production is unchanged.
