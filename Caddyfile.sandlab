@@ -1,0 +1,13 @@
+sandlab.zenzcash.com {
+	tls {
+		issuer acme {
+			dir https://acme-v02.api.letsencrypt.org/directory
+		}
+	}
+	header X-Robots-Tag "noindex, nofollow, noarchive"
+	respond /robots.txt "User-agent: *\nDisallow: /\n" 200
+	reverse_proxy app:8080 {
+		# Adapt the existing trusted-proxy contract. Never trust a client-supplied IP.
+		header_up Fly-Client-IP {remote_host}
+	}
+}
