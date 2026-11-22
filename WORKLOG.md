@@ -5826,3 +5826,15 @@ Implementation in progress; user verification remains pending.
   catalog identities and counts. Preserve the off-site object; remove only the
   temporary local extraction and remote download after verification. No additional
   service cost or credential transfer is needed.
+- **F-259 — Restore data checks pass; use the durable acknowledgment record.**
+  The fresh off-site archive downloaded with its exact expected SHA-256. Local
+  extraction passed database integrity, foreign keys, schema/counts, manifest,
+  every published release, unchanged cutoff and completed import checks. The
+  extra acknowledgment-file assertion failed: writeImportPreview rescans after
+  publication, assigns a new report ID and removes the obsolete acknowledgment
+  marker. This is existing behavior; acknowledgeReview first records the durable
+  review.acknowledgment event in audit-events.json, and publication-review.json
+  retains the authorized digests. Adjust this operational restore check to assert
+  exactly one acknowledgment event, matching the approved candidate and actual
+  production publication report, plus the publication-review binding. Retain all
+  database and archive checks. No application behavior or content changes.
