@@ -5795,3 +5795,15 @@ Implementation in progress; user verification remains pending.
   live catalog, accounts, displayed refresh date and backup restore. Preserve
   all deferred topics and user data. This is the reviewed content-only release;
   no additional forum fetch or model analysis is authorized or needed.
+- **F-257 — November 21 local publication passes; prepare production storage.**
+  D-214 local atomic publication succeeds with 332 topics / 15,024 records,
+  unchanged personal tables and retained history. Current live API matches all
+  299 baseline release identities. Production volume has 2.2 GiB free, including
+  the inactive 585-MiB /data/transfers/pull-20261121-production.sqlite snapshot.
+  Before publication, preserve that transfer copy in a gzip archive using the
+  existing verified compression workflow: require empty WAL, unchanged size and
+  mtime, and identical SHA-256 after decompression before removing the plain copy.
+  Keep the archive, live database, backups and import history. This reversible
+  storage preparation is within D-214; no paid volume expansion is required.
+  Publication still compares the current baseline and preserves fresh user data,
+  with a consistent safety backup created under the import lock before staging.
