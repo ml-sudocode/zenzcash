@@ -5873,3 +5873,37 @@ Implementation in progress; user verification remains pending.
   and persistence operations in ARCHITECTURE.md. Verify HTTPS, content, account
   flows, source isolation and restart persistence before handing over. The design
   changes discussed in chat remain subsequent work, not part of this setup.
+
+- **F-261 — Sandlab staging deployed and verified.** The isolated sandlab
+  checkout now runs the existing application image with Compose at
+  https://sandlab.zenzcash.com. Let's Encrypt issued a trusted certificate
+  (November 22, 2026 through February 20, 2027); Caddy persists ACME state and
+  renews automatically. HTTP redirects to HTTPS. Host firewall allows 80/tcp,
+  443/tcp and 443/udp; both services use restart-unless-stopped. The app runs as
+  uid/gid 10001 with a read-only image, no capabilities, no published port and
+  an internal-only network. Caddy replaces untrusted Fly-Client-IP headers.
+  The externally initialized app_data volume is explicitly external in Compose
+  so lifecycle commands do not confuse it with a Compose-created volume.
+  Source: verified local off-site backup SHA-256
+  2ebda9ed2195fb235efbb593c5034c7ed9385f63f55dc4857fa5516adbc38ade.
+  Sanitized seed: schema 11, 332 topics, 15,024 posts, zero accounts; all 14
+  personal/history tables empty. Compared hashes and counts of published,
+  releases, current_posts, restrictions, source_revisions, renditions, source_pulls
+  and topic_listings against the source; all match. Temporary unsanitized
+  extraction removed after verification. No production credentials or model calls.
+  Nine relevant deployment/seed tests pass. Docker build runtime smoke passes.
+  Compose and Caddy validation pass. HTTPS health, catalog, robots/noindex,
+  private-path 404s, production-origin rejection and spoofed-IP replacement pass.
+  Real Chromium with a virtual authenticator passes browsing, registration,
+  sign-out/sign-in, host-only Secure/HttpOnly/SameSite cookies, bookmark and
+  session persistence across app restart, and test-account deletion, without
+  runtime exceptions. The first probe used an incorrect cleanup API path;
+  corrected the probe, removed its disposable account, and reran successfully.
+  Inspected the rendered topics screenshot. Security review found no production
+  data mount, exposed app/admin port, shared login scope or credentials in config.
+  Public staging is excluded from search indexing; it has no access password or
+  off-host backup. Source changes require rebuilding the app image. Main
+  checkouts remain unchanged; no push, Fly deployment or redesign implementation.
+  Operation commands are in ARCHITECTURE.md. Local evidence:
+  work/staging-content-verification.json, work/sandlab-browser.json and screenshots.
+  User review of the running staging site is pending.

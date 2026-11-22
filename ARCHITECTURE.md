@@ -118,6 +118,7 @@ Use `docker compose -f compose.sandlab.yaml ps` for status and
 `docker compose -f compose.sandlab.yaml logs --tail=100 app proxy` for logs.
 `docker compose -f compose.sandlab.yaml restart app` restarts the app without
 rebuilding. `docker compose -f compose.sandlab.yaml down` stops staging and retains
-its volumes. Both services restart after host reboots. Do not use `down -v` unless
-intentionally deleting staging data and certificates. Staging has persistent local
+its volumes. Both services restart after host reboots. Do not use `down -v`: it
+deletes certificate storage. The separately initialized `app_data` volume is
+external to Compose and survives that command. Staging has persistent local
 storage but no off-host backup; it is for disposable testing accounts.
