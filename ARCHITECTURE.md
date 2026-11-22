@@ -80,8 +80,20 @@ Caddy can reach the app through the internal Compose network; the app has no
 published port or outbound network. Caddy overwrites `Fly-Client-IP` with the
 connection peer so the existing server proxy mode can apply per-client limits.
 Do not expose the app port or forward untrusted client headers through unchanged.
-Search engines receive `noindex` headers and a disallowing robots.txt. The staging
-site is publicly reachable, not password-protected.
+Search engines receive `noindex` headers and a disallowing robots.txt. All HTTPS
+paths require HTTP Basic Auth with username `sandlab`, including public health
+and data endpoints. The app's internal container health check remains available.
+The root-owned mode-0600 file `/etc/zenzcash-sandlab/basic-auth` contains the
+username and bcrypt password hash and is mounted read-only into Caddy. Neither
+the password nor its hash belongs in Git, environment files, images or docs.
+Caddy strips the Basic Authorization header before proxying to the app. HTTP
+redirects and Caddy-managed ACME challenges remain available for renewal.
+
+The server-local auth file must exist before starting the proxy; a missing file
+fails startup. To change credentials, use `caddy hash-password` with password input
+on stdin, update the root-owned file on the host, then recreate the proxy with
+`docker compose -f compose.sandlab.yaml up -d --force-recreate --no-deps proxy`.
+Recreation also refreshes the bind mount if the file was replaced atomically.
 
 Initialize from a verified local backup using Node 22.13+ (or Node 24). The seed
 tool only accepts schema 11, checks the supplied SHA-256, removes accounts and
@@ -111,7 +123,7 @@ the application. Browser assets are built into the image, not live-mounted:
 scripts/check.sh
 scripts/build-auth.sh
 docker compose -f compose.sandlab.yaml up -d --build --wait app
-curl --fail https://sandlab.zenzcash.com/healthz
+curl --fail --user sandlab https://sandlab.zenzcash.com/healthz
 ```
 
 Use `docker compose -f compose.sandlab.yaml ps` for status and

@@ -5919,3 +5919,22 @@ Implementation in progress; user verification remains pending.
   Recreate only the proxy to add its mount. Verify missing/wrong credentials get
   401, correct credentials reach the site and APIs, and app health stays green.
   This supersedes the public-access statement in F-261. Production is unchanged.
+
+- **F-262 — Sandlab Basic Auth enabled and verified.** Username sandlab; the
+  user-provided password was hashed through Caddy stdin and never written to a
+  file or command-line argument. Only the bcrypt hash is stored in the server-local
+  /etc/zenzcash-sandlab/basic-auth file (root:root, 0600; parent 0700), outside Git.
+  Compose mounts that specific file read-only with create_host_path disabled;
+  Caddy imports it inside an all-path basic_auth block and strips Authorization
+  before proxying. Only the proxy was recreated; the app was not restarted.
+  Compose and Caddy validation pass. HTTPS homepage, health, account API, catalog,
+  robots, an actual JavaScript asset, HEAD and POST requests all reject missing
+  credentials with 401. Wrong username and wrong password also return 401.
+  Correct credentials return 200 for the homepage, asset, health, account API,
+  robots and all 332 catalog topics; WebAuthn remains available. HTTP still
+  redirects with 308 to HTTPS; app internal health remains healthy. Scanned all
+  tracked files and staging branch commit patches: neither plaintext nor hash is
+  present. Security review: secret is outside the checkout and Docker build context,
+  no shared application port or production changes, hash omitted from all evidence.
+  ARCHITECTURE.md now documents authentication and credential rotation. User
+  verification of the browser login prompt remains pending.

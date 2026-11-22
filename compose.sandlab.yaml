@@ -57,6 +57,12 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile.sandlab:/etc/caddy/Caddyfile:ro
+      - type: bind
+        source: /etc/zenzcash-sandlab/basic-auth
+        target: /run/secrets/sandlab-basic-auth
+        read_only: true
+        bind:
+          create_host_path: false
       - caddy_data:/data
       - caddy_config:/config
     networks: [backend, edge]
