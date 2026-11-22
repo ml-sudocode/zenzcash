@@ -5807,3 +5807,22 @@ Implementation in progress; user verification remains pending.
   storage preparation is within D-214; no paid volume expansion is required.
   Publication still compares the current baseline and preserves fresh user data,
   with a consistent safety backup created under the import lock before staging.
+- **F-258 — November 21 content published; verify off-site restore locally.**
+  Production atomic publication completed 2026-11-22T01:28:09.729Z on machine
+  e823213f175598. All four transfer hashes matched. Safety copy retained at
+  /data/backups/release-20261121-before.sqlite; 332 topics / 15,024 records /
+  eight accounts. All 14 personal tables and prior history are preserved.
+  Live API matches every rehearsal release. Health, authentication availability,
+  origin, hidden posts, fee retractions, election edit and 15 sampled topics pass.
+  Chrome 1600x1100 has no runtime exceptions; inspected live catalog, Radbro and
+  new-topic screenshots. Refresh reads Nov 21, 2026, 02:35 AM UTC. Local preview
+  server stopped. Storage compression preserves the original snapshot hash and
+  saves 509,051,378 bytes. Production currently has 1.8 GiB free, while imports
+  occupy 1,707,564 KiB and the database 657,268 KiB. A full restore exceeds that
+  free space. Finish the authorized restore check locally: download the fresh
+  off-site archive to a private production transfer file using existing credential
+  handling, verify its hash, SFTP it to this workspace, verify and extract into a
+  private temporary directory, then check schema/integrity/foreign keys, manifest,
+  catalog identities and counts. Preserve the off-site object; remove only the
+  temporary local extraction and remote download after verification. No additional
+  service cost or credential transfer is needed.
