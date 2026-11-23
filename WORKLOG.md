@@ -6104,3 +6104,13 @@ Implementation in progress; user verification remains pending.
   a narrower first-appearance filter than the user's activity-summary expectation.
   Source data evidence: work/zcg-newness-audit.json. Read-only investigation; no
   UI/data change, regeneration, forum fetch or deployment for this question.
+
+- **D-222 — Restore useful author context; layout cleanup must preserve features.**
+  User explicitly requires the circular author icon/name, visible forum-tenure
+  badge and relative post date alongside the timestamp. Restore these in a
+  cohesive header inside each post card, preserving anonymity/reveal behavior.
+  Audit removed information against the sandlab baseline and restore directory
+  metadata and thread navigation context in secondary positions rather than
+  deleting it. Keep the current post/footer boundaries, rewrite choices, Next
+  navigation and directly available controls. Stage, test and deploy only the
+  staging branch; no source fetch, analysis spending or production changes.
