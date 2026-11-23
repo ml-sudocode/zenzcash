@@ -5957,3 +5957,29 @@ Implementation in progress; user verification remains pending.
   database migration, source fetch, AI spending or push. Verify behavior with
   focused tests, the repository gate and desktop/mobile browser checks, then
   rebuild only the staging app. Record exact rollback commands and results.
+
+- **F-263 — Content-first redesign implemented and checked on its staging branch.**
+  Full-width topic rows contain titles and descriptions. Search/sort/filter controls
+  remain directly available in a distinct area (sidebar on desktop, bounded region
+  above content on mobile). Summaries appear before new points and discussion;
+  the first three new points are visible. Posts show their selected full-text
+  version by default, with compact attribution and secondary feedback/AI notes
+  below the text. Explicit three-state feedback labels replace ambiguous symbols.
+  The sticky Next post action skips ahead, respects filtering/visibility, crosses
+  lazy-load boundaries and reports the last post. Browser testing caught and fixed
+  the previous post being selected again within the scroll-margin gap.
+  Citation anchors open original-text dialogs without moving the reading position,
+  restore focus on close, and support middle-click/new tabs. Question-description
+  citations now accompany their supported text. Historical claim attribution is
+  unchanged; future summary instructions request smaller supported claim units.
+  No new AI analysis, source fetches, database changes or production deployment.
+  Removed superseded avatar/thread-tab/disclosure styles and expansion state.
+  Validation: scripts/check.sh passes (61 Rust tests, clippy, debug/release builds,
+  251 Node tests); scripts/build-auth.sh passes; browser and passkey suites pass.
+  Browser coverage includes desktop/mobile repeated Next, lazy boundary and final
+  post, modal scroll/focus/Escape, real middle-click, expanded text, filtering,
+  keyboard access, selected exports, privacy, account flows and cached deployment.
+  Inspected screenshots of directory, summary, reading stream and citation dialog.
+  Evidence: work/design-{gate,browser,passkeys}.log and work/screenshots.
+  ARCHITECTURE.md records branch/image rollback instructions. Staging deployment
+  verification and the user's visual review follow this implementation commit.

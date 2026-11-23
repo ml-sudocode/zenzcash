@@ -80,14 +80,15 @@ test("topics page shows published refresh independent of the import checkpoint a
     catalog.topics[0].snapshot_at='2026-11-11T17:30:00.123Z';
     catalog.topics[1].snapshot_at='2026-11-07T12:00:00Z';
     for(const [query,interests] of [['',[]],['Konclave',['protocol']],['No matches',[]]]) {
-      const hero=nodes(render(catalog,query,interests),'hero')[0];
-      assert.deepEqual(hero.children.map(child=>child.attributes.get('class')??child.tag),['h1','lede','content-refresh small muted']);
-      assert.equal(hero.children[2].textContent,`Latest forum content refresh: ${shortDate('2026-11-11T17:30:00.123Z')}`);
+      const page=render(catalog,query,interests),hero=nodes(page,'hero')[0];
+      assert.deepEqual(hero.children.map(child=>child.attributes.get('class')??child.tag),['h1']);
+      assert.equal(nodes(nodes(page,'directory-tools')[0],'content-refresh')[0].textContent,`Latest forum content refresh: ${shortDate('2026-11-11T17:30:00.123Z')}`);
     }
     catalog.topics[1].snapshot_at='2026-11-12T01:00:00Z';
     assert.equal(nodes(render(catalog),'content-refresh')[0].textContent,`Latest forum content refresh: ${shortDate('2026-11-12T01:00:00Z')}`);
     catalog.topics=[];
-    assert.deepEqual(nodes(render(catalog),'hero')[0].children.map(child=>child.attributes.get('class')??child.tag),['h1','lede']);
+    assert.deepEqual(nodes(render(catalog),'hero')[0].children.map(child=>child.attributes.get('class')??child.tag),['h1']);
+    assert.equal(nodes(render(catalog),'content-refresh').length,0);
   }
 });
 test("home renders every available real topic and applies interest filters",t=>{

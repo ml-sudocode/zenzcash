@@ -18,6 +18,7 @@ import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/
 import { fileReviewInput } from '../tools/review-publication.mjs';
 import { corpusData } from './corpus-fixture.mjs';
 import { checkCachedDeployment } from './cached-deployment.mjs';
+import { checkReadingFlow } from './reading-flow-browser.mjs';
 import { buildRuntime } from '../tools/build-runtime.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -177,7 +178,7 @@ try {
   assert.equal(catalog.topics.every(data=>data.topic.threads.every(thread=>!Object.hasOwn(thread,'posts'))),true);
   assert.equal(catalog.last_pull_cutoff,pullCutoff);
   const newestSnapshot = new Date(Math.max(...catalog.topics.map(data=>Date.parse(data.snapshot_at)))).toISOString();
-  assert.equal(await evaluate("document.querySelector('.hero .lede').nextElementSibling.textContent"),`Latest forum content refresh: ${shortDate(newestSnapshot)}`);
+  assert.equal(await evaluate("document.querySelector('.content-refresh').textContent"),`Latest forum content refresh: ${shortDate(newestSnapshot)}`);
   const fullTopics = await Promise.all(catalog.topics.map(async data=>(await fetch(`http://localhost:8017/data/${data.topic.id}.json`)).json()));
   assert.deepEqual([...new Set(contentRequests)],['/data/topics.json']);
   for(const data of fullTopics) assert.deepEqual(catalog.topics.find(item=>item.topic.id===data.topic.id).stats,topicStats(data.topic,data.snapshot_at));
@@ -209,7 +210,7 @@ try {
   for (const [width,height] of [[1280,600],[390,844]]) {
     await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
     for (const returnVia of ["all-topics","header","history"]) {
-      await evaluate("document.querySelectorAll('.topic-card')[document.querySelectorAll('.topic-card').length-1].scrollIntoView({block:'center'})");
+      await evaluate("document.querySelectorAll('.topic-card')[document.querySelectorAll('.topic-card').length-1].scrollIntoView({block:'center'}); window.scrollBy(0,100)");
       const before = await evaluate("(()=>{const card=[...document.querySelectorAll('.topic-card')].at(-1);card.focus({preventScroll:true});return {y:scrollY,top:card.getBoundingClientRect().top,id:card.id,sort:document.querySelector('#topic-sort').value,query:document.querySelector('#topic-search').value};})()");
       assert.ok(before.y>0,`Directory fixture must scroll at ${width}px`);
       await evaluate(`document.getElementById(${JSON.stringify(before.id)}).click()`);
@@ -229,7 +230,7 @@ try {
     await waitFor(`document.querySelector('.topic-head h1')?.textContent === ${JSON.stringify(entry.topic.headline)}`);
     assert.equal(await evaluate("document.querySelectorAll('.included-threads li').length"),entry.topic.threads.length);
     assert.equal(await evaluate("document.querySelectorAll('.question-card').length"),entry.topic.issues.length);
-    assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(node=>node.hidden)"),true);
+    assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(node=>!node.hidden)"),true);
     const last=entry.topic.threads.flatMap(thread=>thread.posts).filter(post=>!post.hidden).at(-1);
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}/post/${last.key}`)}`);
     await waitFor(`document.querySelector(${JSON.stringify(`#post-${last.key.replace('/','-')} .version-original`)}) !== null`);
@@ -244,9 +245,10 @@ try {
   await waitFor("document.querySelector('#setting-includeHiddenAge') !== null");
   assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),false);
   assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
-  assert.match(await evaluate("document.querySelector('.guest-actions-note').textContent"),/require sign-in/);
+  assert.match(await evaluate("document.querySelector('[aria-label=\"Save post · sign-in required\"]').getAttribute('aria-label')"),/sign-in required/);
   await evaluate("document.querySelector('#setting-includeHiddenAge').click()");
   assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),true);
+  await checkReadingFlow({send,evaluate,waitFor,capture});
   await evaluate("document.querySelector('[aria-label=\"Save post · sign-in required\"]').click()");
   await waitFor("document.querySelector('#account-panel') !== null");
   assert.match(await evaluate("document.querySelector('#account-panel').textContent"),/Sign in to save posts/);
@@ -260,7 +262,7 @@ try {
   await waitFor("document.querySelector('.highlight-settings') !== null");
   for(const [width,height] of [[1280,900],[390,844]]) {
     await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
-    await evaluate("document.querySelector('.settings-panel').open=true; document.querySelector('#setting-includeHiddenAge').scrollIntoView({block:'center'})");
+    await evaluate("document.querySelector('#setting-includeHiddenAge').scrollIntoView({block:'center'})");
     assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
     assert.equal(await evaluate("document.documentElement.scrollWidth<=innerWidth"),true);
     await capture(`reading-controls-${width}.png`);
@@ -279,18 +281,15 @@ try {
   await waitFor("document.querySelector('.selection-bar') !== null && document.querySelector('#site-nav').textContent.includes('Profile')");
   assert.equal(await evaluate("document.querySelector('#account-panel') === null"),true);
   assert.equal(await evaluate("document.querySelector('.selection-bar').open"),false);
-  assert.equal(await evaluate("document.querySelector('.reading-content').firstElementChild.classList.contains('whats-new')"),true);
+  assert.equal(await evaluate("document.querySelector('.reading-content').firstElementChild.classList.contains('topic-summary')"),true);
   assert.equal(await evaluate("document.querySelector('.topic-summary h2').textContent"),"Topic summary");
-  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>n.hidden)"),true);
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>!n.hidden)"),true);
   const newest=[...available].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at)||b.key.localeCompare(a.key,'en',{numeric:true}))[0];
   assert.equal(await evaluate("document.querySelector('.post:not(.hidden-post)').id"),`post-${newest.key.replace('/','-')}`);
   await capture("batch004-topic-desktop.png");
   assert.equal(await evaluate("document.querySelector('#header-logout').textContent"),"Log out");
   assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
-  await evaluate("document.querySelector('.new-points').open=true");
-  await waitFor("document.querySelector('.new-points').open");
-  // Allow native toggle events to update controlled disclosure state before the next interaction.
-  await delay();
+  assert.equal(await evaluate("document.querySelector('.settings-panel').tagName"),'ASIDE');
   await evaluate("document.querySelector('#setting-flagAssumptions').click()");
   assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
   for (const [width,height] of [[1280,900],[390,844]]) {
@@ -316,19 +315,22 @@ try {
   const counts=[];
   for(const days of [1,3,7]) {
     await click(`${days} day${days===1?'':'s'}`);
-    assert.equal(await evaluate("document.querySelector('.new-points').open"),true);
-    const count=await evaluate("document.querySelector('.new-points summary').textContent");
-    assert.equal(count,`${expectedPoints(days)} new points`); counts.push(count);
+    const count=await evaluate("document.querySelectorAll('.new-points > li').length");
+    assert.equal(count,Math.min(3,expectedPoints(days))); counts.push(expectedPoints(days));
+    if(expectedPoints(days)>3) {
+      await click(`Show all ${expectedPoints(days)} points`);
+      assert.equal(await evaluate("document.querySelectorAll('.new-points > li').length"),expectedPoints(days));
+      await click('Show fewer points');
+    }
   }
   assert.ok(new Set(counts).size>1, 'ZCG fixture must exercise distinct point counts');
-  await evaluate("document.querySelector('.new-points').open=false");
-  await click("Expand all posts");
+  await click("Expand all");
   assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>!n.hidden)"),true);
   const beforeExpandCount=await evaluate("document.querySelectorAll('.post-content').length");
   await evaluate("document.querySelector('.load-more').click()");
   assert.equal(await evaluate("document.querySelectorAll('.post-content').length"),beforeExpandCount+20);
   assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>!n.hidden)"),true);
-  await click("Collapse all posts");
+  await click("Collapse all");
   assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>n.hidden)"),true);
   await evaluate("(()=>{const slider=document.querySelector('#setting-minAccountMonths'); slider.value='36'; slider.dispatchEvent(new Event('change'));})()");
   assert.equal(await evaluate("document.querySelectorAll('.compact-post').length > 0"),true);
@@ -355,10 +357,10 @@ try {
   assert.equal(await evaluate("document.activeElement.id === 'setting-toneBands-bad'"),true);
   assert.equal(await evaluate("document.querySelectorAll('.compact-post').length > 0"),true);
   await evaluate("document.querySelector('.compact-post button').click()");
-  await click("Oldest first");
-  await click("By thread");
-  assert.equal(await evaluate("document.querySelectorAll('.thread-tab').length"),data.topic.threads.length);
-  await click("All threads together");
+  await evaluate("document.querySelector('#setting-postOrder').value='oldest'; document.querySelector('#setting-postOrder').dispatchEvent(new Event('change'))");
+  await evaluate(`document.querySelector('#setting-threadView').value=${JSON.stringify(String(data.topic.threads[0].id))}; document.querySelector('#setting-threadView').dispatchEvent(new Event('change'))`);
+  assert.equal(await evaluate("document.querySelectorAll('#setting-threadView option').length"),data.topic.threads.length+1);
+  await evaluate("document.querySelector('#setting-threadView').value='all'; document.querySelector('#setting-threadView').dispatchEvent(new Event('change'))");
   await evaluate(`location.hash=${JSON.stringify(route)}`);
   await waitFor(`document.querySelector(${JSON.stringify(postSelector+' .version-original')}) !== null`);
   await evaluate("document.querySelector('#setting-anonymous').click()");
@@ -369,6 +371,7 @@ try {
   await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).click()`);
   assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).textContent`),"Reveal author");
   const mood = async (label) => {
+    await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .post-feedback')}).open=true`);
     await evaluate(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).click()`);
     await waitFor(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).getAttribute('aria-pressed') === 'true'`);
   };
@@ -449,7 +452,7 @@ try {
   assert.equal(downloaded,"zenzcash-selected-posts.md");
   const prompt=readFileSync(join(root,"site/prompt.md"),'utf8');
   assert.equal(readFileSync(join(downloads,downloaded),'utf8'),selectionMarkdown(data,selected,"http://localhost:8017/",prompt));
-  await evaluate("document.querySelector('.selection-bar').open=false; document.querySelector('.settings-panel').open=false; window.scrollTo(0,0)");
+  await evaluate("document.querySelector('.selection-bar').open=false; window.scrollTo(0,0)");
   await send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:1,mobile:false});
   assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
   assert.equal(await evaluate("document.querySelector('.companion').getBoundingClientRect().bottom <= document.querySelector('.site-header').getBoundingClientRect().bottom"),true);
@@ -462,7 +465,7 @@ try {
   assert.deepEqual(errors,[]);
   {
     // Retain native keyboard verification separately from scripted click coverage.
-    await evaluate("document.querySelector('.debate-summary').open=true; document.querySelector('.question-card').open=false; document.querySelector('.question-card > summary').focus()");
+    await evaluate("document.querySelector('.question-card').open=false; document.querySelector('.question-card > summary').focus()");
     await send("Page.bringToFront");
     assert.equal(await evaluate("document.activeElement === document.querySelector('.question-card > summary')"),true);
     await send("Input.dispatchKeyEvent", {type:"keyDown",key:"Enter",code:"Enter",windowsVirtualKeyCode:13,text:"\r",unmodifiedText:"\r"});

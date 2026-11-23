@@ -8,7 +8,7 @@ import { parseCuration } from "./topic-directory.js";
 import { renderHome, renderHowToUse } from "./info-pages.js";
 import { DEFAULT_SETTINGS, isUnanswered, migrateSettings, orderedPosts, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, POSTS_PER_LOAD, shownToReach } from "./logic.js";
 import { postElementId } from "./post.js";
-import { renderTopic, THREAD_TABS_ID } from "./topic.js";
+import { renderTopic, THREAD_TABS_ID, disposePostStream } from "./topic.js";
 import { postRoute, topicRoute } from "./selection.js";
 import { parseCatalog, parseTopicContent, catalogRoute } from "./catalog.js";
 import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
@@ -16,6 +16,7 @@ import { playerView } from "./player-view.js";
 import { accountPanel, accountOriginLink, companionView, guestVisit, parsePersonal } from "./personal.js";
 import { passkeyRequest } from "./passkey-request.js";
 import { ReadingHistory } from "./reading-history.js";
+import { closeCitationPreview } from "./citation-preview.js";
 
 const SETTINGS_KEY = "zforum.design.settings.v7";
 const LAST_VISIT_KEY = "zforum.visit.v2";
@@ -154,12 +155,11 @@ const state = {
   account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, sign_in_reason: null, sign_in_return: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
   shownFiltered: new Set(),
-  open: { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+  open: { expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
-  expanded: new Set(),
-  expansionRequests: new Set(),
+  collapsed: new Set(),
   selecting: false,
   selected: new Set(),
   flash: null,
@@ -203,22 +203,20 @@ const actions = {
     state.versions.set(key, version);
   },
   setExpanded(key, expanded) {
-    state.expansionRequests.delete(key);
-    if (expanded) state.expanded.add(key);
-    else state.expanded.delete(key);
+    if (expanded) state.collapsed.delete(key);
+    else state.collapsed.add(key);
   },
   setSelecting(selecting) {
     state.selecting = selecting;
     render({ keepScroll: true });
   },
   expandAll() {
-    for (const post of orderedPosts(state.data.topic, state.settings, state.thread)) if (!post.hidden) state.expansionRequests.add(post.key);
+    state.collapsed.clear();
     render({ keepScroll: true });
     document.getElementById("expand-all").focus();
   },
   collapseAll() {
-    state.expansionRequests.clear();
-    state.expanded.clear();
+    state.collapsed = new Set(state.data.topic.threads.flatMap(thread => thread.posts).filter(post => !post.hidden).map(post => post.key));
     render({ keepScroll: true });
     document.getElementById("collapse-all").focus();
   },
@@ -241,17 +239,20 @@ const actions = {
   },
   // Opens a cited post in its thread's tab with its original showing, scrolls to it, and
   // highlights it.
-  openPost(key) {
+  openPost(key) { actions.nextPost(key, true); },
+  nextPost(key, original = false) {
     const thread = threadOfPost(key);
     state.thread = thread.id;
     const stream = state.settings.threadView === "all" ? "all" : thread.id;
     state.shown.set(stream, shownToReach(orderedPosts(state.data.topic, state.settings, thread.id).findIndex((post) => post.key === key), state.shown.get(stream) ?? POSTS_PER_LOAD));
     state.shownFiltered.add(key);
-    state.versions.set(key, "original");
-    state.expansionRequests.add(key);
-    state.flash = key;
+    if (original) state.versions.set(key, "original");
+    state.collapsed.delete(key);
+    state.flash = original ? key : null;
     render({ keepScroll: true });
-    document.getElementById(postElementId(key)).scrollIntoView({ behavior: "smooth", block: "center" });
+    const target = document.getElementById(postElementId(key));
+    target.scrollIntoView({ behavior: "instant", block: "start" });
+    target.focus({ preventScroll: true });
   },
   // Resolves once the rating is saved and the counts are updated. A failure switches the
   // ratings off with the reason shown.
@@ -409,6 +410,8 @@ function notices() {
 }
 
 function render({ keepScroll }) {
+  closeCitationPreview();
+  disposePostStream();
   const samePage = renderedHash === location.hash;
   const preserve = keepScroll && samePage;
   const scroll = { x: window.scrollX, y: window.scrollY };
@@ -440,6 +443,7 @@ function render({ keepScroll }) {
 }
 
 async function navigate() {
+  closeCitationPreview();
   const sequence = ++navigationSequence;
   const requestedHash = location.hash;
   if (renderedHash === '#/topics' && requestedHash !== renderedHash) {
@@ -461,9 +465,8 @@ async function navigate() {
     if (changedContent) {
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
-    state.expansionRequests.clear();
-    state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
-    state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+    state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.collapsed.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
+    state.open = { expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
     }
   }
   try {

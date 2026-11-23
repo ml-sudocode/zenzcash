@@ -31,7 +31,7 @@ export function questionCards(topic, view) {
         if (event.target === detail && detail.isConnected) view.actions.setOpen("arguments", issue.id, detail.open);
       } },
     }, h("summary", {}, "Explore the arguments"),
-    h("p", { class: "muted small" }, "These are attributed positions, not verified findings. Sources for the question: ", cites(issue.description.cites, view)),
+    h("p", { class: "muted small" }, "These are attributed positions, not verified findings."),
     h("ul", { class: "points" }, issue.points.map((id) => {
       const point = points.get(id);
       return h("li", { id: `argument-${id}` },
@@ -51,7 +51,7 @@ export function questionCards(topic, view) {
     },
     h("summary", { id: `${questionElementId(issue.id)}-heading`, class: "question-heading" },
       h("span", { class: "question-number", "aria-hidden": "true" }, String(index + 1).padStart(2, "0")),
-      h("span", { class: "question-heading-text" }, h("strong", {}, issue.issue), h("span", { class: "question-description" }, view.transform(issue.description.text)))),
+      h("span", { class: "question-heading-text" }, h("strong", {}, issue.issue), h("span", { class: "question-description" }, statement(issue.description, view)))),
     h("div", { class: "question-content" },
       h("p", { class: "decision-at-stake" }, statement(issue.decision_at_stake, view)),
       h("dl", { class: "question-positions" }, issue.positions_with_post_references.map((position) => [h("dt", {}, position.label), h("dd", {}, statement(position, view))])),

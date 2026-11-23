@@ -20,11 +20,11 @@ function setup(t) {
   const ids = [...new Set([...keys].map((key) => Number(key.split("/")[0])))];
   const opened = [];
   const view = {
-    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), analysis: { dimensions: { tone: { score: 2 } }, summary: "Original text" } }])),
-    threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread" }])),
+    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), author:'alice', created_at:'2026-10-31T12:00:00Z', hidden:false, segments:[{kind:'text',text:'Original text'}], analysis: { dimensions: { tone: { score: 2 } }, summary: "Original text" } }])),
+    threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread", url:'https://forum.example/t/thread/7' }])),
     letterOf: new Map(ids.map((id, index) => [id, String.fromCharCode(65 + index)])),
     news: { points: ["p17"] }, transform: (text) => text,
-    state: { settings: { highlightNew: true }, open: { questions: new Set(), arguments: new Set() } },
+    state: { data:{topic:{id:'zcg'}}, settings: { highlightNew: true, anonymous:false }, open: { questions: new Set(), arguments: new Set() } },
     actions: {
       setOpen(kind, id, open) { if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
       openPost(key) { opened.push(key); },
@@ -38,7 +38,8 @@ test("initial summary exposes six native disclosures, with all details inside th
   const root = questionCards(topic, view);
   assert.equal(nodes(root, "question-card").length, 6);
   assert.deepEqual(nodes(root, "question-card").map((card) => [card.tag, card.open, card.children[0].tag]), Array.from({ length: 6 }, () => ["details", false, "summary"]));
-  assert.deepEqual(nodes(root, "question-description").map((node) => node.textContent), topic.issues.map((issue) => issue.description.text));
+  assert.deepEqual(nodes(root, "question-description").map((node) => node.children[0].textContent), topic.issues.map((issue) => issue.description.text));
+  assert.deepEqual(nodes(root, "question-description").map(node=>nodes(node,'cite').map(cite=>cite.attributes.get('href'))),topic.issues.map(issue=>issue.description.cites.map(key=>`#/topic/zcg/post/${key}`)));
   assert.deepEqual(nodes(root, "question-arguments").map((node) => [node.tag, node.open]), Array.from({ length: 6 }, () => ["details", false]));
   assert.deepEqual(nodes(root, "points").flatMap((list) => list.children.map((li) => li.attributes.get("id"))), topic.issues.flatMap((issue) => issue.points.map((id) => `argument-${id}`)));
   assert.equal(nodes(root, "badge-new").length, 1);
@@ -76,7 +77,11 @@ test("related questions, sources and retained disclosure state use the existing 
   click(nodes(first, "related-questions")[0].children[1]);
   assert.equal(findId(root, "question-q3").open, true);
   click(nodes(first, "cite")[0]);
-  assert.deepEqual(opened, [topic.issues[0].decision_at_stake.cites[0]]);
+  assert.deepEqual(opened, []);
+  const preview=nodes(document.body,'citation-preview')[0];
+  assert.equal(preview.open,true);
+  click(descendants(preview).find(node=>node.tag==='button'&&node.textContent==='Read in discussion'));
+  assert.deepEqual(opened, [topic.issues[0].description.cites[0]]);
   root = questionCards(topic, view);
   assert.equal(findId(root, "question-q1").open, true);
   assert.equal(nodes(findId(root, "question-q1"), "question-arguments")[0].open, true);
@@ -99,6 +104,6 @@ test("source-derived prose remains text and is passed through anonymous text tra
   view.transform = (text) => text.replaceAll("@alice", "@Participant 1");
   const root = questionCards(topic, view);
   assert.equal(descendants(root).some((node) => node.tag === "img" || node.tag === "script"), false);
-  assert.equal(nodes(root, "question-description")[0].textContent, '<img src=x onerror="alert(1)"> @Participant 1');
+  assert.equal(nodes(root, "question-description")[0].children[0].textContent, '<img src=x onerror="alert(1)"> @Participant 1');
   assert.equal(descendants(root).filter((node) => node.tag === null && node.text.includes("onerror")).length, 2);
 });

@@ -3,7 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { parseCuration, topicDirectory } from "../site/js/topic-directory.js";
 import { renderTopics } from "../site/js/home.js";
-import { installDom, nodes } from "./recorded-dom.mjs";
+import { installDom, nodes, descendants } from "./recorded-dom.mjs";
 import { listingFixture } from './helpers.mjs';
 const curation=parseCuration(JSON.parse(readFileSync(new URL('../site/topic-curation.json',import.meta.url),'utf8')));
 function fixture() {
@@ -29,6 +29,12 @@ test('manual featured order has up to three unique topics, honors filters and do
   const home=renderTopics(catalog,{interests:[]},{},config,{query:'',sort:'recent'});
   assert.deepEqual(nodes(nodes(home,'featured-topics')[0],'topic-card').map(n=>n.attributes.get('href')),['#/topic/konclave','#/topic/zcg','#/topic/bug-bounties']);
   assert.equal(nodes(home,'topic-card').length,4);
+  assert.equal(nodes(home,'directory-tools')[0].tag,'aside');
+  assert.equal(nodes(home,'card-stats').length,0);
+  assert.equal(nodes(home,'keywords').length,0);
+  assert.equal(nodes(home,'tags').length,0);
+  assert.equal(descendants(nodes(home,'directory-tools')[0]).some(n=>n.tag==='details'),false);
+  for (const row of nodes(home,'topic-card')) assert.deepEqual(row.children.map(n=>n.tag),['h3','p']);
   assert.deepEqual(ids(topicDirectory(catalog,config,['grants'],{query:'',sort:'recent'})),[['zcg'],['zebra-disclosure']]);
   assert.deepEqual(parseCuration({featured:[],interests:{}}),{featured:[],interests:{}});
   for(const invalid of [null,{}, {...curation,featured:['zcg','zcg']},{...curation,featured:['a','b','c','d']},{...curation,featured:['../zcg']},{...curation,interests:{zcg:['x']}},{...curation,interests:{zcg:['grants','grants']}},{...curation,interests:{zcg:[]}},{...curation,extra:true}]) assert.throws(()=>parseCuration(invalid),{message:`Invalid topic curation: ${JSON.stringify(invalid)}`});

@@ -67,7 +67,7 @@ Maintainer rules, including approval before new analysis spending, are in
 
 ## Sandlab staging
 
-The `sandlab` branch runs at https://sandlab.zenzcash.com on the development
+The `sandlab-content-first` branch runs at https://sandlab.zenzcash.com on the development
 host. Its Compose project is `zenzcash-sandlab`; it does not deploy to Fly.io.
 Use the dedicated staging checkout for changes. The application uses the same
 Dockerfile and Rust server as production, with its own origin, WebAuthn RP ID,
@@ -134,3 +134,25 @@ its volumes. Both services restart after host reboots. Do not use `down -v`: it
 deletes certificate storage. The separately initialized `app_data` volume is
 external to Compose and survives that command. Staging has persistent local
 storage but no off-host backup; it is for disposable testing accounts.
+
+The content-first redesign is isolated on `sandlab-content-first`; `sandlab`
+retains the pre-redesign revision `611fd8a`. Posts open with their chosen text
+version, and the sticky Next post button advances through matching public posts,
+loading the next batch when necessary. Topic summaries precede new points and
+posts. Search, sorting and filters remain visible in a distinct controls area;
+post feedback and AI notes are optional disclosures below the text. Citation
+links preview originals in a native dialog and support normal new-tab navigation.
+Stored citations remain attached to their supported claim units; no historical
+analysis was regenerated for this layout change.
+
+To restore the pre-redesign staging UI without changing accounts, certificates or
+Basic Auth, use the preserved local image (do not add `--build`):
+
+```sh
+docker tag zenzcash-sandlab:before-content-first-20261123 zenzcash-sandlab:dev
+docker compose -f compose.sandlab.yaml up -d --no-build --force-recreate --wait app
+```
+
+The next build from `sandlab-content-first` restores the redesign. For a source
+rollback, switch the clean staging checkout to `sandlab` and rebuild the app.
+Keep the rollback image until the redesign has been reviewed.
