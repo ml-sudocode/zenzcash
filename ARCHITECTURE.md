@@ -148,9 +148,13 @@ The header retains the circular author avatar, visible forum-tenure badge and
 both absolute and relative post dates. Anonymous mode masks the avatar/name and
 tenure together until the reader reveals that author. Topic-list metadata lives
 below the description, including counts, dates, account statistics and tags.
-Version selection uses labeled tabs without nested colored frames. Mixed-thread
-views name each post's source thread. On mobile, the sticky Next post control and
-post scroll offset follow the measured header height, including signed-in layouts.
+Version selection uses labeled tabs and a subtle blue rewrite background without
+vertical rails; originals use the normal post background. Mixed-thread views name
+each post's source thread. Explore the main questions is collapsed by default;
+its disclosure state survives control changes. Reading controls keep a minimum
+240px sidebar above phone widths, with an open pinned panel at 700px and below.
+On mobile, Next post and post scroll offsets account for both the measured header
+height and the controls panel, including signed-in layouts.
 Stored citations remain attached to their supported claim units; no historical
 analysis was regenerated for this layout change.
 

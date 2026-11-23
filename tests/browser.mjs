@@ -469,6 +469,10 @@ try {
   assert.deepEqual(errors,[]);
   {
     // Retain native keyboard verification separately from scripted click coverage.
+    await evaluate("document.querySelector('.question-summary > summary').focus()");
+    await send("Input.dispatchKeyEvent", {type:"keyDown",key:"Enter",code:"Enter",windowsVirtualKeyCode:13,text:"\r",unmodifiedText:"\r"});
+    await send("Input.dispatchKeyEvent", {type:"keyUp",key:"Enter",code:"Enter",windowsVirtualKeyCode:13});
+    await waitFor("document.querySelector('.question-summary').open");
     await evaluate("document.querySelector('.question-card').open=false; document.querySelector('.question-card > summary').focus()");
     await send("Page.bringToFront");
     assert.equal(await evaluate("document.activeElement === document.querySelector('.question-card > summary')"),true);

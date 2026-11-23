@@ -24,9 +24,9 @@ function setup(t) {
     threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread", url:'https://forum.example/t/thread/7' }])),
     letterOf: new Map(ids.map((id, index) => [id, String.fromCharCode(65 + index)])),
     news: { points: ["p17"] }, transform: (text) => text,
-    state: { data:{topic:{id:'zcg'}}, settings: { highlightNew: true, anonymous:false }, open: { questions: new Set(), arguments: new Set() } },
+    state: { data:{topic:{id:'zcg'}}, settings: { highlightNew: true, anonymous:false }, open: { summary:false, questions: new Set(), arguments: new Set() } },
     actions: {
-      setOpen(kind, id, open) { if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
+      setOpen(kind, id, open) { if (kind==='summary')view.state.open.summary=open;else if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
       openPost(key) { opened.push(key); },
     },
   };
@@ -36,6 +36,9 @@ function setup(t) {
 test("initial summary exposes six native disclosures, with all details inside their own cards", (t) => {
   const { topic, view } = setup(t);
   const root = questionCards(topic, view);
+  assert.equal(root.tag,'details');
+  assert.equal(root.open,false);
+  assert.equal(root.children[0].textContent,'Explore the main questions');
   assert.equal(nodes(root, "question-card").length, 6);
   assert.deepEqual(nodes(root, "question-card").map((card) => [card.tag, card.open, card.children[0].tag]), Array.from({ length: 6 }, () => ["details", false, "summary"]));
   assert.deepEqual(nodes(root, "question-description").map((node) => node.children[0].textContent), topic.issues.map((issue) => issue.description.text));
@@ -68,6 +71,8 @@ test("Next opens and focuses each next heading without closing other questions",
 test("related questions, sources and retained disclosure state use the existing actions", (t) => {
   const { topic, view, opened } = setup(t);
   let root = questionCards(topic, view);
+  root.open=true;
+  root.dispatchEvent(new Event('toggle'));
   const first = findId(root, "question-q1");
   first.open = true;
   first.dispatchEvent(new Event("toggle"));
@@ -83,6 +88,7 @@ test("related questions, sources and retained disclosure state use the existing 
   click(descendants(preview).find(node=>node.tag==='button'&&node.textContent==='Read in discussion'));
   assert.deepEqual(opened, [topic.issues[0].description.cites[0]]);
   root = questionCards(topic, view);
+  assert.equal(root.open,true);
   assert.equal(findId(root, "question-q1").open, true);
   assert.equal(nodes(findId(root, "question-q1"), "question-arguments")[0].open, true);
   // A queued event from a detached old tree cannot overwrite current state.

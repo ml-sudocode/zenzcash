@@ -6160,3 +6160,21 @@ Implementation in progress; user verification remains pending.
   With no reply yet to the phone-layout preference, proceed with the stated
   assumption of an open pinned panel at phone widths, and a minimum-width side
   panel on wider windows. Keep all three requests in scope for staging verification.
+
+- **F-269 — Persistent controls, optional question exploration and rewrite tint.**
+  Reading controls retain a minimum 240px side column through tablet widths;
+  at 700px and below they stay open in a pinned, internally scrollable panel.
+  Next-post navigation and anchor offsets account for the pinned panel. The
+  question section is now Explore the main questions, collapsed on topic entry
+  and retaining its open state during control changes. Individual questions,
+  arguments, citations and the topic overview remain available. Rewrite text
+  gets a subtle blue background in light and dark mode; original text keeps the
+  normal card background. Labels and per-post footers remain intact.
+  Validation: full repository gate passes (61 Rust, 254 Node, clippy/builds),
+  targeted summary/topic tests pass (19), and the final browser suite passes.
+  Width checks cover 320, 390, 700, 701, 800, 1024 and 1280px, including visible
+  controls, minimum width and no horizontal overflow. Keyboard disclosure,
+  retained state, exact theme tint colors and next-post behavior are checked.
+  Inspected rewrite-blue screenshots in mobile light and desktop dark mode.
+  Evidence: work/narrow-controls-{unit,gate,browser-final}.log and
+  work/screenshots/rewrite-blue-*.png. Deployment verification follows.

@@ -6,12 +6,19 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     await send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button,clickCount:1});
     await send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button,clickCount:1});
   };
+  for(const width of [1280,1024,800,701,700,390,320]) {
+    await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
+    await evaluate("document.querySelector('.post:not(.compact-post):not(.hidden-post)').scrollIntoView({block:'start',behavior:'instant'})");
+    assert.equal(await evaluate("(()=>{const panel=document.querySelector('.settings-panel'),r=panel.getBoundingClientRect();return r.width>=240&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.settings-panel')===panel})()"),true,`Reading controls stay visible and at least 240px wide at ${width}px`);
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true,`No overflow at ${width}px`);
+  }
   for (const [width,height] of [[1280,900],[390,844]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     await send('Page.reload');
     await waitFor("document.querySelector('.topic-summary .cite') !== null && document.querySelector('.post-content') !== null");
     assert.equal(await evaluate("[...document.querySelectorAll('.post:not(.compact-post)')].every(post=>{const avatar=post.querySelector('.avatar'),badge=post.querySelector('.age-badge'),relative=post.querySelector('.post-relative-date');return avatar&&badge&&relative&&getComputedStyle(avatar).borderRadius==='50%'&&avatar.getBoundingClientRect().width===44&&getComputedStyle(badge).display!=='none'&&relative.textContent.length>0})"),true,'Author context stays visible on desktop and mobile');
-    if(width===390)assert.equal(await evaluate("document.querySelector('.topic-summary').getBoundingClientRect().top < document.querySelector('.settings-panel').getBoundingClientRect().top"),true,'Mobile summary precedes the open controls');
+    assert.equal(await evaluate("document.querySelector('.question-summary').open"),false,'Main questions start collapsed');
+    assert.equal(await evaluate("document.querySelector('.question-summary > summary').textContent"),'Explore the main questions');
     await evaluate("document.querySelector('.topic-summary .cite').scrollIntoView({block:'center'}); document.querySelector('.topic-summary .cite').focus({preventScroll:true})");
     const before = await evaluate("({y:scrollY,href:document.activeElement.href})");
     await mouse('.topic-summary .cite');
@@ -53,7 +60,13 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
       await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
       assert.equal(await evaluate("(()=>{const posts=[...document.querySelectorAll('.forum-posts > .post')];return posts.every((post,index)=>{const style=getComputedStyle(post),rect=post.getBoundingClientRect(),footer=post.querySelector('.post-actions');return style.boxShadow==='none'&&style.borderLeftWidth==='1px'&&style.borderRightWidth==='1px'&&(!footer||(footer.closest('.post')===post&&footer.getBoundingClientRect().bottom<=rect.bottom))&&(index===0||rect.top-posts[index-1].getBoundingClientRect().bottom>=15);})})()"),true,`Distinct post boundaries and contained footers at ${width}px in ${theme}`);
       assert.equal(await evaluate("[...document.querySelectorAll('.version')].every(n=>getComputedStyle(n).borderLeftWidth==='0px')"),true,'Text versions do not look like nested post sections');
+      assert.equal(await evaluate("getComputedStyle(document.querySelector('.version-neutral')).backgroundColor"),theme==='light'?'rgb(238, 245, 252)':'rgb(27, 43, 61)','Rewrites have a subtle blue background');
+      assert.equal(await evaluate("getComputedStyle(document.querySelector('.version-original')).backgroundColor"),'rgba(0, 0, 0, 0)','Originals keep the post background');
       await capture(`post-boundaries-${theme}-${width}.png`);
+      const previousY=await evaluate('scrollY');
+      await evaluate("document.querySelector('.version-neutral').closest('.post').scrollIntoView({block:'start',behavior:'instant'})");
+      await capture(`rewrite-blue-${theme}-${width}.png`);
+      await evaluate(`window.scrollTo(0,${previousY})`);
     }
     await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(savedTheme)}`);
     const thirdId = await evaluate("[...document.querySelectorAll('.post')].filter(p=>p.querySelector('.post-content')&&!p.querySelector('.post-content').hidden)[2].id");

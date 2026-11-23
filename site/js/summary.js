@@ -63,10 +63,13 @@ export function questionCards(topic, view) {
     cards.set(issue.id, card);
     return card;
   });
-  return h("section", { class: "question-summary", "aria-label": "Questions in the debate" },
-    h("h2", {}, "Choose a question"),
+  const section = h("details", { class: "question-summary", open: view.state.open.summary, on: { toggle: event => {
+    if (event.target === section && section.isConnected) view.actions.setOpen('summary', null, section.open);
+  } } },
+    h("summary", { class: 'question-summary-heading' }, "Explore the main questions"),
     h("p", { class: "muted" }, "Start wherever you’re curious. Each question stands on its own; open the arguments when you want more detail."),
     h("div", { class: "question-list" }, rendered),
     h("p", { class: "summary-scope muted small" }, `All ${topic.points.length} point${topic.points.length === 1 ? "" : "s"} remain available under “Explore the arguments”, including those from filtered posts. Citations name the thread and post (A#12) and open the original; their colours indicate tone only, not argument quality.`),
     h("p", { class: "analysis-disclosure muted small" }, h("strong", {}, "AI-generated analysis. "), ANALYSIS_DISCLOSURE));
+  return section;
 }
