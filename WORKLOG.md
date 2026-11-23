@@ -6152,3 +6152,11 @@ Implementation in progress; user verification remains pending.
   question section by default. Preserve individual question/argument state and
   the topic overview. Keep the sorting/filter controls open and directly usable.
   Implement and verify only on the existing staging branch.
+
+- **D-224 — Restore subtle text-version backgrounds; proceed with pinned phone controls.**
+  User requests calming blue behind AI rewrites and an unhighlighted or subtly
+  distinct original. Apply the tint only to the text-version region inside the
+  post, retaining labels and the separate post/footer boundary without rails.
+  With no reply yet to the phone-layout preference, proceed with the stated
+  assumption of an open pinned panel at phone widths, and a minimum-width side
+  panel on wider windows. Keep all three requests in scope for staging verification.
