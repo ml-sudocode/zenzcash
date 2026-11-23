@@ -6178,3 +6178,12 @@ Implementation in progress; user verification remains pending.
   Inspected rewrite-blue screenshots in mobile light and desktop dark mode.
   Evidence: work/narrow-controls-{unit,gate,browser-final}.log and
   work/screenshots/rewrite-blue-*.png. Deployment verification follows.
+  Deployed bed6b62 to staging only. HTTPS browser verification at
+  2026-11-23T19:16:51Z passes visible minimum-width controls at 1440, 800, 390
+  and 320px, collapsed question section, rewrite tint, preserved author context,
+  card/footer containment, citation previews, Basic Auth and no overflow or
+  runtime exceptions. Inspected the deployed mobile screenshot. Evidence:
+  work/narrow-controls-staging.json and corresponding PNGs. Security review:
+  UI-only changes retain text rendering and identity masking; no new input
+  boundaries, dependencies or credentials. Commit identity matches repository
+  configuration. Production unchanged; user visual review remains pending.
