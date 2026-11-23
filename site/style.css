@@ -331,7 +331,8 @@ main { max-width: 1440px; padding-right: 130px; }
 @media (max-width: 1050px) {
   .reading-layout, .directory-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .settings-panel, .directory-tools { position: static; grid-row: 1; max-height: 230px; overflow: auto; }
-  .settings-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
+  .reading-content { display: contents; }
+  .settings-panel { grid-row: 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
   .settings-panel > h2, .settings-panel > .match-count { grid-column: 1 / -1; margin: 0; }
   .settings-panel fieldset { min-width: 0; }
   .settings-panel .reading-choice { min-width: 0; }

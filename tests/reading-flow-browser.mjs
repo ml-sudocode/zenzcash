@@ -10,6 +10,7 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     await send('Page.reload');
     await waitFor("document.querySelector('.topic-summary .cite') !== null && document.querySelector('.post-content') !== null");
+    if(width===390)assert.equal(await evaluate("document.querySelector('.topic-summary').getBoundingClientRect().top < document.querySelector('.settings-panel').getBoundingClientRect().top"),true,'Mobile summary precedes the open controls');
     await evaluate("document.querySelector('.topic-summary .cite').scrollIntoView({block:'center'}); document.querySelector('.topic-summary .cite').focus({preventScroll:true})");
     const before = await evaluate("({y:scrollY,href:document.activeElement.href})");
     await mouse('.topic-summary .cite');

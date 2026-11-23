@@ -5961,7 +5961,7 @@ Implementation in progress; user verification remains pending.
 - **F-263 — Content-first redesign implemented and checked on its staging branch.**
   Full-width topic rows contain titles and descriptions. Search/sort/filter controls
   remain directly available in a distinct area (sidebar on desktop, bounded region
-  above content on mobile). Summaries appear before new points and discussion;
+  after the summary on mobile topic pages). Summaries appear before new points and discussion;
   the first three new points are visible. Posts show their selected full-text
   version by default, with compact attribution and secondary feedback/AI notes
   below the text. Explicit three-state feedback labels replace ambiguous symbols.
