@@ -6033,3 +6033,10 @@ Implementation in progress; user verification remains pending.
   metadata restoration or production change. The rewrite criterion was explained
   from model/marks.md and site/js/rubric.js: model judgment of useful neutralization,
   with no fixed tone cutoff and no invented argument for pure taunts.
+  Deployed 46082d5 to staging only. Authenticated browser verification at
+  2026-11-23T03:40:37Z confirms the neutral default, one selected rewrite and four
+  explicitly labeled originals on thread-59311, 332 topics, Basic Auth protection,
+  citation behavior and desktop/mobile layout with no runtime exceptions. Inspected
+  the mobile reading screenshot. Post-commit security review: static labels only,
+  no new input handling, credentials or authentication changes. Staging checkout
+  is clean; visual acceptance remains with the user.
