@@ -6021,3 +6021,15 @@ Implementation in progress; user verification remains pending.
   staging ZCG topic has 333 rewrites among 853 public posts, only four among the
   newest twenty. Distinguish an assessed post without a rewrite from an older
   post whose analysis was omitted. Keep Original/Re-write/Changes choice intact.
+
+- **F-265 — Restore explicit rewrite-availability labels.** Original-only text now
+  says "Original · no AI re-write available" when assessed, or "Original · this
+  dated post has not been analyzed" for omitted analysis. Rewrite-first remains
+  the default; stored preferences and individual version switching are unchanged.
+  Focused coverage checks default rewrite selection, switching back and forth,
+  and both original-only cases under both preferences. Repository gate passes
+  (61 Rust tests, 252 Node tests, clippy/builds); full browser suite passes.
+  Evidence: work/rewrite-label-{gate,browser}.log. No content regeneration,
+  metadata restoration or production change. The rewrite criterion was explained
+  from model/marks.md and site/js/rubric.js: model judgment of useful neutralization,
+  with no fixed tone cutoff and no invented argument for pure taunts.

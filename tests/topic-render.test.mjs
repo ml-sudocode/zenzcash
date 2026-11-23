@@ -222,6 +222,31 @@ test("rewrite audits group identical operations once without losing distinct quo
   assert.equal(nodes(root,"bookmark-icon").length,1);
 });
 
+test('rewrite-first defaults remain distinct from originals with no rewrite or no analysis', t => {
+  const {posts,state,view}=fixture(t);
+  assert.equal(state.settings.preferredVersion,'neutral');
+  const rewritten=posts.find(post=>post.analysis?.neutral_rendition != null);
+  assert.ok(rewritten);
+  const first=renderPost(rewritten,view);
+  assert.equal(nodes(first,'version-neutral').length,1);
+  assert.equal(nodes(first,'version-label')[0].textContent,'AI re-write · check against the original');
+  click(nodes(first,'version-tab-original')[0]);
+  assert.equal(nodes(first,'version-label')[0].textContent,'Original · as posted on the forum');
+  click(nodes(first,'version-tab-neutral')[0]);
+  assert.equal(nodes(first,'version-neutral').length,1);
+  for(const preference of ['neutral','original']) {
+    state.settings.preferredVersion=preference;
+    for(const analysis of [{...rewritten.analysis,neutral_rendition:null},null]) {
+      const root=renderPost({...rewritten,analysis},view);
+      assert.equal(nodes(root,'version-label')[0].textContent,analysis===null
+        ? 'Original · this dated post has not been analyzed' : 'Original · no AI re-write available');
+      assert.equal(nodes(root,'version-tabs').length,0);
+      assert.equal(nodes(root,'version-original').length,1);
+      assert.equal(nodes(root,'post-content')[0].hidden,false);
+    }
+  }
+});
+
 test("failed expansion stays retryable and does not interrupt other posts", t => {
   const { posts, state, view } = fixture(t);
   const original = console.error;

@@ -69,6 +69,9 @@ function diffContent(post, view) {
 function versions(post, view) {
   if (post.analysis===null || post.analysis.neutral_rendition === null) {
     return h("div", { class: "version version-original solo" },
+      h("p", { class: "version-label zf" }, post.analysis === null
+        ? "Original · this dated post has not been analyzed"
+        : "Original · no AI re-write available"),
       h("div", { class: "post-body" }, originalContent(post, view)));
   }
   const panel = h("div", { role: "tabpanel" });
