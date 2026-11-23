@@ -13,7 +13,7 @@ import { DatabaseSync } from "node:sqlite";
 import { createHash } from "node:crypto";
 import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
-import { shortDate, topicStats } from '../site/js/logic.js';
+import { shortDate, topicStats, accountAgeLabel } from '../site/js/logic.js';
 import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/content-review.mjs';
 import { fileReviewInput } from '../tools/review-publication.mjs';
 import { corpusData } from './corpus-fixture.mjs';
@@ -368,8 +368,11 @@ try {
   await waitFor(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}) !== null`);
   await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).click()`);
   assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).textContent`),"Hide author");
+  assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .avatar')}).textContent`),rewritten.author[0].toUpperCase());
+  assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .age-badge')}).textContent`),accountAgeLabel(rewritten.account,data.snapshot_at));
   await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).click()`);
   assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).textContent`),"Reveal author");
+  assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .age-badge')}) === null && document.querySelector(${JSON.stringify(postSelector+' .avatar-anon')}) !== null`),true);
   const mood = async (label) => {
     await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .post-feedback')}).open=true`);
     await evaluate(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).click()`);

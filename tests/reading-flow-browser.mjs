@@ -10,6 +10,7 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     await send('Page.reload');
     await waitFor("document.querySelector('.topic-summary .cite') !== null && document.querySelector('.post-content') !== null");
+    assert.equal(await evaluate("[...document.querySelectorAll('.post:not(.compact-post)')].every(post=>{const avatar=post.querySelector('.avatar'),badge=post.querySelector('.age-badge'),relative=post.querySelector('.post-relative-date');return avatar&&badge&&relative&&getComputedStyle(avatar).borderRadius==='50%'&&avatar.getBoundingClientRect().width===44&&getComputedStyle(badge).display!=='none'&&relative.textContent.length>0})"),true,'Author context stays visible on desktop and mobile');
     if(width===390)assert.equal(await evaluate("document.querySelector('.topic-summary').getBoundingClientRect().top < document.querySelector('.settings-panel').getBoundingClientRect().top"),true,'Mobile summary precedes the open controls');
     await evaluate("document.querySelector('.topic-summary .cite').scrollIntoView({block:'center'}); document.querySelector('.topic-summary .cite').focus({preventScroll:true})");
     const before = await evaluate("({y:scrollY,href:document.activeElement.href})");

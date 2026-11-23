@@ -5,7 +5,7 @@
 // (D-51).
 
 import { h, link, replaceContent, renderBlocks } from "./dom.js";
-import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate } from "./logic.js";
+import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate, relativeDate } from "./logic.js";
 import { parseBlocks } from "./markdown.js";
 import { FEEDBACK, REACTIONS, MOODS, RATINGS } from "./vocab.js";
 import { postAssessment, highlightedNotes } from "./post-analysis.js";
@@ -18,6 +18,13 @@ export const postElementId = (key) => `post-${key.replace("/", "-")}`;
 
 const isMasked = (post, view) => view.state.settings.anonymous && !view.state.revealed.has(post.key);
 const forumPostLink = (post, view) => h("span", { class: "source-post-link" }, link(`${view.threadOf.get(post.key).url}/${post.number}`, "On the forum ↗"));
+
+function avatar(post, view) {
+  if (isMasked(post, view)) return h('div', { class: 'avatar avatar-anon', 'aria-hidden': 'true' }, `P${view.numbers.get(post.author)}`);
+  let hash = 0;
+  for (const character of post.author) hash = (hash * 31 + character.codePointAt(0)) >>> 0;
+  return h('div', { class: `avatar avatar-c${hash % 8}`, 'aria-hidden': 'true' }, post.author[0].toUpperCase());
+}
 
 function authorHead(post, view, reveal) {
   const masked = isMasked(post, view);
@@ -32,17 +39,21 @@ function authorHead(post, view, reveal) {
   return h(
     "header",
     { class: "post-head" },
-    view.state.settings.threadView === 'all' && view.state.data.topic.threads.length > 1
-      ? h('p', { class: 'post-thread' }, `Thread ${view.letterOf.get(thread.id)} · ${thread.title}`) : null,
-    h("span", { class: "author", title: masked ? null : accountAgeLabel(post.account, view.snapshotAt) }, masked ? pseudonym(view.numbers.get(post.author)) : post.author),
+    avatar(post, view),
+    h('div', { class: 'post-heading' },
+    h('div', { class: 'post-author-line' },
+    h("span", { class: "author" }, masked ? pseudonym(view.numbers.get(post.author)) : post.author),
     masked
       ? h("button", { class: "linkish small reveal zf", on: { click: reveal } }, "Reveal author")
-      : null,
-    !masked && view.state.settings.anonymous ? h("button", { class: "linkish small reveal", on: { click: reveal } }, "Hide author") : null,
-    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: thread.title }, `Post ${view.letterOf.get(thread.id)}#${post.number}`), reply, ` · ${shortDate(post.created_at)}`),
+      : h('span', { class: `age-badge${post.account.created_at === null ? ' age-unknown' : ''}` }, accountAgeLabel(post.account, view.snapshotAt)),
+    !masked && view.state.settings.anonymous ? h("button", { class: "linkish small reveal", on: { click: reveal } }, "Hide author") : null),
+    h("div", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: thread.title }, `Post ${view.letterOf.get(thread.id)}#${post.number}`), reply, ` · ${shortDate(post.created_at)} · `, h('span', { class: 'post-relative-date' }, relativeDate(post.created_at))),
+    view.state.settings.threadView === 'all' && view.state.data.topic.threads.length > 1
+      ? h('p', { class: 'post-thread' }, `Thread ${view.letterOf.get(thread.id)} · ${thread.title}`) : null,
+    h('div', { class: 'post-context' },
     view.state.settings.highlightNew && view.news.posts.has(post.key)
       ? h('span', { class: 'post-new' }, `New in selected ${view.state.settings.since.days}-day window`) : null,
-    post.hidden ? null : forumPostLink(post, view),
+    post.hidden ? null : forumPostLink(post, view))),
   );
 }
 

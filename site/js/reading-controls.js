@@ -1,5 +1,5 @@
 import { h } from "./dom.js";
-import { greyReasons } from "./logic.js";
+import { greyReasons, countLabel } from "./logic.js";
 import { TONE_BANDS, SUPPORT_BANDS, POST_VERSIONS, READING_VERSIONS, toggleChoice } from "./reader-options.js";
 import { filterInfo } from "./filter-info.js";
 
@@ -29,7 +29,7 @@ export function readingControls(view) {
       info("threadView", "thread view", "Read all included threads together, or choose one thread. Your selected posts remain available when changing this view."),
       h("select", { id: "setting-threadView", on: { change: event => event.target.value === "all" ? set({ threadView: "all" }) : view.actions.setThread(Number(event.target.value)) } },
         h("option", { value: "all", selected: settings.threadView === "all" }, "All threads together"),
-        view.state.data.topic.threads.map(thread => h("option", { value: thread.id, selected: settings.threadView === "thread" && view.state.thread === thread.id }, `${view.letterOf.get(thread.id)} · ${thread.title}`)))),
+        view.state.data.topic.threads.map(thread => h("option", { value: thread.id, selected: settings.threadView === "thread" && view.state.thread === thread.id }, `${view.letterOf.get(thread.id)} · ${thread.title} (${countLabel(thread.posts.length, 'post')})`)))),
     h("p", { class: "match-count small muted", "aria-live": "polite" }, `${matching} of ${visible.length} posts match. Other posts appear as compact rows.`),
     choices("Tone", "toneBands", TONE_BANDS, "Choose the tone levels you want to read. Bad includes hostile or dismissive language; Moderate is pointed; Good is restrained. A material harsh passage can lower the rating. This describes the original wording, not whether its ideas are right."),
     choices("Level of support for arguments", "supportBands", SUPPORT_BANDS, "Low, Medium and High describe how much reasoning or evidence the author supplies. This is not a fact-check. Posts without an applicable rating remain included. Select several levels, or Any."),

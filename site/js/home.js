@@ -1,20 +1,30 @@
 import { h } from "./dom.js";
-import { shortDate } from "./logic.js";
+import { shortDate, topicCountLabel } from "./logic.js";
 import { INTERESTS } from "./vocab.js";
-import { topicDirectory } from "./topic-directory.js";
+import { directoryInterests, topicDirectory } from "./topic-directory.js";
 import { latestContentRefresh } from "./catalog.js";
 
-function topicRow(data) {
+function topicRow(data, curation) {
+  const {stats} = data;
   return h("a", { class: "topic-card", id: `topic-card-${data.topic.id}`, href: `#/topic/${data.topic.id}` },
     h("h3", {}, data.topic.card.title),
-    h("p", { class: "byline" }, data.topic.card.byline));
+    h("p", { class: "byline" }, data.topic.card.byline),
+    h('footer', { class: 'topic-metadata' },
+      h('p', { class: 'card-stats' }, topicCountLabel(stats)),
+      h('p', { class: 'card-stats' }, `Latest post: ${shortDate(stats.lastPostAt)}`),
+      h('p', { class: 'card-stats topic-account-stats' },
+        stats.medianYears === null ? 'Account ages unknown' : `Median ${stats.medianYears.toFixed(1)} years on the forum`,
+        ` · ${stats.joinedRecently} joined in the last 90 days`,
+        stats.unknownAge > 0 ? ` · ${stats.unknownAge} hide their profile` : null),
+      h('p', { class: 'tags' }, directoryInterests(data, curation).map(id=>INTERESTS.find(interest=>interest.id===id).label).join(' · ')),
+      h('p', { class: 'keywords' }, data.topic.card.keywords.join(' · '))));
 }
 
 export function renderTopics(catalog, settings, actions, curation, directory) {
   const wanted = settings.interests;
   const results = topicDirectory(catalog, curation, wanted, directory);
   const refreshedAt = latestContentRefresh(catalog);
-  const cards = (topics) => h("div", { class: "board" }, topics.map(topicRow));
+  const cards = (topics) => h("div", { class: "board" }, topics.map(data=>topicRow(data, curation)));
   const toggle = (id) => actions.setSettings({ interests: wanted.includes(id) ? wanted.filter((other) => other !== id) : [...wanted, id] });
   return h("div", { class: "home topic-directory" },
     h("header", { class: "hero" }, h("h1", {}, "Topics")),

@@ -98,7 +98,9 @@ export function renderTopic(data, state, actions) {
     transform: state.settings.anonymous ? text => maskMentions(text, numbers) : text => text, cutoff, pulledAt, news: whatsNew(topic, cutoff, pulledAt) };
   const heading = h("header", { class: "topic-head" }, h("p", { class: "back" }, h("a", { href: "#/topics" }, "← Topics")), h("h1", {}, topic.headline));
   const sources = h("details", { class: "topic-sources small muted" }, h("summary", {}, `Source threads (${topic.threads.length})`),
-    h("ul", { class: "included-threads" }, topic.threads.map(thread => h("li", {}, `${view.letterOf.get(thread.id)} · ${thread.title}`, " · ", link(thread.url, "On the forum ↗")))));
+    h("ul", { class: "included-threads" }, topic.threads.map(thread => h("li", {},
+      h('button', { class: 'linkish', on: { click: () => actions.setThread(thread.id) } }, `${view.letterOf.get(thread.id)} · ${thread.title} (${countLabel(thread.posts.length, 'post')})`),
+      " · ", link(thread.url, "On the forum ↗")))));
   if (data.visibility_pending) return h("div", { class: "topic originals-only" }, heading,
     h("p", { class: "notice", role: "status" }, "Some forum posts are no longer public. The remaining originals are available below. AI summaries, re-writes and filters will return with the checked update."), sources, discussion(topic, view));
   return h("div", { class: "topic" }, heading,

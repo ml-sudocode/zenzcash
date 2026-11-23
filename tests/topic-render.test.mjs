@@ -146,6 +146,13 @@ test("summary precedes new points; sorting is directly available and bulk contro
   const selects = descendants(root).filter((n) => n.tag === "select");
   assert.equal(selects.length, 3);
   assert.deepEqual(findId(root,'setting-preferredVersion').children.map(n => n.textContent), ["Show me the re-write first", "Show me original text first"]);
+  const thread=data.topic.threads[0];
+  assert.equal(findId(root,'setting-threadView').children[1].textContent,`A · ${thread.title} (${thread.posts.length} posts)`);
+  const source=descendants(nodes(root,'included-threads')[0]).find(n=>n.tag==='button');
+  let selectedThread=null;
+  actions.setThread=id=>{selectedThread=id;};
+  click(source);
+  assert.equal(selectedThread,thread.id);
   const content = nodes(root, "reading-content")[0];
   assert.equal(content.children[0].className, "topic-summary card");
   assert.equal(content.children[1].className, "whats-new card");
@@ -247,6 +254,38 @@ test('newness is labeled per post and each post owns its analysis and feedback f
   assert.equal(nodes(renderPost(post,view),'post-thread')[0].textContent,`Thread A · ${data.topic.threads[0].title}`);
   state.settings.threadView='thread';
   assert.equal(nodes(renderPost(post,view),'post-thread').length,0);
+});
+
+test('post headers retain circular identity, visible tenure and relative dates without leaking masked identities', t => {
+  const {posts,state,view}=fixture(t);
+  t.mock.method(Date,'now',()=>Date.parse('2026-11-23T12:00:00Z'));
+  const post=posts[1];
+  post.created_at='2026-10-26T12:00:00Z';
+  for(const [account,label] of [
+    [{created_at:'2020-01-01T00:00:00Z',status:'public'},'6 years on the forum'],
+    [{created_at:'2026-01-01T00:00:00Z',status:'public'},'9 months on the forum'],
+    [{created_at:null,status:'profile hidden'},'profile hidden'],
+  ]) {
+    post.account=account;
+    for(const masked of [false,true]) {
+      state.settings.anonymous=masked;
+      state.revealed.clear();
+      const root=renderPost(post,view),head=nodes(root,'post-head')[0];
+      assert.equal(nodes(head,'avatar')[0].textContent,masked?'P2':'B');
+      assert.equal(nodes(head,'avatar')[0].attributes.get('aria-hidden'),'true');
+      assert.equal(nodes(head,'author')[0].textContent,masked?'Participant 2':'bob');
+      assert.deepEqual(nodes(head,'age-badge').map(n=>n.textContent),masked?[]:[label]);
+      assert.equal(nodes(head,'post-relative-date')[0].textContent,'28 days ago');
+      assert.equal(nodes(head,'post-meta')[0].textContent.includes('2026'),true);
+      if(masked) {
+        assert.equal(head.textContent.includes('bob'),false);
+        state.revealed.add(post.key);
+        const revealed=renderPost(post,view);
+        assert.equal(nodes(revealed,'avatar')[0].textContent,'B');
+        assert.equal(nodes(revealed,'age-badge')[0].textContent,label);
+      }
+    }
+  }
 });
 
 test('rewrite-first defaults remain distinct from originals with no rewrite or no analysis', t => {

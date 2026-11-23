@@ -6114,3 +6114,22 @@ Implementation in progress; user verification remains pending.
   deleting it. Keep the current post/footer boundaries, rewrite choices, Next
   navigation and directly available controls. Stage, test and deploy only the
   staging branch; no source fetch, analysis spending or production changes.
+
+- **F-268 — Restore author context and remaining removed metadata.** Post headers
+  again contain a circular, stable-color initial avatar, author name, visible
+  forum-tenure badge and relative date beside the absolute timestamp. Grouped
+  header layout sits inside the existing post card. Anonymous mode masks icon,
+  name and tenure together; revealing/hiding refreshes the complete header.
+  Restored directory post/thread/participant counts, last-post time, account-age
+  statistics, curated interest tags and keywords below the topic description in
+  a secondary metadata footer. Restored thread post counts in the selector and
+  internal navigation from source-thread links. Kept full-text defaults, rewrite
+  tabs, summary/citation features, post footers and directly available controls.
+  Validation: repository gate passes (61 Rust, 254 Node, clippy/builds), targeted
+  tests cover explicit years/months/unknown tenure, 28-days-ago labels, anonymity,
+  source navigation and directory metadata. Full browser suite passes including
+  visible circular avatars/badges on desktop/mobile and reveal/hide behavior.
+  Corrected one newly written test's expected category to match the existing
+  curation file (Protocol, not Governance); no product data changed. Inspected
+  mobile post headers and desktop directory screenshot. Evidence:
+  work/author-context-{gate,focused,browser}.log and work/screenshots.

@@ -143,8 +143,12 @@ posts. Search, sorting and filters remain visible in a distinct controls area;
 post feedback and AI notes are optional disclosures below the text. Citation
 links preview originals in a native dialog and support normal new-tab navigation.
 Each post is a separate bordered surface with its actions and analysis inside an
-attached footer. Newness is a per-post time-window label, not a connecting rail;
-version selection uses labeled tabs without nested colored frames. Mixed-thread
+attached footer. Newness is a per-post time-window label, not a connecting rail.
+The header retains the circular author avatar, visible forum-tenure badge and
+both absolute and relative post dates. Anonymous mode masks the avatar/name and
+tenure together until the reader reveals that author. Topic-list metadata lives
+below the description, including counts, dates, account statistics and tags.
+Version selection uses labeled tabs without nested colored frames. Mixed-thread
 views name each post's source thread. On mobile, the sticky Next post control and
 post scroll offset follow the measured header height, including signed-in layouts.
 Stored citations remain attached to their supported claim units; no historical
