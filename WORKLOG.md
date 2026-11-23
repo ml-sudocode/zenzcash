@@ -6142,3 +6142,13 @@ Implementation in progress; user verification remains pending.
   Security review: restored metadata is rendered as text, avatar classes derive
   from a bounded hash, anonymous headers omit identity/tenure, and no auth or
   secret changes were made. User visual review remains pending.
+
+- **D-223 — Persistent narrow-window controls and optional question exploration.**
+  User approves the restored context and requests reading controls remain usable
+  at a minimum width when the browser narrows. Preserve the side panel on wider
+  windows instead of moving it out of view at 1050px. Phone-width treatment is
+  being clarified (open pinned panel versus side column with horizontal scrolling).
+  Rename Choose a question to Explore the main questions and collapse the overall
+  question section by default. Preserve individual question/argument state and
+  the topic overview. Keep the sorting/filter controls open and directly usable.
+  Implement and verify only on the existing staging branch.
