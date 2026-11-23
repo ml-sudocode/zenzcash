@@ -6040,3 +6040,16 @@ Implementation in progress; user verification remains pending.
   the mobile reading screenshot. Post-commit security review: static labels only,
   no new input handling, credentials or authentication changes. Staging checkout
   is clean; visual acceptance remains with the user.
+
+- **D-220 — Make post boundaries independent of state and thread membership.**
+  User reports purple rails apparently grouping multiple posts within a thread.
+  The actual source is each new-in-window post's inset purple shadow, which joins
+  visually across adjacent posts. Replace state-dependent vertical rails with
+  separate post surfaces and neutral spacing. Newness is an explicit text badge;
+  read state remains conveyed by its existing labeled action. State and text
+  version must not look like enclosing discussion sections. Use labeled version
+  controls without nested colored frames, show source-thread titles when mixing
+  multiple threads, and retain bounded quote styling within each post. Preserve
+  summaries, rewrites, original/diff choice, filters, feedback, saved/read actions,
+  citation previews and Next post. Verify actual desktop/mobile and light/dark
+  reading layouts before deploying only to staging on the existing branch.
