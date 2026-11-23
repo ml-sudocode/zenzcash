@@ -6001,3 +6001,13 @@ Implementation in progress; user verification remains pending.
   clean. The pre-redesign branch and local rollback image remain available with
   commands in ARCHITECTURE.md. No push or production deployment. User visual
   acceptance remains pending.
+
+- **D-218 — Preserve features while reducing visual noise.** User rejects the
+  stripped topic rows and apparently missing AI summaries. Correct the staging
+  redesign on sandlab-content-first: restore visible post AI summaries alongside
+  expanded full text; restore topic metadata, tags and keywords with secondary
+  visual treatment; verify topic summaries and source/thread navigation remain
+  available. Content-first means prioritizing content rather than deleting
+  features. Preserve visible sorting/filter controls, Next post and citation
+  previews. Clarification about which summary surface appears missing is pending;
+  proceed with the verified regressions without changing data or production.
