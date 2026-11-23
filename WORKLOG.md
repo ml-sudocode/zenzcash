@@ -6053,3 +6053,9 @@ Implementation in progress; user verification remains pending.
   summaries, rewrites, original/diff choice, filters, feedback, saved/read actions,
   citation previews and Next post. Verify actual desktop/mobile and light/dark
   reading layouts before deploying only to staging on the existing branch.
+
+- **D-221 — Explicit post containers with owned footers.** User confirms each
+  post must be a visually separate unit and its feedback, AI analysis and other
+  actions must sit inside that post's footer. Thin horizontal separators are
+  insufficient. Apply the same container and footer structure irrespective of
+  newness; inspect adjacent short posts as well as long originals and rewrites.
