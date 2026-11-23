@@ -5983,3 +5983,21 @@ Implementation in progress; user verification remains pending.
   Evidence: work/design-{gate,browser,passkeys}.log and work/screenshots.
   ARCHITECTURE.md records branch/image rollback instructions. Staging deployment
   verification and the user's visual review follow this implementation commit.
+
+- **F-264 — Content-first branch deployed to Sandlab and verified over HTTPS.**
+  Deployed implementation 4ec58a9 plus mobile summary-order fix b3bb9b0 by rebuilding
+  only the Compose app. Running image is
+  sha256:5b3648c2fc4b2d0d9f5fc9df6fda51dc5944697fa5aacb618fde4228c2b3fd92;
+  app is healthy and the existing proxy was not recreated. HTTPS browser checks
+  at 2026-11-23T01:02:40Z confirm 332 topics, expanded posts, summary first on
+  desktop/mobile, open reading controls, citation preview preserving scroll, no
+  horizontal overflow and zero runtime exceptions. Unauthenticated home, health
+  and catalog requests return 401; authenticated health returns 200. Inspected
+  final staging screenshots. Evidence: work/content-first-staging.json,
+  work/content-first-staging-{1440,390}.png and work/design-deploy.log.
+  Post-commit security review found no new issue: untrusted content uses the shared
+  safe text renderer, citation links are constrained and new tabs use noopener;
+  credentials and hash are absent from the commits. Production checkouts remain
+  clean. The pre-redesign branch and local rollback image remain available with
+  commands in ARCHITECTURE.md. No push or production deployment. User visual
+  acceptance remains pending.
