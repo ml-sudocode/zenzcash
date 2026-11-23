@@ -43,7 +43,7 @@ export function readingControls(view) {
     h("fieldset", { class: "highlight-settings" }, h("legend", {}, "Highlights and author identities"),
       toggle("Flag disputed assumptions", "flagAssumptions", "Shows notes on assumptions the AI identified as disputed but presented as settled. Expand a post to inspect the passage. This does not hide posts or verify claims."),
       toggle("Show constructive reframing", "showReframing", "Shows notes where the AI identified a useful way to reframe the discussion. These appear inside expanded posts; this does not filter the stream."),
-      toggle("Highlight new points and posts", "highlightNew", "Highlights posts and summary points in the selected 1, 3 or 7 days ending at the last forum pull. What’s new counts remain visible when highlighting is off."),
+      toggle("Label new points and posts", "highlightNew", "Labels posts and summary points in the selected 1, 3 or 7 days ending at the last forum pull. These labels indicate timing, not thread groups or unread posts. What’s new counts remain visible when labels are off."),
       toggle("Hide author names — reveal one at a time", "anonymous", "Replaces names and mentions with participant numbers to help you focus on ideas. Reveal or hide each post’s author individually. Source links and exports retain attribution."),
       toggle("Show mind-change ratings", "showRatings", "Shows the reader voting controls and aggregate ratings for how a post changed people’s minds. This is separate from AI tone and argument-support ratings.")),
     h("p", { class: "small muted" }, "There is deliberately no author filter. Hearing people we disagree with helps keep the conversation connected, rather than creating separate echo chambers."));

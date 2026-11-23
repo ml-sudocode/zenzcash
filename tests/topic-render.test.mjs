@@ -222,6 +222,33 @@ test("rewrite audits group identical operations once without losing distinct quo
   assert.equal(nodes(root,"bookmark-icon").length,1);
 });
 
+test('newness is labeled per post and each post owns its analysis and feedback footer', t => {
+  const {posts,state,view,data}=fixture(t);
+  const post=posts[1];
+  view.news.posts.add(post.key);
+  for(const days of [1,3,7])for(const highlight of [false,true])for(const isNew of [false,true]) {
+    state.settings.since.days=days;
+    state.settings.highlightNew=highlight;
+    if(isNew)view.news.posts.add(post.key);else view.news.posts.delete(post.key);
+    const root=renderPost(post,view);
+    assert.equal(nodes(root,'post-new').length,highlight&&isNew?1:0);
+    if(highlight&&isNew)assert.equal(nodes(root,'post-new')[0].textContent,`New in selected ${days}-day window`);
+    const footer=nodes(root,'post-actions')[0];
+    assert.equal(footer.tag,'footer');
+    assert.equal(footer.attributes.get('aria-label'),`Actions for post A#${post.number}`);
+    assert.equal(footer.parentNode.parentNode,root);
+    assert.equal(nodes(footer,'post-feedback').length,1);
+    assert.equal(nodes(footer,'why-marks').length,1);
+    assert.equal(nodes(footer,'post-disclosure').length,1);
+    assert.equal(nodes(footer,'post-content').length,0);
+  }
+  assert.equal(nodes(renderPost(post,view),'post-thread').length,0);
+  data.topic.threads.push({id:8,title:'Another thread',posts:[]});
+  assert.equal(nodes(renderPost(post,view),'post-thread')[0].textContent,`Thread A · ${data.topic.threads[0].title}`);
+  state.settings.threadView='thread';
+  assert.equal(nodes(renderPost(post,view),'post-thread').length,0);
+});
+
 test('rewrite-first defaults remain distinct from originals with no rewrite or no analysis', t => {
   const {posts,state,view}=fixture(t);
   assert.equal(state.settings.preferredVersion,'neutral');

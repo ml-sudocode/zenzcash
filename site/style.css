@@ -1,6 +1,5 @@
-/* zforum's own interface uses the first group of tokens. The discussion is drawn like the
-   forum itself (--forum-*), and restatements carry their own colour (--restated) so it is
-   always clear which text is on show (D-48, D-49). */
+/* Discussion text uses --forum-* tokens. Post boundaries are independent of
+   new/read state and selected text version; labels communicate those states. */
 :root {
   color-scheme: light;
   --bg: #f6f5f1;
@@ -17,8 +16,6 @@
   --high-bg: #e4f3ea;
   --new: #6a4fb3;
   --new-bg: #eee8fb;
-  --restated: #1f6f63;
-  --restated-bg: #e6f3f0;
   --forum-bg: #ffffff;
   --forum-text: #222222;
   --forum-muted: #6e6e6e;
@@ -43,8 +40,6 @@
     --high-bg: #1d3326;
     --new: #b7a2f0;
     --new-bg: #2c2541;
-    --restated: #6fcfbd;
-    --restated-bg: #18302b;
     --forum-bg: #1e1f21;
     --forum-text: #dddddd;
     --forum-muted: #a3a3a3;
@@ -146,14 +141,16 @@ a.topic-card:hover h3, a.topic-card:focus-visible h3 { color: var(--accent); tex
 .discussion > h2 { margin-top: 32px; }
 
 /* The discussion, drawn like the forum (D-48). zforum's additions inside it carry .zf. */
-.forum { background: var(--forum-bg); color: var(--forum-text); border: 1px solid var(--forum-line); border-radius: 4px; padding: 0 16px 16px; font-family: Helvetica, Arial, sans-serif; }
+.forum { color: var(--forum-text); }
+.forum-posts { display: grid; gap: 16px; padding-top: 16px; }
 .forum a { color: var(--forum-link); }
 .zf { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
-.post { display: block; padding: 28px 0; border-top: 1px solid var(--forum-line); scroll-margin-top: 88px; }
-.post.is-new { box-shadow: inset 3px 0 0 var(--new); padding-left: 8px; }
+.post { display: block; padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--forum-bg); scroll-margin-top: 88px; min-width: 0; }
 .post.flash { outline: 3px solid var(--accent); outline-offset: 2px; }
 .hidden-post { opacity: 0.6; }
 .post-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 0.92rem; }
+.post-thread { flex-basis: 100%; margin: 0 0 4px; color: var(--muted); font-size: .8rem; overflow-wrap: anywhere; }
+.post-new { color: var(--muted); font-size: .75rem; }
 .author { font-weight: 700; }
 .post-meta { color: var(--forum-muted); font-size: 0.8rem; }
 .post-body { font-size: 1.05rem; line-height: 1.75; overflow-wrap: anywhere; }
@@ -187,34 +184,25 @@ body { padding-bottom: 240px; }
 .recovery-codes { border: 2px solid var(--accent); border-radius: 8px; padding: 16px; margin: 12px 0; }
 .recovery-codes pre { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
 .passkey-status .notice { margin-top: 0; }
-.post.read-post { border-left: 3px solid var(--line); background: var(--bg); }
 .read-post .post-brief { font-weight: 400; }
 @media (prefers-reduced-motion: reduce) { .companion { transition: none; animation: none; } }
 .selection-bar p { margin: 8px 0 0; }
 .selection-bar textarea { width: 100%; min-height: 100px; margin-top: 10px; }
 button:disabled { opacity: 0.5; cursor: default; }
 
-/* Restatement and original (D-49): the restatement is tinted, the original plain. */
+/* Text versions belong to the same post; only the selected label changes. */
 .version-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-.version-tab { border: 1px solid var(--forum-line); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--forum-bg); color: var(--forum-muted); padding: 3px 12px; font-size: 0.85rem; }
-.version-tab-neutral[aria-selected="true"] { background: var(--restated-bg); border-color: var(--restated); color: var(--restated); font-weight: 700; }
-.version-tab-original[aria-selected="true"] { border-color: var(--forum-muted); color: var(--forum-text); font-weight: 700; }
-.version-tab-diff[aria-selected="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
-.version-diff { border-left: 4px solid var(--accent); }
+.version-tab { border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--forum-muted); padding: 6px 10px; font-size: 0.85rem; }
+.version-tab[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--accent); font-weight: 700; }
 .diff-text { white-space: pre-wrap; }
 .version-diff del { color: var(--low); background: var(--low-bg); text-decoration: line-through; }
 .version-diff ins { color: var(--high); background: var(--high-bg); text-decoration: underline; }
-.version { border: 1px solid var(--forum-line); border-radius: 0 6px 6px 6px; padding: 2px 12px 6px; }
-.version.solo { border-radius: 6px; margin-top: 8px; }
-.version-neutral { background: var(--restated-bg); border-color: var(--restated); border-left-width: 4px; }
-.version-original { background: var(--forum-bg); border-left: 4px solid var(--forum-muted); }
-.version-label { margin: 6px 0 2px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-.version-neutral .version-label { color: var(--restated); }
-.version-original .version-label { color: var(--forum-muted); }
+.version { padding-top: 6px; }
+.version-label { margin: 6px 0 10px; font-size: 0.78rem; color: var(--forum-muted); }
 .post-body p { margin: 0.4em 0; }
 .post-body pre { overflow-x: auto; background: var(--bg); padding: 8px; border-radius: 6px; }
 .post-body { overflow-wrap: anywhere; }
-.forum-quote, .md-quote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid var(--forum-line); color: var(--forum-muted); }
+.forum-quote, .md-quote { margin: 12px 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--forum-muted); }
 .quote-by { font-size: 0.82rem; font-weight: 600; margin: 4px 0; }
 
 /* zforum's footer on each post: ratings (§6) and feedback (§7) */
@@ -235,7 +223,7 @@ button:disabled { opacity: 0.5; cursor: default; }
 
 @media (max-width: 560px) {
   .post-meta { margin-left: 0; flex-basis: 100%; }
-  .forum { padding: 0 10px 12px; }
+  .post { padding: 16px; }
 }
 
 /* Reading experience, batch 003. */
@@ -273,14 +261,15 @@ main { max-width: 1440px; padding-right: 130px; }
 .settings-panel select { font-size: .82rem; }
 .since-row input { width: 4.5em; }
 .discussion-toolbar, .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.post.compact-post { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: .85rem; }
+.post.compact-post { display: flex; align-items: center; gap: 12px; padding: 12px 16px; font-size: .85rem; }
 .compact-summary { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .compact-post > .small { max-width: 40%; }
 .post-disclosure { margin: 10px 0; gap: 8px; }
 .why-marks { margin-top: 14px; font-size: .9rem; }
 .highlighted-flag { font-size: .85rem; margin-top: 8px; }
 .highlighted-flag > summary, .post-feedback > summary { color: var(--accent); cursor: pointer; }
-.post-actions { border-top: 1px solid var(--line); margin-top: 20px; padding-top: 4px; color: var(--muted); font-size: .85rem; }
+.post-actions { border-top: 1px solid var(--line); margin: 20px -20px -20px; padding: 12px 20px; border-radius: 0 0 8px 8px; background: var(--bg); color: var(--muted); font-size: .85rem; }
+.post-actions .post-disclosure { margin: 0 0 8px; }
 .post-feedback { margin: 8px 0; }
 .post-feedback[open] { padding: 12px; background: var(--bg); border-radius: 8px; }
 .mood-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 8px 0; }
@@ -346,7 +335,7 @@ main { max-width: 1440px; padding-right: 130px; }
   .companion { z-index: 36; top: 5px; right: 5px; width: 76px; min-height: 0; height: 82px; padding: 0; border-radius: 14px; }
   .companion .companion-creature { transform: scale(.65); transform-origin: top center; margin-top: 3px; margin-bottom: -30px; }
   .companion .small { display: none; }.companion-stars { font-size: 12px; }
-  .post { scroll-margin-top: 172px; }
+  .post { scroll-margin-top: calc(var(--header-height) + 78px); }
   .post.compact-post { flex-wrap: wrap; }.compact-post > .small { max-width: 100%; }
   .info-page .hero { padding-top: 16px; }
 }
@@ -381,7 +370,7 @@ main { max-width: 1440px; padding-right: 130px; }
 .topic-sources { margin-top: 24px; }
 .new-points { padding-left: 22px; }
 .new-points li { margin: 12px 0; }
-.post-navigation { position: sticky; top: 12px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; background: var(--forum-bg); border-bottom: 1px solid var(--line); }
+.post-navigation { position: sticky; top: 12px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; background: var(--bg); border-bottom: 1px solid var(--line); }
 .post-navigation .next-post { font-weight: 600; min-height: 40px; }
 .post-navigation .small { font-family: system-ui, sans-serif; }
 .citation-preview { width: min(760px, calc(100vw - 32px)); max-height: 85vh; padding: 0 24px 24px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 80px #0005; }
@@ -391,8 +380,11 @@ main { max-width: 1440px; padding-right: 130px; }
 .citation-actions { border-top: 1px solid var(--line); padding-top: 16px; font-size: .85rem; }
 .citation-body { margin: 20px 0; }
 @media (max-width: 700px) {
-  .post-navigation { top: 100px; }
+  .post-navigation { top: calc(var(--header-height) + 6px); }
   .citation-preview { width: calc(100vw - 16px); max-height: 90dvh; padding: 0 16px 16px; }
   .citation-header { font-size: .9rem; }
   .section-heading { align-items: flex-start; }
+}
+@media (max-width: 560px) {
+  .post-actions { margin-left: -16px; margin-right: -16px; margin-bottom: -16px; padding: 12px 16px; }
 }

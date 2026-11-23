@@ -47,6 +47,14 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     assert.equal(await evaluate(`document.querySelector('#${nextId} .post-content').hidden`),false);
     assert.equal(await evaluate("(()=>{const r=document.querySelector('.next-post').getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===document.querySelector('.next-post')})()"),true,'Next stays visible and clickable after skipping');
     await capture(`content-first-posts-${width}.png`);
+    const savedTheme=await evaluate('document.documentElement.dataset.theme');
+    for(const theme of ['light','dark']) {
+      await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
+      assert.equal(await evaluate("(()=>{const posts=[...document.querySelectorAll('.forum-posts > .post')];return posts.every((post,index)=>{const style=getComputedStyle(post),rect=post.getBoundingClientRect(),footer=post.querySelector('.post-actions');return style.boxShadow==='none'&&style.borderLeftWidth==='1px'&&style.borderRightWidth==='1px'&&(!footer||(footer.closest('.post')===post&&footer.getBoundingClientRect().bottom<=rect.bottom))&&(index===0||rect.top-posts[index-1].getBoundingClientRect().bottom>=15);})})()"),true,`Distinct post boundaries and contained footers at ${width}px in ${theme}`);
+      assert.equal(await evaluate("[...document.querySelectorAll('.version')].every(n=>getComputedStyle(n).borderLeftWidth==='0px')"),true,'Text versions do not look like nested post sections');
+      await capture(`post-boundaries-${theme}-${width}.png`);
+    }
+    await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(savedTheme)}`);
     const thirdId = await evaluate("[...document.querySelectorAll('.post')].filter(p=>p.querySelector('.post-content')&&!p.querySelector('.post-content').hidden)[2].id");
     await mouse('.next-post');
     await waitFor(`document.activeElement.id === ${JSON.stringify(thirdId)}`);

@@ -462,6 +462,7 @@ try {
   await evaluate(`document.querySelector(${JSON.stringify(postSelector)}).scrollIntoView()`);
   assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
   await capture("batch004-post-mobile.png");
+  assert.equal(await evaluate("(()=>{const button=document.querySelector('.next-post'),r=button.getBoundingClientRect();return r.top>=document.querySelector('.site-header').getBoundingClientRect().bottom&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===button})()"),true,'Signed-in mobile header does not cover Next post');
   assert.deepEqual(errors,[]);
   {
     // Retain native keyboard verification separately from scripted click coverage.

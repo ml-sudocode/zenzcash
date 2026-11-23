@@ -142,6 +142,11 @@ loading the next batch when necessary. Topic summaries precede new points and
 posts. Search, sorting and filters remain visible in a distinct controls area;
 post feedback and AI notes are optional disclosures below the text. Citation
 links preview originals in a native dialog and support normal new-tab navigation.
+Each post is a separate bordered surface with its actions and analysis inside an
+attached footer. Newness is a per-post time-window label, not a connecting rail;
+version selection uses labeled tabs without nested colored frames. Mixed-thread
+views name each post's source thread. On mobile, the sticky Next post control and
+post scroll offset follow the measured header height, including signed-in layouts.
 Stored citations remain attached to their supported claim units; no historical
 analysis was regenerated for this layout change.
 

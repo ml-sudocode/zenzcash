@@ -6059,3 +6059,23 @@ Implementation in progress; user verification remains pending.
   actions must sit inside that post's footer. Thin horizontal separators are
   insufficient. Apply the same container and footer structure irrespective of
   newness; inspect adjacent short posts as well as long originals and rewrites.
+
+- **F-266 — Separate post containers and attached footers verified.** Each post
+  now has a neutral border, background and gap from its neighbors. Feedback,
+  analysis, save/read/listen and collapse controls remain inside its shaded footer.
+  Removed joining purple newness rails, read-state rails and nested version frames.
+  Newness is explicitly labeled with the selected day window; mixed-thread posts
+  name their thread. Labeled version tabs and original-only status remain intact.
+  Replaced the missing-glyph audio icon with Listen. Mobile header height is
+  measured so signed-in navigation does not overlap sticky Next post.
+  Validation: repository gate passes (61 Rust, 253 Node, clippy/builds), and the
+  final browser run passes all previous workflows plus actual light/dark card
+  separation, footer containment, no version rails and signed-in Next visibility.
+  Inspected desktop/mobile light/dark screenshots and the original/rewrite control
+  layout. Initial gate failed in an existing verifier test reading an empty PID
+  file; unchanged retry passes. An interrupted browser run left its disposable
+  server alive; identified/terminated its two process groups and reran cleanly
+  rather than weakening assertions. Evidence: work/post-boundaries-gate-retry.log,
+  work/post-boundaries-browser-clean.log, work/screenshots/post-boundaries-*.png.
+  Saved pre-change image as zenzcash-sandlab:before-post-boundaries-20261123.
+  No database, AI, source-fetch, password or production change.

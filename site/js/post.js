@@ -21,6 +21,7 @@ const forumPostLink = (post, view) => h("span", { class: "source-post-link" }, l
 
 function authorHead(post, view, reveal) {
   const masked = isMasked(post, view);
+  const thread = view.threadOf.get(post.key);
   const replyKey = post.reply_to === null ? null : `${view.threadOf.get(post.key).id}/${post.reply_to}`;
   let reply = null;
   if (replyKey !== null) {
@@ -31,12 +32,16 @@ function authorHead(post, view, reveal) {
   return h(
     "header",
     { class: "post-head" },
+    view.state.settings.threadView === 'all' && view.state.data.topic.threads.length > 1
+      ? h('p', { class: 'post-thread' }, `Thread ${view.letterOf.get(thread.id)} · ${thread.title}`) : null,
     h("span", { class: "author", title: masked ? null : accountAgeLabel(post.account, view.snapshotAt) }, masked ? pseudonym(view.numbers.get(post.author)) : post.author),
     masked
       ? h("button", { class: "linkish small reveal zf", on: { click: reveal } }, "Reveal author")
       : null,
     !masked && view.state.settings.anonymous ? h("button", { class: "linkish small reveal", on: { click: reveal } }, "Hide author") : null,
-    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: view.threadOf.get(post.key).title }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}`), reply, ` · ${shortDate(post.created_at)}`, view.state.settings.highlightNew && view.news.posts.has(post.key) ? h("span", { class: "badge-new zf" }, "New") : null),
+    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: thread.title }, `Post ${view.letterOf.get(thread.id)}#${post.number}`), reply, ` · ${shortDate(post.created_at)}`),
+    view.state.settings.highlightNew && view.news.posts.has(post.key)
+      ? h('span', { class: 'post-new' }, `New in selected ${view.state.settings.since.days}-day window`) : null,
     post.hidden ? null : forumPostLink(post, view),
   );
 }
@@ -198,7 +203,7 @@ function postArticle(post, view) {
       view.actions.selectPost(post.key, event.target.checked);
       view.syncSelection();
     } } }), `Select ${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}`) : null;
-  const classes = ["post", filtered ? "filtered" : null, view.state.settings.highlightNew && view.news.posts.has(post.key) ? "is-new" : null, view.state.flash === post.key ? "flash" : null];
+  const classes = ["post", view.state.flash === post.key ? "flash" : null];
   const personal = view.state.account?.personal;
   const saved = personal?.reading[post.key] ?? { bookmarked: false, read: false };
   if (saved.read) classes.push("read-post");
@@ -206,7 +211,7 @@ function postArticle(post, view) {
   const personalControls = [
     tool(personal ? (saved.read ? "Mark unread" : "Mark read") : "Mark read · sign-in required", saved.read ? "Mark unread" : "Mark read", () => personal ? view.actions.setReading(post.key, { read: !saved.read }) : view.actions.openAccount("save your read/unread choices"), saved.read),
     tool(personal ? (saved.bookmarked ? "Remove bookmark" : "Save post") : "Save post · sign-in required", h("span", { class: `bookmark-icon${saved.bookmarked ? " filled" : ""}`, "aria-hidden": "true" }), () => personal ? view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) : view.actions.openAccount("save posts"), saved.bookmarked),
-    tool("Listen to this post", "🔊", () => view.actions.listenPost(post.key))];
+    tool("Listen to this post", "Listen", () => view.actions.listenPost(post.key))];
   return h(
     "article",
     { class: classes.filter((name) => name !== null).join(" "), id, tabindex: -1 },
@@ -215,7 +220,7 @@ function postArticle(post, view) {
       selection,
       brief,
       content,
-      h("footer", { class: "post-actions zf" },
+      h("footer", { class: "post-actions zf", 'aria-label': `Actions for post ${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}` },
         h("div", { class: "post-disclosure" }, personalControls, expansion),
         h("details", { class: "post-feedback" }, h("summary", {}, "Give feedback"),
           h("p", { class: "small muted" }, "Optional reactions to the post and feedback on its AI re-write."),

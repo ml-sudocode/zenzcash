@@ -27,6 +27,11 @@ replaceContent(document.getElementById("theme-control"), themeControl(
 ));
 
 const main = document.getElementById("main");
+const header = document.querySelector('.site-header');
+const syncHeaderHeight = () => document.documentElement.style.setProperty('--header-height', `${header.getBoundingClientRect().height}px`);
+syncHeaderHeight();
+// The page header persists across routes; its observer lives for this document.
+new ResizeObserver(syncHeaderHeight).observe(header);
 // Hash navigation is rendered here, so browser history must not also restore scroll.
 history.scrollRestoration = "manual";
 let renderedHash = null;
