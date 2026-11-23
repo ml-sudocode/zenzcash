@@ -6088,3 +6088,19 @@ Implementation in progress; user verification remains pending.
   Post-commit security review found no new issue: thread names are escaped text,
   header sizing uses numeric DOM measurements, and auth/config are unchanged.
   Staging app healthy; checkout clean. User visual acceptance remains pending.
+
+- **F-267 — Audit empty ZCG What's new against the deployed snapshot.** User asks
+  whether the empty summary list and 186 seven-day posts are correct. Independently
+  counted non-hidden posts from staging /data/zcg.json: 853 unique public post keys;
+  trailing 1/3/7-day windows contain 12/91/186 unique posts. Endpoint is
+  2026-11-21T02:32:35.229Z (snapshot fallback; last_pulled_at absent), not current
+  time. Seven-day counts by source thread: 58515=57, 58566=0, 58571=31, 58610=0,
+  58611=57, 58656=41. This grouped topic spans six forum threads. All twenty
+  summary points have first_at between October 26 and October 31; all match the
+  first/earliest cited post as required by the summary schema and validator.
+  Therefore all three windows produce zero "new points" under current logic,
+  even though six existing points cite posts in the seven-day window (p4,p7,p13,
+  p15,p16,p19). This is not evidence of no recent developments. The label describes
+  a narrower first-appearance filter than the user's activity-summary expectation.
+  Source data evidence: work/zcg-newness-audit.json. Read-only investigation; no
+  UI/data change, regeneration, forum fetch or deployment for this question.
