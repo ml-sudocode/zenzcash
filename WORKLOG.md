@@ -5938,3 +5938,22 @@ Implementation in progress; user verification remains pending.
   no shared application port or production changes, hash omitted from all evidence.
   ARCHITECTURE.md now documents authentication and credential rotation. User
   verification of the browser login prompt remains pending.
+
+- **D-217 — Implement the agreed content-first redesign on staging.** User
+  authorizes all ten agreed design changes and deployment only to Sandlab, with
+  everything on a reversible branch. Create sandlab-content-first from 611fd8a;
+  retain sandlab at that revision and tag the current app image
+  zenzcash-sandlab:before-content-first-20261123. Implement expanded posts by
+  default with a continuously available Next post action; compact metadata and
+  secondary actions; full-width topic rows; directly visible, visually separate
+  search/sorting/filter controls; summary-first topic pages; accessible citation
+  previews plus real new-tab links; short new-point lists shown immediately;
+  clearly labeled feedback; optional explained reframing; citations beside their
+  existing supported claim units. Preserve provenance, original/rewrite choice,
+  account flows, visibility restrictions, source links and existing filtering.
+  Do not invent sentence-level attribution where stored data has only a larger
+  cited unit; tighten future summary instructions without new model calls.
+  Keep staging Basic Auth and all secrets outside Git. No production deploy,
+  database migration, source fetch, AI spending or push. Verify behavior with
+  focused tests, the repository gate and desktop/mobile browser checks, then
+  rebuild only the staging app. Record exact rollback commands and results.
