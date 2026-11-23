@@ -6011,3 +6011,13 @@ Implementation in progress; user verification remains pending.
   features. Preserve visible sorting/filter controls, Next post and citation
   previews. Clarification about which summary surface appears missing is pending;
   proceed with the verified regressions without changing data or production.
+
+- **D-219 — Clarification: rewrites exist but are less common than expected.**
+  User clarifies that the apparently missing summary was the full AI rewrite,
+  then confirms some posts do have rewrites. Narrow the immediate correction to
+  restoring explicit original-only labels removed by the redesign; do not change
+  the already-neutral default, regenerate content, or execute D-218's speculative
+  post-summary/metadata restoration in response to this clarified issue. The
+  staging ZCG topic has 333 rewrites among 853 public posts, only four among the
+  newest twenty. Distinguish an assessed post without a rewrite from an older
+  post whose analysis was omitted. Keep Original/Re-write/Changes choice intact.
