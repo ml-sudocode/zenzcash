@@ -6133,3 +6133,12 @@ Implementation in progress; user verification remains pending.
   curation file (Protocol, not Governance); no product data changed. Inspected
   mobile post headers and desktop directory screenshot. Evidence:
   work/author-context-{gate,focused,browser}.log and work/screenshots.
+  Deployed 0107118 to staging. HTTPS browser verification at
+  2026-11-23T15:27:42Z passes visible circular avatars, tenure badges and relative
+  dates, post/footer containment, rewrite defaults, citation previews, Basic Auth,
+  332 topics and mobile/desktop overflow checks with no runtime exceptions.
+  Inspected deployed mobile screenshot with actual "6 years" and "9 months"
+  badges. Evidence: work/author-context-staging.json and corresponding PNGs.
+  Security review: restored metadata is rendered as text, avatar classes derive
+  from a bounded hash, anonymous headers omit identity/tenure, and no auth or
+  secret changes were made. User visual review remains pending.
