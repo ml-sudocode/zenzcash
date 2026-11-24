@@ -6430,3 +6430,13 @@ Implementation in progress; user verification remains pending.
   should expose the concise overview rather than expand every detailed analysis.
   This updates the earlier initially-collapsed main-questions layout to the new
   requested quick comparison. No new summaries, source imports or AI spending.
+
+- **F-274 — Help icons close while hovered or focused.**
+  Click-close now dismisses both pinned and hover/focus display. Pointer departure
+  and blur do not undo dismissal; a fresh pointer entry/focus or click can show
+  help again. Escape remains supported. Unit tests cover repeated toggles, initial
+  pin states and dismissal/re-entry; the real Chrome suite passes mouse clicks,
+  emulated phone touch taps, keyboard Enter, pointer departure and reachable
+  underlying options. Inspected the closed phone-help screenshot. Evidence:
+  work/filter-help-unit.log, work/filter-help-browser.log and
+  work/screenshots/filter-help-closed-{1280,390}.png. Staging deployment follows.

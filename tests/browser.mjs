@@ -20,6 +20,7 @@ import { corpusData } from './corpus-fixture.mjs';
 import { checkCachedDeployment } from './cached-deployment.mjs';
 import { checkReadingFlow } from './reading-flow-browser.mjs';
 import { checkSummaryUsability } from './summary-usability-browser.mjs';
+import { checkFilterInfo } from './filter-info-browser.mjs';
 import { checkSavedHistory } from './saved-history-browser.mjs';
 import { buildRuntime } from '../tools/build-runtime.mjs';
 
@@ -384,6 +385,7 @@ try {
   await send("Input.dispatchKeyEvent",{type:"keyDown",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
   await send("Input.dispatchKeyEvent",{type:"keyUp",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
   assert.equal(await evaluate("getComputedStyle(document.querySelector('#info-toneBands')).display"),"none");
+  await checkFilterInfo({send,evaluate,capture});
   await evaluate("document.querySelector('#setting-toneBands-good').click()");
   await waitFor("document.querySelector('#site-nav').textContent.includes('Profile')");
   await evaluate("document.querySelector('#setting-toneBands-bad').focus(); document.querySelector('#setting-toneBands-bad').click()");
