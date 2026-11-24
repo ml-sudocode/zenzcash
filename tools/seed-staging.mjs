@@ -4,15 +4,15 @@ import { dirname, join } from 'node:path';
 import { seedDatabase } from './seed-database.mjs';
 import { sha256File } from './lib/fsio.mjs';
 
-// Schema 11 contains historical feedback tables that are not safe to leave to
-// account cascade deletion. Future schema changes require a new privacy review.
+// Schemas 11/12 contain historical feedback tables that cannot rely on account
+// cascade deletion. Schema 12's topic bookmarks do cascade; verify them too.
 export async function seedStaging(source, destination, expectedHash) {
   if ([destination, `${destination}-wal`, `${destination}-shm`].some(existsSync)) throw new Error(`Refusing to replace existing staging database: ${destination}`);
   const directory = mkdtempSync(join(dirname(destination), '.staging-seed-'));
   const temporary = join(directory, 'sanitized.sqlite');
   try {
     const original = await seedDatabase(source, temporary, expectedHash);
-    if (original.schema !== 11) throw new Error(`Staging seed requires schema 11; found ${original.schema}`);
+    if (![11,12].includes(original.schema)) throw new Error(`Staging seed requires schema 11 or 12; found ${original.schema}`);
     const db = new DatabaseSync(temporary);
     try {
       db.exec(`PRAGMA foreign_keys=ON; PRAGMA secure_delete=ON;
@@ -35,6 +35,7 @@ export async function seedStaging(source, destination, expectedHash) {
         (SELECT count(*) FROM ratings) + (SELECT count(*) FROM moods) +
         (SELECT count(*) FROM progress_cache) + (SELECT count(*) FROM historical) AS count`).get().count;
       if (remaining !== 0) throw new Error(`Staging seed retains ${remaining} personal records`);
+      if (original.schema === 12 && db.prepare('SELECT count(*) AS n FROM saved_topics').get().n !== 0) throw new Error('Staging seed retains saved topics');
     } finally { db.close(); }
     return await seedDatabase(temporary, destination, await sha256File(temporary));
   } finally { rmSync(directory, {recursive:true, force:true}); }

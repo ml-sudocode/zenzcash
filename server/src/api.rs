@@ -140,6 +140,15 @@ async fn reading(
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
+struct TopicBookmark { saved: bool }
+async fn save_topic(State(state): State<Shared>, headers: HeaderMap, Path(topic): Path<String>, Json(body): Json<TopicBookmark>) -> ApiResult {
+    let app = locked(&state);
+    let id = account(&app.db, &headers, true, false)?;
+    app.db.save_topic(&id, &topic, body.saved)?;
+    Ok(Json(json!({"topic":topic,"saved":body.saved})).into_response())
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ReadingQuery {
     #[serde(default)]
     after: String,
@@ -353,6 +362,7 @@ pub(super) fn router(state: Shared, site: &FsPath) -> Router {
         .route("/api/account/visit", post(visit))
         .route("/api/account/reading", get(reading_list))
         .route("/api/account/reading/{thread}/{post}", put(reading))
+        .route("/api/account/topics/{topic}", put(save_topic))
         .route("/api/account/preferences", put(preferences))
         .route("/api/account/appearance", put(appearance))
         .route("/api/account/mood/{thread}/{post}", put(mood_set))

@@ -26,7 +26,7 @@ fn check_analysis_omission(post: &Value, key: &str, hidden: bool) -> Result<bool
     }
     Ok(true)
 }
-fn topic_id(value: &str) -> Result<&str> {
+pub(crate) fn topic_id(value: &str) -> Result<&str> {
     if value.is_empty() || value == "topics" || value.len() > 80 || !value.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-') {
         return Err(format!("invalid topic id {value:?}"));
     }

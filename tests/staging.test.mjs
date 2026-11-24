@@ -29,6 +29,7 @@ function fixture(path, people) {
     db.prepare('INSERT INTO recovery VALUES(?,?)').run(id,id);
     db.prepare("INSERT INTO visits VALUES(?,'device',1,0)").run(id);
     db.prepare("INSERT INTO reading VALUES(?,'7/1',1,1)").run(id);
+    db.prepare("INSERT INTO saved_topics VALUES(?,'topic')").run(id);
     db.prepare("INSERT INTO feedback VALUES(?,'7/1','rendition','head',1,1)").run(id);
     db.prepare("INSERT INTO feedback_clears VALUES(?,'7/1','emotions',2)").run(id);
     db.prepare("INSERT INTO feedback_signed_v1 VALUES(?,'7/1','rendition','head',10,3)").run(id);
@@ -47,13 +48,13 @@ test('staging removes personal data while preserving content and the source, wit
       const source=join(root,'source.sqlite'), destination=join(root,'staging.sqlite');
       fixture(source,people);
       const hash=await sha256File(source);
-      assert.deepEqual(await seedStaging(source,destination,hash),{schema:11,topics:1,posts:2,accounts:0});
+      assert.deepEqual(await seedStaging(source,destination,hash),{schema:12,topics:1,posts:2,accounts:0});
       assert.equal(await sha256File(source),hash);
       assert.equal(statSync(destination).mode & 0o777,0o600);
       assert.equal(readFileSync(destination).includes(Buffer.from('PRIVATE_STAGING_FIXTURE')),false);
       const db=new DatabaseSync(destination,{readOnly:true});
       try {
-        for (const table of ['accounts','credentials','sessions','recovery','visits','reading','feedback','feedback_clears','feedback_signed_v1','feedback_clears_signed_v1','ratings','moods','progress_cache','historical']) {
+        for (const table of ['accounts','credentials','sessions','recovery','visits','reading','saved_topics','feedback','feedback_clears','feedback_signed_v1','feedback_clears_signed_v1','ratings','moods','progress_cache','historical']) {
           assert.equal(db.prepare(`SELECT count(*) AS n FROM ${table}`).get().n,0,table);
         }
         assert.equal(db.prepare('SELECT value FROM sequence').get().value,0);
@@ -80,11 +81,24 @@ test('staging rejects hash mismatch, unknown schema and occupied WAL files witho
     const db=new DatabaseSync(source);
     db.exec('PRAGMA user_version=10'); db.close();
     const hash=await sha256File(source);
-    await assert.rejects(seedStaging(source,destination,hash),{message:'Staging seed requires schema 11; found 10'});
+    await assert.rejects(seedStaging(source,destination,hash),{message:'Staging seed requires schema 11 or 12; found 10'});
     assert.equal(existsSync(destination),false);
     writeFileSync(`${destination}-wal`,'occupied');
     await assert.rejects(seedStaging(source,destination,hash),{message:`Refusing to replace existing staging database: ${destination}`});
     assert.equal(readFileSync(`${destination}-wal`,'utf8'),'occupied');
     assert.equal(readdirSync(root).some(name=>name.startsWith('.staging-seed-')),false);
+  } finally { rmSync(root,{recursive:true,force:true}); }
+});
+
+test('staging still sanitizes schema 11 backups before the saved-topics migration',async()=>{
+  const root=mkdtempSync(join(tmpdir(),'staging-legacy-'));
+  try {
+    const source=join(root,'source.sqlite'),destination=join(root,'staging.sqlite');
+    fixture(source,1);
+    const db=new DatabaseSync(source);db.exec('DROP TABLE saved_topics; PRAGMA user_version=11');db.close();
+    const hash=await sha256File(source);
+    assert.deepEqual(await seedStaging(source,destination,hash),{schema:11,topics:1,posts:2,accounts:0});
+    assert.equal(await sha256File(source),hash);
+    assert.equal(readFileSync(destination).includes(Buffer.from('PRIVATE_STAGING_FIXTURE')),false);
   } finally { rmSync(root,{recursive:true,force:true}); }
 });

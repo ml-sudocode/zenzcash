@@ -6271,3 +6271,18 @@ Implementation in progress; user verification remains pending.
   convenience links working. Implement, test and deploy only on the staging
   branch. User also requests a short collaborator summary and explanation of
   desktop/mobile checks; include both in the final response.
+
+- **F-271 — Account-owned saved topics and additive schema 12.**
+  Added topic bookmarks independently of existing saved posts. The account API
+  returns only its own saved topic ids; writes require the existing session,
+  CSRF and same-origin protections, reject unknown body fields and invalid ids,
+  and cap each account at 1000 topic bookmarks. Removal remains possible when a
+  topic is no longer published. Parameterized writes are atomic and account
+  deletion cascades. Schema 12 adds one table without rewriting existing rows.
+  Staging sanitation supports both schema 11 backups and schema 12, verifying
+  that topic bookmarks are removed with other personal data. The full gate
+  passes: 64 Rust and 265 Node tests, including schema migration/preservation,
+  reopen persistence, account isolation, authenticated route boundaries and
+  staging privacy. Evidence: work/saved-history-gate.log. Keep this backend
+  revision as a schema-12-compatible UI rollback baseline; older schema-11
+  images cannot open the migrated database. Back up staging before deployment.
