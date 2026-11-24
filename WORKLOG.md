@@ -6550,3 +6550,13 @@ Implementation in progress; user verification remains pending.
   matching PNGs and work/compact-topic-deploy.log. Post-commit security review
   found no new issues or committed secrets; identity/signing match configuration.
   Production unchanged. User visual review remains pending.
+
+- **D-233 — Merge the reviewed staging changes into main.**
+  User approves the current staging result and explicitly requests merging to
+  main. Preserve the reviewed sandlab-content-first history and existing local
+  main work; integrate origin/main's separate historical documentation commit
+  before publishing main with a normal push. GitHub CI runs checks only, with no
+  deployment job. This request does not deploy or publish content to production.
+  The reviewed application passes 64 Rust and 270 Node tests plus desktop/phone
+  browser and authenticated staging checks. Verify the merged tree, identity,
+  credential boundaries and required checks before updating main and pushing.
