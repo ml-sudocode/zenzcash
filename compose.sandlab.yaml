@@ -1,0 +1,86 @@
+name: zenzcash-sandlab
+
+services:
+  app:
+    image: zenzcash-sandlab:dev
+    build: .
+    restart: unless-stopped
+    init: true
+    user: "10001:10001"
+    entrypoint: ["/app/server/target/release/zforum-server"]
+    command:
+      - serve
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --proxy
+      - fly
+      - --site
+      - /app/site
+      - --db
+      - /data/zforum.sqlite
+      - --origin
+      - https://sandlab.zenzcash.com
+      - --rp-id
+      - sandlab.zenzcash.com
+      - --webauthn
+      - /app/server/webauthn/target/release/zforum-webauthn
+    volumes:
+      - app_data:/data
+    networks: [backend]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 2g
+    pids_limit: 256
+    stop_signal: SIGINT
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--max-time", "5", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+  proxy:
+    image: caddy:2.11.9-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
+    restart: unless-stopped
+    depends_on:
+      app: {condition: service_healthy}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile.sandlab:/etc/caddy/Caddyfile:ro
+      - type: bind
+        source: /etc/zenzcash-sandlab/basic-auth
+        target: /run/secrets/sandlab-basic-auth
+        read_only: true
+        bind:
+          create_host_path: false
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [backend, edge]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+networks:
+  backend:
+    internal: true
+  edge:
+
+volumes:
+  app_data:
+    external: true
+    name: zenzcash-sandlab_app_data
+  caddy_data:
+  caddy_config:

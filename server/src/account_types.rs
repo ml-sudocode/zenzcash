@@ -115,8 +115,8 @@ impl Preferences {
                 return Err(format!("invalid {name} list"));
             }
         }
-        if prefs.version != 7 || prefs.min_account_months > 1200 {
-            return Err("preferences require version 7 and minimum account age 0 to 1200 months".into());
+        if prefs.version != 8 || prefs.min_account_months > 1200 {
+            return Err("preferences require version 8 and minimum account age 0 to 1200 months".into());
         }
         let Since::PullDays { days } = prefs.since;
         if ![1, 3, 7].contains(&days) {

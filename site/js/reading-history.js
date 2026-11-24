@@ -12,6 +12,7 @@ export class ReadingHistory {
     this.topics = new Map();
     this.bookmarksNext = '';
     this.bookmarksLoaded = false;
+    this.bookmarkPages = 0;
     this.loadingBookmarks = null;
   }
   record(key, entry) {
@@ -51,6 +52,7 @@ export class ReadingHistory {
       try {
         this.bookmarksNext = await this.page({ bookmarks: 'true', after: this.bookmarksNext });
         this.bookmarksLoaded = true;
+        this.bookmarkPages++;
       } finally { this.loadingBookmarks = null; }
     })();
     return this.loadingBookmarks;

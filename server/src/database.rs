@@ -89,7 +89,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 11 {
+        if version > 12 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -138,6 +138,7 @@ impl Database {
         }
         if version < 10 { crate::listing::migrate(&connection)?; }
         if version < 11 { connection.execute_batch(include_str!("review-schema.sql")).map_err(error)?; }
+        if version < 12 { connection.execute_batch(include_str!("saved-topics-schema.sql")).map_err(error)?; }
         Ok(Self { connection, reader: ReadDatabase { location, permits: std::sync::Arc::new(tokio::sync::Semaphore::new(8)) } })
     }
     pub fn reader(&self) -> ReadDatabase { self.reader.clone() }
@@ -338,7 +339,7 @@ impl Database {
             )
             .map_err(error)?;
         Ok(
-            json!({"label":label,"appearance":appearance,"preferences":prefs.map(|text| serde_json::from_str::<Value>(&text)).transpose().map_err(error)?,"moods":self.moods(account)?,"recovery_remaining":remaining,"progress":self.progress(account)?}),
+            json!({"label":label,"appearance":appearance,"preferences":prefs.map(|text| serde_json::from_str::<Value>(&text)).transpose().map_err(error)?,"moods":self.moods(account)?,"saved_topics":self.saved_topics(account)?,"recovery_remaining":remaining,"progress":self.progress(account)?}),
         )
     }
     pub fn progress(&self, account: &str) -> Result<Value> {

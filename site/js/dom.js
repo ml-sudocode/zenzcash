@@ -4,7 +4,7 @@
 
 import { safeHref } from "./markdown.js";
 
-const ALLOWED_ATTRIBUTES = new Set(["class", "id", "title", "type", "value", "min", "max", "step", "start", "aria-label", "aria-pressed", "aria-selected", "aria-expanded", "aria-controls", "aria-hidden", "aria-live", "role", "for", "name", "checked", "selected", "disabled", "open"]);
+const ALLOWED_ATTRIBUTES = new Set(["class", "id", "title", "type", "value", "min", "max", "step", "start", "aria-label", "aria-labelledby", "aria-pressed", "aria-selected", "aria-expanded", "aria-controls", "aria-hidden", "aria-live", "role", "for", "name", "checked", "selected", "disabled", "open", "tabindex", "target", "rel"]);
 
 // h("div", {class: "x", on: {click: fn}, href: "#/topic/zcg"}, "text", childNode, [more])
 // `href` here is for internal navigation only and must start with "#/"; external links go

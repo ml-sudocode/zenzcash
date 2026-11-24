@@ -34,7 +34,7 @@ export async function checkCachedDeployment({send,evaluate,waitFor,capture}) {
   try{
     for(const attempt of [1,2]){
       await send('Page.navigate',{url:`${origin}/?legacy=${attempt}`});
-      await waitFor('document.body.textContent === "Zenzcash could not load its data: Invalid topic data in catalog"');
+      await waitFor('document.body?.textContent === "Zenzcash could not load its data: Invalid topic data in catalog"');
       assert.deepEqual(legacyRequests,['/js/app.js','/js/catalog.js']);
     }
     upgraded=true;

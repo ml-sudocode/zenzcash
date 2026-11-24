@@ -69,16 +69,32 @@ export function selectionBar(view) {
     h("p", { class: "muted small" }, "Exports include original text, usernames and source links—even in anonymous mode. Nothing is sent to an AI by Zenzcash. Playback and exports capture your selection when you start."), output, status, files);
   const clear = h("button", { class: "chip", on: { click: () => view.actions.clearSelection() } }, "Clear selection");
   buttons.push(clear);
-  const bulk = (label, thread) => h("button", { class: "chip", on: { click: () => view.actions.selectScope(scopeSelection(view.state.data.topic, view.state.selected, thread)) } }, label);
-  view.syncSelection = () => { count.textContent = `${view.state.selected.size} selected`;  updateButtons(); if (!busy) { output.hidden = true; status.textContent = ""; } };
-  view.syncSelection();
-  return h("details", { class: "selection-bar", open: view.state.open.expert, on: { toggle: (event) => { if (event.target.isConnected && event.target.classList.contains("selection-bar")) view.actions.setOpen("expert", null, event.target.open); } } },
+  const scopes = [];
+  const scopeButton = (label, keys) => {
+    const button = h('button', { class: 'chip', disabled: keys.size === 0, on: { click: () => view.actions.selectScope(new Set([...view.state.selected, ...keys])) } }, label);
+    scopes.push({ button, keys });
+    return button;
+  };
+  const bulk = (label, thread) => scopeButton(label, scopeSelection(view.state.data.topic, new Set(), thread));
+  view.syncSelection = () => {
+    count.textContent = `${view.state.selected.size} selected`;
+    updateButtons();
+    for (const { button, keys } of scopes) {
+      const selected = [...keys].filter(key => view.state.selected.has(key)).length;
+      button.setAttribute('aria-pressed', selected === 0 ? 'false' : selected === keys.size ? 'true' : 'mixed');
+      button.setAttribute('title', `${selected} of ${keys.size} posts selected`);
+    }
+    if (!busy) { output.hidden = true; status.textContent = ""; }
+  };
+  const root = h("details", { class: "selection-bar", open: view.state.open.expert, on: { toggle: (event) => { if (event.target.isConnected && event.target.classList.contains("selection-bar")) view.actions.setOpen("expert", null, event.target.open); } } },
     h("summary", {}, "Expert user tools · ", count),
     h("p", {}, "Select the posts you want to listen to or export with a pre-written prompt. Choose individual posts, all posts in a thread, or a time window such as the last 24 hours."),
     h("div", { class: "selection-actions" },
       h("button", { class: "chip", "aria-pressed": String(view.state.selecting), on: { click: () => view.actions.setSelecting(!view.state.selecting) } }, view.state.selecting ? "Done selecting" : "Select individual posts"), clear,
-      h("button", { class: "chip", disabled: view.cutoff === null, on: { click: () => view.actions.selectScope(new Set([...view.state.selected, ...view.allPosts.filter((post) => !post.hidden && view.news.posts.has(post.key)).map((post) => post.key)])) } }, `Select posts in this time window (${view.allPosts.filter((post) => !post.hidden && view.news.posts.has(post.key)).length})`),
+      scopeButton(`Select posts in this time window (${view.news.posts.size})`, view.news.posts),
       bulk("Select all in this topic", null)),
     h("div", { class: "selection-actions" }, view.state.data.topic.threads.map((thread) => bulk(`Select thread ${view.letterOf.get(thread.id)} · ${thread.title}`, thread.id))),
     h("p", { class: "small muted" }, "Bulk selection includes collapsed and not-yet-loaded posts, but excludes forum-hidden posts. Changing filters or the time window does not alter your selection."), workflows);
+  view.syncSelection();
+  return root;
 }

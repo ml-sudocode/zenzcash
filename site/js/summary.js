@@ -11,6 +11,16 @@ export function orientation(topic, view) {
   return h("div", { class: "overview" }, topic.overview.map((sentence) => h("p", {}, statement(sentence, view))));
 }
 
+export function exploreArguments(view, section) {
+  return h('button', { class: 'chip explore-arguments', 'aria-controls': 'main-questions', on: { click: () => {
+    view.actions.setOpen('summary', null, true);
+    section.open = true;
+    const heading = section.querySelector('summary');
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ block: 'start', behavior: 'instant' });
+  } } }, 'Explore the arguments ↓');
+}
+
 export function questionCards(topic, view) {
   const points = new Map(topic.points.map((point) => [point.id, point]));
   const issues = new Map(topic.issues.map((issue) => [issue.id, issue]));
@@ -30,8 +40,7 @@ export function questionCards(topic, view) {
       on: { toggle: (event) => {
         if (event.target === detail && detail.isConnected) view.actions.setOpen("arguments", issue.id, detail.open);
       } },
-    }, h("summary", {}, "Explore the arguments"),
-    h("p", { class: "muted small" }, "These are attributed positions, not verified findings. Sources for the question: ", cites(issue.description.cites, view)),
+    }, h("summary", {}, "Supporting points and evidence"),
     h("ul", { class: "points" }, issue.points.map((id) => {
       const point = points.get(id);
       return h("li", { id: `argument-${id}` },
@@ -51,22 +60,28 @@ export function questionCards(topic, view) {
     },
     h("summary", { id: `${questionElementId(issue.id)}-heading`, class: "question-heading" },
       h("span", { class: "question-number", "aria-hidden": "true" }, String(index + 1).padStart(2, "0")),
-      h("span", { class: "question-heading-text" }, h("strong", {}, issue.issue), h("span", { class: "question-description" }, view.transform(issue.description.text)))),
+      h("span", { class: "question-heading-text" }, h("strong", {}, issue.issue), h("span", { class: "question-description" }, statement(issue.description, view)))),
     h("div", { class: "question-content" },
       h("p", { class: "decision-at-stake" }, statement(issue.decision_at_stake, view)),
-      h("dl", { class: "question-positions" }, issue.positions_with_post_references.map((position) => [h("dt", {}, position.label), h("dd", {}, statement(position, view))])),
       h("p", { class: "unresolved" }, h("strong", {}, "Still unresolved: "), statement(issue.unresolved_status, view)),
-      detail,
       issue.related_issues.length > 0 ? h("div", { class: "related-questions" }, h("span", { class: "muted small" }, "Related questions: "), issue.related_issues.map((id) => h("button", { class: "linkish small", on: { click: () => openQuestion(id) } }, issues.get(id).issue))) : null,
       index < topic.issues.length - 1 ? h("button", { class: "chip next-question", on: { click: () => openQuestion(topic.issues[index + 1].id) } }, "Next question →") : h("p", { class: "muted small" }, "You can revisit any question or continue into the discussion below."),
     ));
     cards.set(issue.id, card);
-    return card;
+    return h('section', { class: 'question-row', 'aria-labelledby': `${questionElementId(issue.id)}-heading` }, card,
+      h('section', { class: 'main-arguments', 'aria-labelledby': `arguments-heading-${issue.id}` },
+        h('h3', { id: `arguments-heading-${issue.id}`, class: 'arguments-heading' }, 'Main arguments'),
+        h("dl", { class: "question-positions" }, issue.positions_with_post_references.map((position) => [h("dt", {}, view.transform(position.label)), h("dd", {}, statement(position, view))])),
+        detail));
   });
-  return h("section", { class: "question-summary", "aria-label": "Questions in the debate" },
-    h("h2", {}, "Choose a question"),
-    h("p", { class: "muted" }, "Start wherever you’re curious. Each question stands on its own; open the arguments when you want more detail."),
+  const section = h("details", { id: 'main-questions', class: "question-summary", open: view.state.open.summary, on: { toggle: event => {
+    if (event.target === section && section.isConnected) view.actions.setOpen('summary', null, section.open);
+  } } },
+    h("summary", { class: 'question-summary-heading' }, "Main questions and arguments"),
+    h("p", { class: "muted small" }, "Compare the positions on each question. These are attributed arguments, not verified findings."),
+    h('div', { class: 'summary-column-headings', 'aria-hidden': 'true' }, h('span', {}, 'Main questions'), h('span', {}, 'Main arguments')),
     h("div", { class: "question-list" }, rendered),
-    h("p", { class: "summary-scope muted small" }, `All ${topic.points.length} point${topic.points.length === 1 ? "" : "s"} remain available under “Explore the arguments”, including those from filtered posts. Citations name the thread and post (A#12) and open the original; their colours indicate tone only, not argument quality.`),
+    h("p", { class: "summary-scope muted small" }, `All ${topic.points.length} point${topic.points.length === 1 ? "" : "s"} remain available under “Supporting points and evidence”, including those from filtered posts. Citations name the thread and post (A#12) and open the original; their colours indicate tone only, not argument quality.`),
     h("p", { class: "analysis-disclosure muted small" }, h("strong", {}, "AI-generated analysis. "), ANALYSIS_DISCLOSURE));
+  return section;
 }

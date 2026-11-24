@@ -62,6 +62,12 @@ and remaining limitations instead of a dispute. Preserve corrections and chronol
 A cited statement is exactly `{text, cites}`, with a nonempty text and 1–6 distinct visible
 post references. Unless otherwise specified, text is at most 400 characters; the six
 detail arrays allow up to 600 characters per statement and 0–6 statements each.
+Keep each cited statement focused on one claim or tightly connected qualification.
+Use separate statement objects for independently sourced claims wherever an array
+allows it. The interface places citations directly after that statement, so its
+references must support the entire text, not just the last sentence. Do not combine
+unrelated claims into a paragraph with a pooled citation list. Do not invent a more
+precise source mapping or discard qualifications just to shorten a statement.
 
 The decision, positions and unresolved status together should usually be 60–100 words.
 This is a design target, not permission to erase a qualification. Detailed fields and

@@ -8,6 +8,29 @@ pub const DEVICE_LIMIT: i64 = 64;
 fn failure(error: impl std::fmt::Display) -> String { format!("reading state: {error}") }
 
 impl Database {
+    pub fn saved_topics(&self, account: &str) -> Result<Vec<String>> {
+        self.connection.prepare("SELECT topic FROM saved_topics WHERE account=?1 ORDER BY topic").map_err(failure)?
+            .query_map([account], |row| row.get(0)).map_err(failure)?
+            .collect::<std::result::Result<Vec<_>, _>>().map_err(failure)
+    }
+
+    pub fn save_topic(&self, account: &str, topic: &str, saved: bool) -> Result<()> {
+        crate::content::topic_id(topic)?;
+        let tx = self.connection.unchecked_transaction().map_err(failure)?;
+        if saved {
+            if !self.has_release(topic)? { return Err("topic is unavailable".into()); }
+            let exists: bool = tx.query_row("SELECT EXISTS(SELECT 1 FROM saved_topics WHERE account=?1 AND topic=?2)", params![account,topic], |row| row.get(0)).map_err(failure)?;
+            if !exists {
+                let count: i64 = tx.query_row("SELECT count(*) FROM saved_topics WHERE account=?1", [account], |row| row.get(0)).map_err(failure)?;
+                if count >= 1000 { return Err("Saved topic limit reached (1000); remove a topic before adding more.".into()); }
+                tx.execute("INSERT INTO saved_topics(account,topic) VALUES(?1,?2)", params![account,topic]).map_err(failure)?;
+            }
+        } else {
+            tx.execute("DELETE FROM saved_topics WHERE account=?1 AND topic=?2", params![account,topic]).map_err(failure)?;
+        }
+        tx.commit().map_err(failure)
+    }
+
     pub fn reading_entry(&self, account: &str, post: &str) -> Result<Value> {
         self.connection.query_row("SELECT bookmarked,read FROM reading WHERE account=?1 AND post=?2", params![account,post],
             |row| Ok(json!({"bookmarked":row.get::<_,bool>(0)?,"read":row.get::<_,bool>(1)?})))
@@ -124,7 +147,7 @@ mod tests {
         {
             let db = Database::open(&path).unwrap();
             db.create_account("test-account").unwrap();
-            db.connection.execute_batch("DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings; DROP TABLE import_review_history; PRAGMA user_version=8;
+            db.connection.execute_batch("DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings; DROP TABLE import_review_history; DROP TABLE saved_topics; PRAGMA user_version=8;
               INSERT INTO reading VALUES('test-account','99/1',0,0),('test-account','99/2',1,0),('test-account','99/3',0,1);
               WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<100) INSERT INTO visits SELECT 'test-account',printf('%032x',x),x,NULL FROM n;").unwrap();
         }

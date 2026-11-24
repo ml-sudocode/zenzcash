@@ -5854,3 +5854,722 @@ Implementation in progress; user verification remains pending.
   production-{verification,browser}.json, screenshots, transfer verification and
   final-space.txt. All bounded publication/verification processes and the local
   preview server have exited. Technical work is complete; user review is pending.
+
+- **D-215 — Host isolated Sandlab staging on this server.** User requests a
+  containerized dev/staging instance at https://sandlab.zenzcash.com with a
+  Let's Encrypt certificate, without deploying to production. Use the dedicated
+  sandlab branch/worktree based on aee05ce, the existing application Dockerfile,
+  and a Caddy reverse proxy with persistent certificate storage and automatic
+  renewal. Open this host's HTTP/HTTPS ports as needed. Seed an independent
+  database from the already verified November 21 off-site backup, removing all
+  accounts, credentials, sessions, recovery material, personal feedback/history
+  and reading state before exposing it. Preserve published content and visibility
+  restrictions. Use the staging hostname as both origin and WebAuthn RP ID.
+  No production mutations, credentials, backup scheduler, forum fetches or model
+  calls; override the production supervisor with the real server command. Caddy
+  overwrites Fly-Client-IP with the connection peer to satisfy the existing trusted
+  proxy contract; the application port is private to its isolated Docker network.
+  Keep all staging deployment files in this branch and document rebuild, restart
+  and persistence operations in ARCHITECTURE.md. Verify HTTPS, content, account
+  flows, source isolation and restart persistence before handing over. The design
+  changes discussed in chat remain subsequent work, not part of this setup.
+
+- **F-261 — Sandlab staging deployed and verified.** The isolated sandlab
+  checkout now runs the existing application image with Compose at
+  https://sandlab.zenzcash.com. Let's Encrypt issued a trusted certificate
+  (November 22, 2026 through February 20, 2027); Caddy persists ACME state and
+  renews automatically. HTTP redirects to HTTPS. Host firewall allows 80/tcp,
+  443/tcp and 443/udp; both services use restart-unless-stopped. The app runs as
+  uid/gid 10001 with a read-only image, no capabilities, no published port and
+  an internal-only network. Caddy replaces untrusted Fly-Client-IP headers.
+  The externally initialized app_data volume is explicitly external in Compose
+  so lifecycle commands do not confuse it with a Compose-created volume.
+  Source: verified local off-site backup SHA-256
+  2ebda9ed2195fb235efbb593c5034c7ed9385f63f55dc4857fa5516adbc38ade.
+  Sanitized seed: schema 11, 332 topics, 15,024 posts, zero accounts; all 14
+  personal/history tables empty. Compared hashes and counts of published,
+  releases, current_posts, restrictions, source_revisions, renditions, source_pulls
+  and topic_listings against the source; all match. Temporary unsanitized
+  extraction removed after verification. No production credentials or model calls.
+  Nine relevant deployment/seed tests pass. Docker build runtime smoke passes.
+  Compose and Caddy validation pass. HTTPS health, catalog, robots/noindex,
+  private-path 404s, production-origin rejection and spoofed-IP replacement pass.
+  Real Chromium with a virtual authenticator passes browsing, registration,
+  sign-out/sign-in, host-only Secure/HttpOnly/SameSite cookies, bookmark and
+  session persistence across app restart, and test-account deletion, without
+  runtime exceptions. The first probe used an incorrect cleanup API path;
+  corrected the probe, removed its disposable account, and reran successfully.
+  Inspected the rendered topics screenshot. Security review found no production
+  data mount, exposed app/admin port, shared login scope or credentials in config.
+  Public staging is excluded from search indexing; it has no access password or
+  off-host backup. Source changes require rebuilding the app image. Main
+  checkouts remain unchanged; no push, Fly deployment or redesign implementation.
+  Operation commands are in ARCHITECTURE.md. Local evidence:
+  work/staging-content-verification.json, work/sandlab-browser.json and screenshots.
+  User review of the running staging site is pending.
+
+- **D-216 — Protect Sandlab with server-local HTTP Basic Auth.** User requests
+  HTTP Basic Auth using the password supplied in chat, with no password committed
+  to the repository. Use username sandlab. Store only its bcrypt hash in a
+  root-owned mode-0600 configuration file under /etc/zenzcash-sandlab, outside
+  every checkout; mount it read-only into Caddy. Commit only the import/mount
+  wiring and operating instructions, never the password or its hash. Protect all
+  HTTPS application paths, keep HTTP-to-HTTPS and ACME certificate renewal working,
+  and remove the Basic Authorization header before proxying to the application.
+  Recreate only the proxy to add its mount. Verify missing/wrong credentials get
+  401, correct credentials reach the site and APIs, and app health stays green.
+  This supersedes the public-access statement in F-261. Production is unchanged.
+
+- **F-262 — Sandlab Basic Auth enabled and verified.** Username sandlab; the
+  user-provided password was hashed through Caddy stdin and never written to a
+  file or command-line argument. Only the bcrypt hash is stored in the server-local
+  /etc/zenzcash-sandlab/basic-auth file (root:root, 0600; parent 0700), outside Git.
+  Compose mounts that specific file read-only with create_host_path disabled;
+  Caddy imports it inside an all-path basic_auth block and strips Authorization
+  before proxying. Only the proxy was recreated; the app was not restarted.
+  Compose and Caddy validation pass. HTTPS homepage, health, account API, catalog,
+  robots, an actual JavaScript asset, HEAD and POST requests all reject missing
+  credentials with 401. Wrong username and wrong password also return 401.
+  Correct credentials return 200 for the homepage, asset, health, account API,
+  robots and all 332 catalog topics; WebAuthn remains available. HTTP still
+  redirects with 308 to HTTPS; app internal health remains healthy. Scanned all
+  tracked files and staging branch commit patches: neither plaintext nor hash is
+  present. Security review: secret is outside the checkout and Docker build context,
+  no shared application port or production changes, hash omitted from all evidence.
+  ARCHITECTURE.md now documents authentication and credential rotation. User
+  verification of the browser login prompt remains pending.
+
+- **D-217 — Implement the agreed content-first redesign on staging.** User
+  authorizes all ten agreed design changes and deployment only to Sandlab, with
+  everything on a reversible branch. Create sandlab-content-first from 611fd8a;
+  retain sandlab at that revision and tag the current app image
+  zenzcash-sandlab:before-content-first-20261123. Implement expanded posts by
+  default with a continuously available Next post action; compact metadata and
+  secondary actions; full-width topic rows; directly visible, visually separate
+  search/sorting/filter controls; summary-first topic pages; accessible citation
+  previews plus real new-tab links; short new-point lists shown immediately;
+  clearly labeled feedback; optional explained reframing; citations beside their
+  existing supported claim units. Preserve provenance, original/rewrite choice,
+  account flows, visibility restrictions, source links and existing filtering.
+  Do not invent sentence-level attribution where stored data has only a larger
+  cited unit; tighten future summary instructions without new model calls.
+  Keep staging Basic Auth and all secrets outside Git. No production deploy,
+  database migration, source fetch, AI spending or push. Verify behavior with
+  focused tests, the repository gate and desktop/mobile browser checks, then
+  rebuild only the staging app. Record exact rollback commands and results.
+
+- **F-263 — Content-first redesign implemented and checked on its staging branch.**
+  Full-width topic rows contain titles and descriptions. Search/sort/filter controls
+  remain directly available in a distinct area (sidebar on desktop, bounded region
+  after the summary on mobile topic pages). Summaries appear before new points and discussion;
+  the first three new points are visible. Posts show their selected full-text
+  version by default, with compact attribution and secondary feedback/AI notes
+  below the text. Explicit three-state feedback labels replace ambiguous symbols.
+  The sticky Next post action skips ahead, respects filtering/visibility, crosses
+  lazy-load boundaries and reports the last post. Browser testing caught and fixed
+  the previous post being selected again within the scroll-margin gap.
+  Citation anchors open original-text dialogs without moving the reading position,
+  restore focus on close, and support middle-click/new tabs. Question-description
+  citations now accompany their supported text. Historical claim attribution is
+  unchanged; future summary instructions request smaller supported claim units.
+  No new AI analysis, source fetches, database changes or production deployment.
+  Removed superseded avatar/thread-tab/disclosure styles and expansion state.
+  Validation: scripts/check.sh passes (61 Rust tests, clippy, debug/release builds,
+  251 Node tests); scripts/build-auth.sh passes; browser and passkey suites pass.
+  Browser coverage includes desktop/mobile repeated Next, lazy boundary and final
+  post, modal scroll/focus/Escape, real middle-click, expanded text, filtering,
+  keyboard access, selected exports, privacy, account flows and cached deployment.
+  Inspected screenshots of directory, summary, reading stream and citation dialog.
+  Evidence: work/design-{gate,browser,passkeys}.log and work/screenshots.
+  ARCHITECTURE.md records branch/image rollback instructions. Staging deployment
+  verification and the user's visual review follow this implementation commit.
+
+- **F-264 — Content-first branch deployed to Sandlab and verified over HTTPS.**
+  Deployed implementation 4ec58a9 plus mobile summary-order fix b3bb9b0 by rebuilding
+  only the Compose app. Running image is
+  sha256:5b3648c2fc4b2d0d9f5fc9df6fda51dc5944697fa5aacb618fde4228c2b3fd92;
+  app is healthy and the existing proxy was not recreated. HTTPS browser checks
+  at 2026-11-23T01:02:40Z confirm 332 topics, expanded posts, summary first on
+  desktop/mobile, open reading controls, citation preview preserving scroll, no
+  horizontal overflow and zero runtime exceptions. Unauthenticated home, health
+  and catalog requests return 401; authenticated health returns 200. Inspected
+  final staging screenshots. Evidence: work/content-first-staging.json,
+  work/content-first-staging-{1440,390}.png and work/design-deploy.log.
+  Post-commit security review found no new issue: untrusted content uses the shared
+  safe text renderer, citation links are constrained and new tabs use noopener;
+  credentials and hash are absent from the commits. Production checkouts remain
+  clean. The pre-redesign branch and local rollback image remain available with
+  commands in ARCHITECTURE.md. No push or production deployment. User visual
+  acceptance remains pending.
+
+- **D-218 — Preserve features while reducing visual noise.** User rejects the
+  stripped topic rows and apparently missing AI summaries. Correct the staging
+  redesign on sandlab-content-first: restore visible post AI summaries alongside
+  expanded full text; restore topic metadata, tags and keywords with secondary
+  visual treatment; verify topic summaries and source/thread navigation remain
+  available. Content-first means prioritizing content rather than deleting
+  features. Preserve visible sorting/filter controls, Next post and citation
+  previews. Clarification about which summary surface appears missing is pending;
+  proceed with the verified regressions without changing data or production.
+
+- **D-219 — Clarification: rewrites exist but are less common than expected.**
+  User clarifies that the apparently missing summary was the full AI rewrite,
+  then confirms some posts do have rewrites. Narrow the immediate correction to
+  restoring explicit original-only labels removed by the redesign; do not change
+  the already-neutral default, regenerate content, or execute D-218's speculative
+  post-summary/metadata restoration in response to this clarified issue. The
+  staging ZCG topic has 333 rewrites among 853 public posts, only four among the
+  newest twenty. Distinguish an assessed post without a rewrite from an older
+  post whose analysis was omitted. Keep Original/Re-write/Changes choice intact.
+
+- **F-265 — Restore explicit rewrite-availability labels.** Original-only text now
+  says "Original · no AI re-write available" when assessed, or "Original · this
+  dated post has not been analyzed" for omitted analysis. Rewrite-first remains
+  the default; stored preferences and individual version switching are unchanged.
+  Focused coverage checks default rewrite selection, switching back and forth,
+  and both original-only cases under both preferences. Repository gate passes
+  (61 Rust tests, 252 Node tests, clippy/builds); full browser suite passes.
+  Evidence: work/rewrite-label-{gate,browser}.log. No content regeneration,
+  metadata restoration or production change. The rewrite criterion was explained
+  from model/marks.md and site/js/rubric.js: model judgment of useful neutralization,
+  with no fixed tone cutoff and no invented argument for pure taunts.
+  Deployed 46082d5 to staging only. Authenticated browser verification at
+  2026-11-23T03:40:37Z confirms the neutral default, one selected rewrite and four
+  explicitly labeled originals on thread-59311, 332 topics, Basic Auth protection,
+  citation behavior and desktop/mobile layout with no runtime exceptions. Inspected
+  the mobile reading screenshot. Post-commit security review: static labels only,
+  no new input handling, credentials or authentication changes. Staging checkout
+  is clean; visual acceptance remains with the user.
+
+- **D-220 — Make post boundaries independent of state and thread membership.**
+  User reports purple rails apparently grouping multiple posts within a thread.
+  The actual source is each new-in-window post's inset purple shadow, which joins
+  visually across adjacent posts. Replace state-dependent vertical rails with
+  separate post surfaces and neutral spacing. Newness is an explicit text badge;
+  read state remains conveyed by its existing labeled action. State and text
+  version must not look like enclosing discussion sections. Use labeled version
+  controls without nested colored frames, show source-thread titles when mixing
+  multiple threads, and retain bounded quote styling within each post. Preserve
+  summaries, rewrites, original/diff choice, filters, feedback, saved/read actions,
+  citation previews and Next post. Verify actual desktop/mobile and light/dark
+  reading layouts before deploying only to staging on the existing branch.
+
+- **D-221 — Explicit post containers with owned footers.** User confirms each
+  post must be a visually separate unit and its feedback, AI analysis and other
+  actions must sit inside that post's footer. Thin horizontal separators are
+  insufficient. Apply the same container and footer structure irrespective of
+  newness; inspect adjacent short posts as well as long originals and rewrites.
+
+- **F-266 — Separate post containers and attached footers verified.** Each post
+  now has a neutral border, background and gap from its neighbors. Feedback,
+  analysis, save/read/listen and collapse controls remain inside its shaded footer.
+  Removed joining purple newness rails, read-state rails and nested version frames.
+  Newness is explicitly labeled with the selected day window; mixed-thread posts
+  name their thread. Labeled version tabs and original-only status remain intact.
+  Replaced the missing-glyph audio icon with Listen. Mobile header height is
+  measured so signed-in navigation does not overlap sticky Next post.
+  Validation: repository gate passes (61 Rust, 253 Node, clippy/builds), and the
+  final browser run passes all previous workflows plus actual light/dark card
+  separation, footer containment, no version rails and signed-in Next visibility.
+  Inspected desktop/mobile light/dark screenshots and the original/rewrite control
+  layout. Initial gate failed in an existing verifier test reading an empty PID
+  file; unchanged retry passes. An interrupted browser run left its disposable
+  server alive; identified/terminated its two process groups and reran cleanly
+  rather than weakening assertions. Evidence: work/post-boundaries-gate-retry.log,
+  work/post-boundaries-browser-clean.log, work/screenshots/post-boundaries-*.png.
+  Saved pre-change image as zenzcash-sandlab:before-post-boundaries-20261123.
+  No database, AI, source-fetch, password or production change.
+  Deployed f1d3f03 to staging; HTTPS browser verification at
+  2026-11-23T03:48:25Z passes post gaps/borders, attached-footer containment,
+  absence of version rails, rewrite default/availability labels, citation preview,
+  332-topic catalog, Basic Auth and mobile/desktop overflow checks. Inspected the
+  deployed mobile view with adjacent short posts (one new and one older). Evidence:
+  work/post-boundaries-staging.json and work/post-boundaries-staging-*.png.
+  Post-commit security review found no new issue: thread names are escaped text,
+  header sizing uses numeric DOM measurements, and auth/config are unchanged.
+  Staging app healthy; checkout clean. User visual acceptance remains pending.
+
+- **F-267 — Audit empty ZCG What's new against the deployed snapshot.** User asks
+  whether the empty summary list and 186 seven-day posts are correct. Independently
+  counted non-hidden posts from staging /data/zcg.json: 853 unique public post keys;
+  trailing 1/3/7-day windows contain 12/91/186 unique posts. Endpoint is
+  2026-11-21T02:32:35.229Z (snapshot fallback; last_pulled_at absent), not current
+  time. Seven-day counts by source thread: 58515=57, 58566=0, 58571=31, 58610=0,
+  58611=57, 58656=41. This grouped topic spans six forum threads. All twenty
+  summary points have first_at between October 26 and October 31; all match the
+  first/earliest cited post as required by the summary schema and validator.
+  Therefore all three windows produce zero "new points" under current logic,
+  even though six existing points cite posts in the seven-day window (p4,p7,p13,
+  p15,p16,p19). This is not evidence of no recent developments. The label describes
+  a narrower first-appearance filter than the user's activity-summary expectation.
+  Source data evidence: work/zcg-newness-audit.json. Read-only investigation; no
+  UI/data change, regeneration, forum fetch or deployment for this question.
+
+- **D-222 — Restore useful author context; layout cleanup must preserve features.**
+  User explicitly requires the circular author icon/name, visible forum-tenure
+  badge and relative post date alongside the timestamp. Restore these in a
+  cohesive header inside each post card, preserving anonymity/reveal behavior.
+  Audit removed information against the sandlab baseline and restore directory
+  metadata and thread navigation context in secondary positions rather than
+  deleting it. Keep the current post/footer boundaries, rewrite choices, Next
+  navigation and directly available controls. Stage, test and deploy only the
+  staging branch; no source fetch, analysis spending or production changes.
+
+- **F-268 — Restore author context and remaining removed metadata.** Post headers
+  again contain a circular, stable-color initial avatar, author name, visible
+  forum-tenure badge and relative date beside the absolute timestamp. Grouped
+  header layout sits inside the existing post card. Anonymous mode masks icon,
+  name and tenure together; revealing/hiding refreshes the complete header.
+  Restored directory post/thread/participant counts, last-post time, account-age
+  statistics, curated interest tags and keywords below the topic description in
+  a secondary metadata footer. Restored thread post counts in the selector and
+  internal navigation from source-thread links. Kept full-text defaults, rewrite
+  tabs, summary/citation features, post footers and directly available controls.
+  Validation: repository gate passes (61 Rust, 254 Node, clippy/builds), targeted
+  tests cover explicit years/months/unknown tenure, 28-days-ago labels, anonymity,
+  source navigation and directory metadata. Full browser suite passes including
+  visible circular avatars/badges on desktop/mobile and reveal/hide behavior.
+  Corrected one newly written test's expected category to match the existing
+  curation file (Protocol, not Governance); no product data changed. Inspected
+  mobile post headers and desktop directory screenshot. Evidence:
+  work/author-context-{gate,focused,browser}.log and work/screenshots.
+  Deployed 0107118 to staging. HTTPS browser verification at
+  2026-11-23T15:27:42Z passes visible circular avatars, tenure badges and relative
+  dates, post/footer containment, rewrite defaults, citation previews, Basic Auth,
+  332 topics and mobile/desktop overflow checks with no runtime exceptions.
+  Inspected deployed mobile screenshot with actual "6 years" and "9 months"
+  badges. Evidence: work/author-context-staging.json and corresponding PNGs.
+  Security review: restored metadata is rendered as text, avatar classes derive
+  from a bounded hash, anonymous headers omit identity/tenure, and no auth or
+  secret changes were made. User visual review remains pending.
+
+- **D-223 — Persistent narrow-window controls and optional question exploration.**
+  User approves the restored context and requests reading controls remain usable
+  at a minimum width when the browser narrows. Preserve the side panel on wider
+  windows instead of moving it out of view at 1050px. Phone-width treatment is
+  being clarified (open pinned panel versus side column with horizontal scrolling).
+  Rename Choose a question to Explore the main questions and collapse the overall
+  question section by default. Preserve individual question/argument state and
+  the topic overview. Keep the sorting/filter controls open and directly usable.
+  Implement and verify only on the existing staging branch.
+
+- **D-224 — Restore subtle text-version backgrounds; proceed with pinned phone controls.**
+  User requests calming blue behind AI rewrites and an unhighlighted or subtly
+  distinct original. Apply the tint only to the text-version region inside the
+  post, retaining labels and the separate post/footer boundary without rails.
+  With no reply yet to the phone-layout preference, proceed with the stated
+  assumption of an open pinned panel at phone widths, and a minimum-width side
+  panel on wider windows. Keep all three requests in scope for staging verification.
+
+- **F-269 — Persistent controls, optional question exploration and rewrite tint.**
+  Reading controls retain a minimum 240px side column through tablet widths;
+  at 700px and below they stay open in a pinned, internally scrollable panel.
+  Next-post navigation and anchor offsets account for the pinned panel. The
+  question section is now Explore the main questions, collapsed on topic entry
+  and retaining its open state during control changes. Individual questions,
+  arguments, citations and the topic overview remain available. Rewrite text
+  gets a subtle blue background in light and dark mode; original text keeps the
+  normal card background. Labels and per-post footers remain intact.
+  Validation: full repository gate passes (61 Rust, 254 Node, clippy/builds),
+  targeted summary/topic tests pass (19), and the final browser suite passes.
+  Width checks cover 320, 390, 700, 701, 800, 1024 and 1280px, including visible
+  controls, minimum width and no horizontal overflow. Keyboard disclosure,
+  retained state, exact theme tint colors and next-post behavior are checked.
+  Inspected rewrite-blue screenshots in mobile light and desktop dark mode.
+  Evidence: work/narrow-controls-{unit,gate,browser-final}.log and
+  work/screenshots/rewrite-blue-*.png. Deployment verification follows.
+  Deployed bed6b62 to staging only. HTTPS browser verification at
+  2026-11-23T19:16:51Z passes visible minimum-width controls at 1440, 800, 390
+  and 320px, collapsed question section, rewrite tint, preserved author context,
+  card/footer containment, citation previews, Basic Auth and no overflow or
+  runtime exceptions. Inspected the deployed mobile screenshot. Evidence:
+  work/narrow-controls-staging.json and corresponding PNGs. Security review:
+  UI-only changes retain text rendering and identity masking; no new input
+  boundaries, dependencies or credentials. Commit identity matches repository
+  configuration. Production unchanged; user visual review remains pending.
+
+- **D-225 — Clarify summary cues, selections and navigation on staging.**
+  User requests hidden-age profiles included by default, a visible explanation
+  of summary citation colors, and more direct access to Explore the arguments.
+  Use an explicit summary action opening the question/argument disclosures;
+  retain collapsed main questions on entry. Explain original-text AI tone
+  bands with labeled swatches, including unassessed, separately from truth or
+  argument quality. Change fresh defaults and pre-hidden-age migrations to
+  include hidden ages while honoring explicit saved include/exclude choices.
+  Investigate the 1/3/7-day summary discrepancy for thread-58906 and explain the
+  existing timestamp rules without running analysis or changing published data.
+  Show bulk selection state based on selected posts, remove the standalone
+  reframing note and its UI toggle, restore reading position after login-page
+  navigation, and compact reading-control label/help layouts. Preserve other
+  analysis and the existing stored-settings API. All implementation and
+  deployment stays on sandlab-content-first; production remains unchanged.
+
+- **F-270 — Audit thread-58906 summary windows and improve reading usability.**
+  Read the existing staging publication without fetching forum data or running
+  AI jobs. thread-58906 uses snapshot fallback 2026-11-21T02:33:14.033Z as its
+  window endpoint. The 1/3/7-day windows contain 8/32/85 public posts and 0/0/2
+  existing summary points. The two qualifying points are p22 (first_at
+  2026-11-14T05:28:04.657Z) and p25 (2026-11-17T11:58:14.191Z). The build assigns
+  first_at from the first listed citation's forum timestamp, and whatsNew
+  filters that timestamp, not later supporting citations or analysis time.
+  No window-specific summary is generated. Explain this rule visibly in
+  What's new and its help text; retain published content and counting semantics.
+  Audit evidence: work/thread-58906-newness-audit.json.
+  Fresh defaults and legacy migrations include hidden-age profiles; explicit
+  saved v7 choices still round-trip unchanged. Add the summary's tone-color
+  legend and one-click argument access, retaining collapsed questions on entry.
+  Bulk controls show full/partial/empty selection and update after individual
+  checkbox changes or clearing. Remove the standalone reframing disclosure and
+  its toggle, preserving raw analysis and the stored settings contract. Compact
+  filter headings place help beside labels and options in two columns.
+  Login detours capture page/sidebar position and open post details; returning
+  through browser history or Back to reading restores these for the same
+  release, including direct post routes. Match disclosure labels so changed
+  account filters do not transfer state to another kind of note.
+  Focused tests initially exposed two remaining assertions of the old hidden-age
+  default; updated those cases to explicitly request exclusion, retaining their
+  expected exclusion messages. Focused tests and final browser suite pass.
+  Browser coverage includes desktop/phone login return with exact coordinates,
+  open footers, history forward/back, explicit saved age exclusion, label/help
+  alignment, argument access and persistence, and light/dark selection colors.
+  Inspected desktop summary, compact sidebar, phone layout, dark selection
+  states and restored phone post footer. Full gate and staging verification
+  follow. Evidence: work/summary-usability-{focused,browser-final}.log,
+  work/reading-return-unit.log and work/screenshots.
+  Extend return capture to non-topic pages and their disclosures, covering the
+  How to use page's Zamagotchi sign-in detour as well. Full gate passes (61 Rust,
+  258 Node, clippy/builds); Node suite passes again after this extension. A browser
+  rerun exposed a pre-existing cache-test race reading document.body before it
+  exists. Made its polling predicate tolerate the loading document while still
+  requiring the same exact expected error text; browser verification reruns.
+  Final browser rerun passes, including non-topic return and the cache check.
+  Deployed 3d3021a to staging only. HTTPS browser verification at
+  2026-11-24T02:03:42Z passes hidden-age default, visible legend, direct argument
+  access, selection states, login return, existing citation previews, retained
+  full posts and author context, and overflow checks at 1440/800/390/320px.
+  Reconfirmed thread-58906's exact 8/32/85 post and 0/0/2 point counts in the UI.
+  Basic Auth remains required; the authenticated app is healthy, 332 topics are
+  present and no runtime exceptions occurred. Inspected deployed desktop/phone
+  summary screenshots. Evidence: work/summary-usability-staging.json, matching
+  PNGs and work/summary-usability-deploy.log. Security review found no new
+  untrusted HTML, selector interpolation, authentication changes or committed
+  secrets. Reading-return state stays in browser memory and requires matching
+  topic release before restoration. Commit identity matches configuration.
+  Production is unchanged; user visual review remains pending.
+
+- **D-226 — Unified Saved and browser-wide return positions.**
+  User requests Saved contain both saved topics and saved posts, and clarifies
+  that Back must restore position on every Zenzcash page, not only login detours.
+  Add account-owned topic bookmarks with save/remove controls and separate
+  Topics/Posts sections under Saved. Use the existing authenticated, CSRF-checked
+  API patterns and an additive schema migration; preserve existing account and
+  post data, back up staging before migration, and document schema-aware rollback.
+  Replace the login-only return slot with per-history-entry snapshots, including
+  loaded post counts, selected text versions, disclosures and filter/view state.
+  Preserve return state across reload/external navigation within the tab without
+  persisting credentials or account responses. Keep directory/back-to-reading
+  convenience links working. Implement, test and deploy only on the staging
+  branch. User also requests a short collaborator summary and explanation of
+  desktop/mobile checks; include both in the final response.
+
+- **F-271 — Account-owned saved topics and additive schema 12.**
+  Added topic bookmarks independently of existing saved posts. The account API
+  returns only its own saved topic ids; writes require the existing session,
+  CSRF and same-origin protections, reject unknown body fields and invalid ids,
+  and cap each account at 1000 topic bookmarks. Removal remains possible when a
+  topic is no longer published. Parameterized writes are atomic and account
+  deletion cascades. Schema 12 adds one table without rewriting existing rows.
+  Staging sanitation supports both schema 11 backups and schema 12, verifying
+  that topic bookmarks are removed with other personal data. The full gate
+  passes: 64 Rust and 265 Node tests, including schema migration/preservation,
+  reopen persistence, account isolation, authenticated route boundaries and
+  staging privacy. Evidence: work/saved-history-gate.log. Keep this backend
+  revision as a schema-12-compatible UI rollback baseline; older schema-11
+  images cannot open the migrated database. Back up staging before deployment.
+  Backend commit cd21511 security review found no auth bypass, interpolated SQL
+  or committed secrets. Identity/signing match the checkout configuration.
+
+- **F-272 — Unified Saved UI and per-entry browser return state.**
+  Saved now contains distinct topic and post lists with independent removal;
+  topic headings expose Save topic with a clear sign-in route for guests.
+  Browser Back/Forward restores each history entry separately, including repeated
+  visits to the same URL, loaded post batches, chosen versions, filters,
+  disclosures and sidebar position. Tab-scoped session storage preserves UI
+  state through reloads and cross-origin departures; account responses and
+  credentials are excluded. Invalid/unavailable storage produces an explicit
+  notice. Published-release and visibility checks prevent restoring stale topic
+  state. Existing directory and Back to reading links retain their behavior.
+  Full repository gate passes (64 Rust, 265 Node). Broad browser regression and
+  the dedicated Saved/history suite pass, including authenticated save/remove,
+  reload persistence, guest sign-in, topic-to-topic and non-topic navigation,
+  repeated URLs and leaving the site at desktop/phone widths. Older browser tests
+  now create fresh visits where they intentionally require initial pagination;
+  reload preservation is tested independently. Inspected Saved phone layout and
+  restored desktop reading screenshots. Evidence: work/saved-history-gate.log,
+  work/saved-history-regression-browser.log,
+  work/saved-history-browser-final.log and work/screenshots.
+  The backend-only revision cd21511 is the compatible UI rollback baseline;
+  ARCHITECTURE documents migration backup and the preserved rollback image.
+  Deployment and HTTPS verification follow; production remains unchanged.
+  Deployed UI revision 03720fb to staging only. Preserved schema-12-compatible
+  rollback image zenzcash-sandlab:before-saved-navigation-20261124 from cd21511.
+  Server-local before/after migration backups pass SQLite quick_check. Counts
+  remain 2 accounts, 1 saved/read post, 15024 current posts and 332 published
+  topics; schema 12 adds an initially empty saved_topics table. Evidence:
+  work/saved-history-{before,after}-migration.json and protected local backups.
+  HTTPS verification at 2026-11-24T02:34:18Z passes general Back restoration,
+  reload restoration, guest Save topic sign-in and rejected unauthenticated
+  writes, plus prior summary/filter/selection/citation behavior. Layout checks
+  pass at 1440/800/390/320px; return checks pass at desktop/phone widths with
+  exact scroll coordinates. Basic Auth remains required and the app is healthy.
+  No browser runtime exceptions. Inspected the deployed phone screenshot.
+  Evidence: work/saved-history-staging.json, matching PNGs and deployment log.
+  Post-commit UI security review found no untrusted HTML, account data persisted
+  in navigation snapshots, auth bypass or committed secrets. Commit identity and
+  signing match configuration. These are automated Chrome viewport checks and
+  screenshot reviews, not physical-device testing. User visual review remains
+  pending. Collaborator summary should lead with the reading/navigation benefit
+  and follow with concrete examples, using plain language and a short paragraph.
+
+- **D-227 — Previous post and simpler reading filters.**
+  Add Previous post beside Next, following the visible reading order and skipping
+  hidden/nonmatching posts, with clear first/last boundary feedback. Replace Any
+  chips with checkbox-only filters: an empty Tone, Argument support or Posts
+  selection means unrestricted; selecting options narrows that group. Settings
+  version 8 makes the changed empty-selection meaning explicit. Migrate prior
+  all-selected groups to empty and preserve narrower selections, account-age
+  choices and other saved preferences. Old empty groups become unrestricted as
+  requested. Remove the Highlights and author identities group and its other
+  controls, leaving a simple Hide author names checkbox; retain existing post
+  analysis/feedback and saved display preferences. Implement/test/deploy on
+  sandlab-content-first only, preserving a current-image rollback. Check desktop
+  and phone layouts, filter clearing, both navigation directions and boundaries.
+  User additionally requests colored source-tag names correspond to Tone filter
+  names. Use Good — restrained, Moderate — pointed and Bad — adversarial or
+  attacking in the legend, drawing Good/Moderate/Bad from the filter vocabulary.
+  Source colors and tooltips must use the same effective tone as the filter,
+  including a material harsh passage lowering the overall tone category.
+
+- **F-273 — Previous post, checkbox filters and consistent tone tags.**
+  Previous/Next share the same current-post detection and matching-post order;
+  both remain visible at phone widths and announce first/last boundaries.
+  Removed Any chips. Empty tone/support/post-type selections now impose no
+  restriction; settings v8 and the authenticated preferences API record this
+  changed meaning explicitly. Old all-selected groups migrate to empty and
+  specific selections, hidden-age exclusion and other preferences remain intact.
+  History snapshots use the same migration. Removed the highlights group and
+  its extra toggles, retaining Hide author names and existing post features.
+  Legend names are shared with Tone filters; source colors/tooltips and filtering
+  now share effective tone including material harsh passages. No AI reruns.
+  Full gate passes: 64 Rust, 269 Node, builds and clippy. Tests enumerate filter
+  subsets/migrations and overall/peak tone combinations. Initial failures came
+  from incomplete citation fixtures, the lightweight DOM's missing checked
+  property, and shared age-fixture mutation; corrected those inputs/assertions
+  without weakening behavior expectations. Browser click detection now accepts
+  the button's child text span while retaining viewport/occlusion checks.
+  Broad browser and separate Saved/history suites pass. Previous/Next work in
+  both reading orders and at boundaries; clearing each group restores the exact
+  matching count. Inspected desktop controls/legend and phone post navigation.
+  Evidence: work/reader-simplify-gate-final.log, work/reader-simplify-browser.log,
+  work/reader-simplify-history-browser.log and work/screenshots.
+  Preserved the previous image as before-reader-simplify-20261124 and created
+  /data/before-reader-simplify-20261124.sqlite in the staging data volume.
+  ARCHITECTURE documents preference conversion for rollback without discarding
+  account/bookmark data. Staging deployment and HTTPS verification follow.
+  Commit bcdac57 security review found no new untrusted HTML, authentication
+  bypass, unvalidated settings acceptance or committed secrets. Identity/signing
+  match configuration. The first container build exited 143 before deployment;
+  the existing app stayed healthy. A bounded retry succeeded. Initial deployed
+  HTTPS checks passed at 2026-11-24T03:07:10Z, including filtered Previous/Next,
+  clearing groups, matching tone names and existing Saved/Back behavior.
+  Screenshot inspection caught horizontal overflow inside the controls panel
+  at 320px even though the page-wide overflow check passed. Stack each group's
+  options vertically at phone widths and assert panel scrollWidth <= clientWidth
+  across 1280/1024/800/701/700/390/320px. Broad browser rerun passes with that
+  stronger assertion. Evidence: work/reader-simplify-browser-final.log.
+  Deployed phone-layout follow-up 004535b. Final HTTPS verification at
+  2026-11-24T03:09:17Z passes all requested changes at 1440/800/390/320px,
+  including internal controls-panel overflow, Previous/Next under each applied
+  filter, exact match-count restoration on clearing, and matching legend names.
+  Prior Saved/login/history/reload/citation behavior still passes; no runtime
+  exceptions, Basic Auth still required, app healthy with 332 published topics.
+  Inspected final 320px deployed screenshot: no clipped filter labels or inner
+  horizontal scrollbar, both post navigation buttons visible. Evidence:
+  work/reader-simplify-staging.json, matching PNGs and
+  work/reader-simplify-deploy-final.log. CSS follow-up security review has no new
+  findings; identity/signing match configuration. Database remains schema 12;
+  the verified pre-update backup is intact. Production remains unchanged.
+  User visual review is pending.
+
+- **D-228 — Peer access to main questions and main arguments.**
+  User proposes placing Main Questions and Main Arguments side by side so each
+  side's arguments are easy to scan. Clarification is pending on two content
+  columns versus two adjacent section buttons. Preserve existing published
+  question/argument text, citations and detail; no new analysis. Also explained
+  where browser checks live, that the agent writes/extends them using the existing
+  Chrome harness, and that screenshots are separately inspected under CLAUDE.md.
+
+- **D-229 — Information icons must close on a second click.**
+  User reports that filter help remains over the options after clicking its icon
+  again. Pinning currently closes but hover/focus CSS immediately keeps the text
+  visible. Make click-close explicitly dismiss hover/focus preview until a fresh
+  intentional hover/focus or another click. Retain keyboard/Escape behavior and
+  pinned help across redraws. Add actual browser coverage of repeated mouse and
+  touch clicks, pointer departure, keyboard use and reachable underlying options;
+  implement and deploy the fix to staging while the summary-layout clarification
+  is pending.
+
+- **D-230 — Responsive paired questions and arguments.**
+  User prefers side-by-side desktop but asks for a phone recommendation. Proceed
+  with paired rows: question/context on the left, existing short attributed
+  positions on the right; stack each question immediately above its arguments on
+  phones and narrow layouts. Show these short summaries by default, with the
+  whole section collapsible. Keep question context and supporting evidence in
+  separate native disclosures, retaining their stored state and all existing
+  citations, related-question links and detailed fields. Explore the arguments
+  should expose the concise overview rather than expand every detailed analysis.
+  This updates the earlier initially-collapsed main-questions layout to the new
+  requested quick comparison. No new summaries, source imports or AI spending.
+
+- **F-274 — Help icons close while hovered or focused.**
+  Click-close now dismisses both pinned and hover/focus display. Pointer departure
+  and blur do not undo dismissal; a fresh pointer entry/focus or click can show
+  help again. Escape remains supported. Unit tests cover repeated toggles, initial
+  pin states and dismissal/re-entry; the real Chrome suite passes mouse clicks,
+  emulated phone touch taps, keyboard Enter, pointer departure and reachable
+  underlying options. Inspected the closed phone-help screenshot. Evidence:
+  work/filter-help-unit.log, work/filter-help-browser.log and
+  work/screenshots/filter-help-closed-{1280,390}.png. Staging deployment follows.
+  Deployed c389727 and verified HTTPS mouse/touch/keyboard dismissal at
+  2026-11-24T03:17:59Z. The app remains healthy and Basic Auth protected. Security
+  review found no new issues; commit identity/signing match configuration.
+
+- **F-275 — Paired question and argument overview.**
+  Existing question descriptions and attributed positions now form paired rows.
+  At 1100px and wider, question/context is left and arguments are right; narrower
+  layouts place each question immediately before its arguments. The concise
+  overview starts open on fresh topic visits and remains collapsible. Context
+  and supporting points/evidence retain separate native disclosures and stored
+  state; source citations, related/next-question navigation and every existing
+  detail field remain available. Explore the arguments opens the overview without
+  expanding all supporting analysis. No content regeneration or database change.
+  Full gate passes (64 Rust, 270 Node, builds/clippy); focused render checks and
+  broad browser regression pass. Geometry assertions include 1280/1100/1099/800/
+  390/320px with visible arguments, pairing, internal and page overflow checks.
+  Inspected desktop and phone screenshots. Help toggling remains covered with
+  actual mouse/touch/keyboard events. Evidence: work/summary-pairs-gate.log,
+  work/summary-pairs-focused.log, work/summary-pairs-browser-final.log and
+  work/screenshots/summary-pairs-{1280,390}.png.
+  ARCHITECTURE now describes the layout and where browser checks are specified.
+  Preserved c389727's deployed image as before-paired-layout-20261124 for rollback
+  while retaining the help fix and settings v8. Final staging verification follows.
+  Separate Saved/history browser suite passes after the layout change, including
+  repeated URLs, deep loaded posts, reloads and leaving/returning to the site.
+  Deployed ab39221 to staging only. HTTPS verification at
+  2026-11-24T03:26:17Z passes pairing/visibility at 1440/1100/1099/800/390/320px,
+  help-icon second-click/tap dismissal, keyboard operation, filter/navigation
+  behavior and all previous summary/citation/login/history checks. No runtime
+  exceptions; Basic Auth remains required, app healthy and catalog still 332
+  topics. Inspected deployed desktop and 320px screenshots. Evidence:
+  work/summary-pairs-history-browser.log, work/summary-pairs-staging.json,
+  matching PNGs and work/summary-pairs-deploy.log. Post-commit security review
+  found no new untrusted HTML, identity bypass or committed secrets. Identity
+  and signing match configuration; production unchanged. User visual review
+  remains pending.
+
+- **D-232 — Compact the whole topic page and clarify included filters.**
+  User extends D-231 to the rest of the topic page, including supporting evidence
+  and individual posts. Use 14px evidence/summary copy and 15px post text with
+  tighter line height and spacing, compact headers and footers, while retaining
+  avatars, attribution, rewrite backgrounds, all content and reachable controls.
+  Empty v8 category lists already mean unrestricted, not excluded. Display an
+  unrestricted group with every option checked, and toggle from that effective
+  selection. Narrow saved selections remain honored; clearing the last choice
+  resets a group to all, retaining the earlier clear-means-no-filter behavior.
+  Explain that behavior in help. No settings format or server change is needed.
+  Verify default full inclusion, exclusion/reinclusion, saved subsets, desktop/
+  phone rendering and open evidence. Commit and deploy staging only with rollback.
+
+- **D-231 — More compact question/argument overview.**
+  User wants supporting points/evidence folded by default and smaller dark-gray
+  argument explanations so more questions fit on screen. Fresh topic views
+  already initialize evidence disclosures closed; explicitly verify this before
+  any overview action. Preserve intentional open sections when using Back, as
+  previously requested. Reduce explanation text and spacing within the paired
+  overview, keep argument/question titles distinct, and retain the full text and
+  citations. Use a readable gray in light mode and its lighter counterpart in
+  dark mode. Scope typography changes to the overview, not forum post text.
+  Test desktop/phone sizes and deploy on staging only with a rollback image.
+
+- **F-276 — Compact question and argument explanations.**
+  Overview explanations now use 14px gray text with 1.4 line height, smaller
+  argument headings and tighter row padding/spacing. Full explanations and
+  citations remain; forum post typography is unchanged. Supporting evidence
+  already starts folded on fresh visits; browser checks now explicitly verify
+  that before any overview action. Intentional disclosure state still survives
+  Back. Desktop/phone browser regression and the full gate pass (64 Rust,
+  270 Node); inspected light/dark screenshots at 1280px and 390px.
+  Evidence: work/compact-summary-browser.log, work/compact-summary-gate.log,
+  work/screenshots/compact-summary-{light,dark}-{1280,390}.png. Preserved the
+  current staging image as before-compact-summary-20261124 for rollback.
+  Deployed 791973b to staging only. HTTPS verification at
+  2026-11-24T03:36:54Z passed compact typography in both themes and folded evidence,
+  paired/stacked layouts without overflow at 1440/1100/1099/800/390/320px, and
+  existing filter, help, citation, Previous/Next and history checks. Inspected
+  deployed desktop/light and phone/dark screenshots. App healthy; Basic Auth
+  remains required, catalog still 332 topics, no runtime exceptions. Evidence:
+  work/compact-summary-staging.json, matching PNGs and compact-summary-deploy.log.
+  Post-commit security review found no new issues or committed secrets; identity
+  and signing match configuration. Production unchanged; user visual review
+  remains pending.
+
+- **F-277 — Compact topic content and visibly inclusive filter defaults.**
+  Summary, What's new and expanded supporting evidence use 14px copy; original
+  and rewritten post bodies use 15px/1.5. Reduced card, header, quote and footer
+  padding while preserving avatars, dates, author tenure, all text/citations,
+  blue rewrite backgrounds, distinct post boundaries and sticky navigation.
+  Unrestricted category groups display all checkboxes checked. Unchecking removes
+  that category; rechecking restores it; clearing the last resets the group to all.
+  Existing v8 empty lists and saved subsets keep their meanings. Matching status
+  explicitly says “All N posts included” when all posts match. Updated help text.
+  Exhaustive render checks cover every category subset and toggle; desktop/phone
+  browser checks verify defaults include all posts, category exclusion/reinclusion,
+  compact typography, open evidence and retained navigation. Inspected light/dark
+  desktop/phone evidence and post screenshots. Full gate passes (64 Rust, 270 Node).
+  The first browser run hit the existing 60-second watchdog without an assertion
+  failure; the expanded suite passes with a bounded 90-second watchdog, with no
+  assertions removed. Evidence: work/compact-topic-{focused,browser,gate}.log and
+  work/screenshots/{compact-evidence,rewrite-blue,post-boundaries}-*.png.
+  Rollback image: zenzcash-sandlab:before-compact-topic-20261124.
+  Deployed 1898ce4 to staging only. HTTPS verification at
+  2026-11-24T03:48:43Z passes all-checked defaults/full inclusion, compact posts and
+  expanded evidence, light/dark typography, 1440/1100/1099/800/390/320px layout,
+  filters, help, citations and history/navigation. Inspected deployed desktop
+  evidence and phone rewrite screenshots. App healthy, Basic Auth required,
+  332 topics and no runtime exceptions. Evidence: work/compact-topic-staging.json,
+  matching PNGs and work/compact-topic-deploy.log. Post-commit security review
+  found no new issues or committed secrets; identity/signing match configuration.
+  Production unchanged. User visual review remains pending.
+
+- **D-233 — Merge the reviewed staging changes into main.**
+  User approves the current staging result and explicitly requests merging to
+  main. Preserve the reviewed sandlab-content-first history and existing local
+  main work; integrate origin/main's separate historical documentation commit
+  before publishing main with a normal push. GitHub CI runs checks only, with no
+  deployment job. This request does not deploy or publish content to production.
+  The reviewed application passes 64 Rust and 270 Node tests plus desktop/phone
+  browser and authenticated staging checks. Verify the merged tree, identity,
+  credential boundaries and required checks before updating main and pushing.
+
+Historical entry from origin/main commit 98d6e6d, retained during D-233's merge.
+Its original D-181 identifier overlaps the independently maintained server log.
+
+- **D-181 — Push the complete current repository to GitHub.** Following the
+  migration, user explicitly requests that the Zforum repository be fully pushed.
+  Publish all current main commits with a normal fast-forward push; retain the
+  intentionally local-only identity backup branch under D-163's privacy decision.
+  Existing research-prototype-final tag already matches GitHub. Worktree is clean;
+  main is 30 commits ahead and zero behind after fetching origin. Diff whitespace
+  and common credential-pattern checks pass. Private ignored development data and
+  credentials remain on the migrated server. Synchronize the server checkout with
+  the published main afterward; no production deployment is requested.

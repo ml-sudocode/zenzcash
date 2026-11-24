@@ -9,6 +9,8 @@ export class RecordedNode extends EventTarget {
     this.open = false;
     this.hidden = false;
     this.isConnected = true;
+    this.style = { overflow: '' };
+    this.parentNode = null;
     this.classList = {
       contains: (name) => (this.attributes.get("class") ?? "").split(" ").includes(name),
       toggle: (name, enabled) => {
@@ -18,7 +20,10 @@ export class RecordedNode extends EventTarget {
       },
     };
   }
-  append(node) { this.children.push(node); }
+  append(node) { this.children.push(node); node.parentNode = this; }
+  remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(node => node !== this); this.isConnected = false; }
+  showModal() { this.open = true; }
+  close() { this.open = false; this.dispatchEvent(new Event('close')); }
   replaceChildren() { this.text = ""; this.children = []; }
   setAttribute(name, value) {
     this.attributes.set(name, value);
@@ -31,18 +36,25 @@ export class RecordedNode extends EventTarget {
   get id() { return this.attributes.get("id"); }
   set id(value) { this.attributes.set("id", value); }
   querySelector(tag) { return descendants(this).find((node) => node.tag === tag) ?? null; }
+  querySelectorAll(tag) { return descendants(this).filter((node) => node.tag === tag); }
   focus(options) { document.activeElement = this; this.focusOptions = options; }
   scrollIntoView(options) { this.scrollOptions = options; }
 }
 export const descendants = (node) => node.children.flatMap((child) => [child, ...descendants(child)]);
 export const nodes = (root, name) => descendants(root).filter((node) => node.classList.contains(name));
 export const findId = (root, id) => descendants(root).find((node) => node.id === id);
-export const click = (node) => node.dispatchEvent(new Event("click"));
+export const click = (node, modifiers = {}) => {
+  const event = new Event('click', {cancelable:true});
+  Object.assign(event, {button:0, ctrlKey:false, metaKey:false, shiftKey:false, altKey:false, ...modifiers});
+  node.dispatchEvent(event);
+  return event;
+};
 export function installDom(t) {
   const before = new Map(["Node", "document", "IntersectionObserver"].map((key) => [key, globalThis[key]]));
   globalThis.Node = RecordedNode;
   globalThis.document = {
     activeElement: null,
+    body: new RecordedNode('body'),
     createElement: (tag) => new RecordedNode(tag),
     createTextNode: (text) => new RecordedNode(null, text),
   };

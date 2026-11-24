@@ -32,6 +32,90 @@ fn rendition(db: &Database) -> String {
         .unwrap()
         .into()
 }
+
+#[test]
+fn saved_topics_are_private_idempotent_bounded_and_removable_when_unavailable() {
+    let mut db = db();
+    db.publish(fixture()).unwrap();
+    db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
+    for _ in 0..2 { db.save_topic(A,"zcg",true).unwrap(); }
+    assert_eq!(db.saved_topics(A).unwrap(),vec!["zcg"]);
+    assert_eq!(db.saved_topics(B).unwrap(),Vec::<String>::new());
+    assert_eq!(db.personal(A).unwrap()["saved_topics"],json!(["zcg"]));
+    for invalid in ["", "topics", "../zcg", "ZCG", &"x".repeat(81)] {
+        assert_eq!(db.save_topic(A,invalid,true).unwrap_err(),format!("invalid topic id {invalid:?}"));
+    }
+    assert_eq!(db.save_topic(A,"missing",true).unwrap_err(),"topic is unavailable");
+    db.save_topic(A,"missing",false).unwrap();
+    db.connection.execute("DELETE FROM published WHERE topic='zcg'",[]).unwrap();
+    db.save_topic(A,"zcg",false).unwrap();
+    assert_eq!(db.saved_topics(A).unwrap(),Vec::<String>::new());
+    assert_eq!(db.reading_entry(A,"7/1").unwrap(),json!({"bookmarked":true,"read":true}));
+    db.publish(fixture()).unwrap();
+    db.connection.execute("WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<1000) INSERT INTO saved_topics SELECT ?1,'topic-'||x FROM n",[A]).unwrap();
+    assert_eq!(db.save_topic(A,"zcg",true).unwrap_err(),"Saved topic limit reached (1000); remove a topic before adding more.");
+    db.save_topic(A,"topic-1",false).unwrap();
+    db.save_topic(A,"zcg",true).unwrap();
+    assert_eq!(db.saved_topics(A).unwrap().len(),1000);
+    db.save_topic(B,"zcg",true).unwrap();
+    db.connection.execute("DELETE FROM accounts WHERE id=?1",[A]).unwrap();
+    assert!(db.saved_topics(A).unwrap().is_empty());
+    assert_eq!(db.saved_topics(B).unwrap(),vec!["zcg"]);
+}
+
+#[test]
+fn saved_topics_migrate_schema_eleven_without_losing_accounts_or_post_saves() {
+    let path = std::env::temp_dir().join(format!("zforum-topics-{}.sqlite",database::secret()));
+    {
+        let mut db = Database::open(&path).unwrap();
+        db.create_account(A).unwrap(); db.publish(fixture()).unwrap();
+        db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
+        db.connection.execute_batch("DROP TABLE saved_topics; PRAGMA user_version=11;").unwrap();
+    }
+    {
+        let db = Database::open(&path).unwrap();
+        assert!(db.saved_topics(A).unwrap().is_empty());
+        assert_eq!(db.reading_entry(A,"7/1").unwrap(),json!({"bookmarked":true,"read":true}));
+        db.save_topic(A,"zcg",true).unwrap();
+    }
+    {
+        let db = Database::open(&path).unwrap();
+        assert_eq!(db.saved_topics(A).unwrap(),vec!["zcg"]);
+        assert_eq!(db.connection.query_row("PRAGMA user_version",[],|row|row.get::<_,i64>(0)).unwrap(),12);
+    }
+    std::fs::remove_file(path).unwrap();
+}
+
+#[tokio::test]
+async fn saved_topic_route_requires_session_csrf_origin_and_strict_body() {
+    let mut db = db(); db.publish(fixture()).unwrap();
+    let (token,csrf) = db.new_session(A,now()).unwrap();
+    let state = Arc::new(Mutex::new(App { proxy:proxy::Proxy::Direct,db,auth:Auth::new("http://localhost:8000","localhost",PathBuf::from("missing")).unwrap(),contract:json!({}) }));
+    let app = router(state.clone(),FsPath::new("site"));
+    for (session,valid_csrf,origin,body,expected) in [
+        (false,false,"http://localhost:8000",r#"{"saved":true}"#,StatusCode::BAD_REQUEST),
+        (true,false,"http://localhost:8000",r#"{"saved":true}"#,StatusCode::BAD_REQUEST),
+        (true,true,"https://evil.example",r#"{"saved":true}"#,StatusCode::FORBIDDEN),
+        (true,true,"http://localhost:8000",r#"{"saved":true,"account":"other"}"#,StatusCode::UNPROCESSABLE_ENTITY),
+        (true,true,"http://localhost:8000",r#"{"saved":"true"}"#,StatusCode::UNPROCESSABLE_ENTITY),
+        (true,true,"http://localhost:8000",r#"{}"#,StatusCode::UNPROCESSABLE_ENTITY),
+        (true,true,"http://localhost:8000",r#"{"saved":true}"#,StatusCode::OK),
+        (true,true,"http://localhost:8000",r#"{"saved":false}"#,StatusCode::OK),
+    ] {
+        let mut request = Request::builder().method("PUT").uri("/api/account/topics/zcg").header("origin",origin).header("x-zforum-request","1").header("content-type","application/json");
+        if session { request=request.header("cookie",format!("zforum_session={token}")); }
+        if valid_csrf { request=request.header("x-csrf-token",&csrf); }
+        let response = app.clone().oneshot(request.body(Body::from(body)).unwrap()).await.unwrap();
+        assert_eq!(response.status(),expected);
+        if expected == StatusCode::OK {
+            let data: Value=serde_json::from_slice(&to_bytes(response.into_body(),65536).await.unwrap()).unwrap();
+            let saved=serde_json::from_str::<Value>(body).unwrap()["saved"].clone();
+            assert_eq!(data,json!({"topic":"zcg","saved":saved}));
+            assert_eq!(locked(&state).db.saved_topics(A).unwrap(),if saved == true { vec!["zcg"] } else { vec![] });
+        }
+        assert!(locked(&state).db.saved_topics(B).unwrap().is_empty());
+    }
+}
 #[test]
 fn dated_originals_publish_without_renditions_and_preserve_personal_state() {
     let mut db=db();
@@ -86,7 +170,7 @@ fn remove_progress_schema(db: &Database) {
       DROP TRIGGER clears_progress_insert; DROP TRIGGER clears_progress_update; DROP TRIGGER clears_progress_delete;
       DROP TRIGGER moods_progress_insert; DROP TRIGGER moods_progress_update; DROP TRIGGER moods_progress_delete;
       DROP INDEX feedback_account_post; DROP TABLE progress_cache;
-      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings; DROP TABLE import_review_history;").unwrap();
+      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings; DROP TABLE import_review_history; DROP TABLE saved_topics;").unwrap();
 }
 #[test]
 fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
@@ -103,7 +187,7 @@ fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
         assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
     }
-    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),11);
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),12);
     db.publish(fixture()).unwrap();
     assert!(db.has_release("zcg").unwrap());
 }
@@ -629,7 +713,7 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
 #[test]
 fn schema_five_availability_migration_preserves_every_table_row(){
     fn rows(db:&Database)->Vec<(String,Vec<Vec<String>>)> {
-        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache','topic_listings','import_review_history') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
+        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache','topic_listings','import_review_history','saved_topics') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
         names.into_iter().map(|name|{assert!(name.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'));let mut query=db.connection.prepare(&format!("SELECT * FROM {name}")).unwrap();let columns=query.column_count();let mut values=query.query_map([],|r|Ok((0..columns).map(|i|format!("{:?}",r.get_ref(i).unwrap())).collect::<Vec<_>>())).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();values.sort();(name,values)}).collect()
     }
     let directory=std::env::temp_dir().join(format!("zforum-view-migration-{}",database::secret()));std::fs::create_dir(&directory).unwrap();let path=directory.join("db.sqlite");
@@ -645,6 +729,7 @@ fn schema_five_availability_migration_preserves_every_table_row(){
     {
         let db=Database::open(&path).unwrap();assert_eq!(rows(&db),before);assert_eq!(db.connection.query_row("SELECT count(*) FROM import_thread_reviews",[],|r|r.get::<_,i64>(0)).unwrap(),0);assert!(!db.visible("7/1").unwrap());assert!(db.visible("7/2").unwrap());
         assert_eq!(db.connection.query_row("SELECT count(*) FROM progress_cache",[],|r|r.get::<_,i64>(0)).unwrap(),0);
+        assert_eq!(db.saved_topics(A).unwrap(), Vec::<String>::new());
         assert_eq!(db.topic_list().unwrap()["topics"].as_array().unwrap().len(),1);
         let public=db.published("zcg").unwrap();assert_eq!(public["visibility_pending"],true);assert_eq!(public["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);assert_eq!(public["topic"]["threads"][0]["posts"][1]["raw"],"original");
         assert_eq!(db.reading_entry(A,"7/2").unwrap(),json!({"bookmarked":true,"read":true}));
@@ -653,9 +738,9 @@ fn schema_five_availability_migration_preserves_every_table_row(){
 }
 
 #[test]
-fn preferences_v7_contract_and_ternary_input_are_strict() {
+fn preferences_v8_contract_and_ternary_input_are_strict() {
     let contract = json!({"threadView":["all","thread"],"postOrder":["newest","oldest"],"preferredVersion":["neutral","original"],"toneBands":["bad","moderate","good"],"supportBands":["low","medium","high"],"postVersions":["rewritten","original"],"interests":["grants"]});
-    let prefs = json!({"version":7,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"minAccountMonths":6,"includeHiddenAge":false,"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"pull-days","days":1},"interests":[]});
+    let prefs = json!({"version":8,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"minAccountMonths":6,"includeHiddenAge":false,"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"pull-days","days":1},"interests":[]});
     account_types::Preferences::validate(&prefs,&contract).unwrap();
     for included in [true,false] {
         let mut valid=prefs.clone();valid["includeHiddenAge"]=json!(included);
@@ -665,7 +750,7 @@ fn preferences_v7_contract_and_ternary_input_are_strict() {
         let mut invalid=prefs.clone();invalid["includeHiddenAge"]=value;
         assert!(account_types::Preferences::validate(&invalid,&contract).is_err());
     }
-    for (key,value,error) in [("version",json!(6),"preferences require version 7 and minimum account age 0 to 1200 months"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("minAccountMonths",json!(1201),"preferences require version 7 and minimum account age 0 to 1200 months"),("since",json!({"kind":"pull-days","days":2}),"pull window must be 1, 3 or 7 days")] {
+    for (key,value,error) in [("version",json!(7),"preferences require version 8 and minimum account age 0 to 1200 months"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("minAccountMonths",json!(1201),"preferences require version 8 and minimum account age 0 to 1200 months"),("since",json!({"kind":"pull-days","days":2}),"pull window must be 1, 3 or 7 days")] {
         let mut invalid=prefs.clone(); invalid[key]=value;
         assert_eq!(account_types::Preferences::validate(&invalid,&contract).unwrap_err(),error);
     }

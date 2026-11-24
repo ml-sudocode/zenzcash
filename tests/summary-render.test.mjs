@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { orientation, questionCards } from "../site/js/summary.js";
+import { orientation, questionCards, exploreArguments } from "../site/js/summary.js";
+import { citationLegend, cites } from '../site/js/citations.js';
 
 import { installDom, descendants, nodes, findId, click } from "./recorded-dom.mjs";
 
@@ -20,25 +21,39 @@ function setup(t) {
   const ids = [...new Set([...keys].map((key) => Number(key.split("/")[0])))];
   const opened = [];
   const view = {
-    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), analysis: { dimensions: { tone: { score: 2 } }, summary: "Original text" } }])),
-    threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread" }])),
+    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), author:'alice', created_at:'2026-10-31T12:00:00Z', hidden:false, segments:[{kind:'text',text:'Original text'}], analysis: { dimensions: { tone: { score: 2 } }, tone_peak: null, summary: "Original text" } }])),
+    threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread", url:'https://forum.example/t/thread/7' }])),
     letterOf: new Map(ids.map((id, index) => [id, String.fromCharCode(65 + index)])),
     news: { points: ["p17"] }, transform: (text) => text,
-    state: { settings: { highlightNew: true }, open: { questions: new Set(), arguments: new Set() } },
+    state: { data:{topic:{id:'zcg'}}, settings: { highlightNew: true, anonymous:false }, open: { summary:true, questions: new Set(), arguments: new Set() } },
     actions: {
-      setOpen(kind, id, open) { if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
+      setOpen(kind, id, open) { if (kind==='summary')view.state.open.summary=open;else if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
       openPost(key) { opened.push(key); },
     },
   };
   return { topic, view, opened };
 }
 
-test("initial summary exposes six native disclosures, with all details inside their own cards", (t) => {
+test("paired summary exposes each question and its positions while keeping supporting detail collapsed", (t) => {
   const { topic, view } = setup(t);
   const root = questionCards(topic, view);
+  assert.equal(root.tag,'details');
+  assert.equal(root.open,true);
+  assert.equal(root.children[0].textContent,'Main questions and arguments');
+  assert.equal(nodes(root,'question-row').length,topic.issues.length);
+  for(const [index,row] of nodes(root,'question-row').entries()) {
+    assert.equal(row.children[0].className,'question-card');
+    assert.equal(row.children[1].className,'main-arguments');
+    const positions=nodes(row,'question-positions')[0];
+    assert.equal(positions.parentNode,row.children[1]);
+    assert.deepEqual(positions.children.filter(node=>node.tag==='dt').map(node=>node.textContent),topic.issues[index].positions_with_post_references.map(position=>position.label));
+    assert.deepEqual(positions.children.filter(node=>node.tag==='dd').map(node=>nodes(node,'cite').map(cite=>cite.attributes.get('href'))),topic.issues[index].positions_with_post_references.map(position=>position.cites.map(key=>`#/topic/zcg/post/${key}`)));
+    assert.equal(nodes(row,'question-arguments')[0].children[0].textContent,'Supporting points and evidence');
+  }
   assert.equal(nodes(root, "question-card").length, 6);
   assert.deepEqual(nodes(root, "question-card").map((card) => [card.tag, card.open, card.children[0].tag]), Array.from({ length: 6 }, () => ["details", false, "summary"]));
-  assert.deepEqual(nodes(root, "question-description").map((node) => node.textContent), topic.issues.map((issue) => issue.description.text));
+  assert.deepEqual(nodes(root, "question-description").map((node) => node.children[0].textContent), topic.issues.map((issue) => issue.description.text));
+  assert.deepEqual(nodes(root, "question-description").map(node=>nodes(node,'cite').map(cite=>cite.attributes.get('href'))),topic.issues.map(issue=>issue.description.cites.map(key=>`#/topic/zcg/post/${key}`)));
   assert.deepEqual(nodes(root, "question-arguments").map((node) => [node.tag, node.open]), Array.from({ length: 6 }, () => ["details", false]));
   assert.deepEqual(nodes(root, "points").flatMap((list) => list.children.map((li) => li.attributes.get("id"))), topic.issues.flatMap((issue) => issue.points.map((id) => `argument-${id}`)));
   assert.equal(nodes(root, "badge-new").length, 1);
@@ -64,22 +79,73 @@ test("Next opens and focuses each next heading without closing other questions",
   }
 });
 
+test('summary action exposes the paired overview without expanding detailed analysis', t => {
+  const { topic, view } = setup(t);
+  view.state.open.summary=false;
+  const root = questionCards(topic, view);
+  const button = exploreArguments(view, root);
+  assert.equal(button.attributes.get('aria-controls'), root.id);
+  click(button);
+  assert.equal(root.open, true);
+  assert.equal(view.state.open.summary, true);
+  for (const kind of ['questions', 'arguments']) assert.deepEqual([...view.state.open[kind]], []);
+  assert.deepEqual(nodes(root, 'question-card').map(card => card.open), topic.issues.map(() => false));
+  assert.deepEqual(nodes(root, 'question-arguments').map(card => card.open), topic.issues.map(() => false));
+  assert.equal(document.activeElement, root.children[0]);
+  assert.deepEqual(root.children[0].scrollOptions, { block: 'start', behavior: 'instant' });
+});
+
+test('visible legend matches citation colors for every tone score and unassessed posts', t => {
+  const { view } = setup(t);
+  const legend = citationLegend();
+  assert.deepEqual(nodes(legend, 'cite').map(node => [node.className, node.textContent]), [
+    ['cite band-high', 'Green · Good — restrained (3)'], ['cite band-mid', 'Yellow · Moderate — pointed (2)'],
+    ['cite band-low', 'Red · Bad — adversarial or attacking (0–1)'], ['cite band-unassessed', 'Gray · Unassessed'],
+  ]);
+  assert.match(legend.textContent, /Tone is not truth, argument quality or agreement/);
+  const post = [...view.posts.values()][0];
+  for (const [score, band] of [[0,'low'],[1,'low'],[2,'mid'],[3,'high'],[null,'unassessed']]) {
+    post.analysis.dimensions.tone.score = score;
+    post.analysis.tone_peak = null;
+    assert.equal(cites([post.key], view).children[0].className, `cite band-${band}`);
+  }
+  for (const overall of [0,1,2,3,null]) for (const peak of [0,1,2,3]) for (const severity of ['minor','material','severe']) {
+    post.analysis.dimensions.tone.score=overall;
+    post.analysis.tone_peak={score:peak,severity,scope:'isolated'};
+    const effective=overall===null?null:severity==='minor'?overall:Math.min(overall,peak);
+    const band=effective===null?'unassessed':effective<2?'low':effective===2?'mid':'high';
+    const name=effective===null?'Unassessed':effective<2?'Bad':effective===2?'Moderate':'Good';
+    const tag=cites([post.key],view).children[0];
+    assert.equal(tag.className,`cite band-${band}`);
+    assert.ok(tag.attributes.get('title').includes(`tone ${name}`));
+  }
+  post.analysis = null;
+  assert.equal(cites([post.key], view).children[0].className, 'cite band-unassessed');
+});
+
 test("related questions, sources and retained disclosure state use the existing actions", (t) => {
   const { topic, view, opened } = setup(t);
   let root = questionCards(topic, view);
+  root.open=true;
+  root.dispatchEvent(new Event('toggle'));
   const first = findId(root, "question-q1");
   first.open = true;
   first.dispatchEvent(new Event("toggle"));
-  const detail = nodes(first, "question-arguments")[0];
+  const detail = nodes(root, "question-arguments")[0];
   detail.open = true;
   detail.dispatchEvent(new Event("toggle"));
   click(nodes(first, "related-questions")[0].children[1]);
   assert.equal(findId(root, "question-q3").open, true);
   click(nodes(first, "cite")[0]);
-  assert.deepEqual(opened, [topic.issues[0].decision_at_stake.cites[0]]);
+  assert.deepEqual(opened, []);
+  const preview=nodes(document.body,'citation-preview')[0];
+  assert.equal(preview.open,true);
+  click(descendants(preview).find(node=>node.tag==='button'&&node.textContent==='Read in discussion'));
+  assert.deepEqual(opened, [topic.issues[0].description.cites[0]]);
   root = questionCards(topic, view);
+  assert.equal(root.open,true);
   assert.equal(findId(root, "question-q1").open, true);
-  assert.equal(nodes(findId(root, "question-q1"), "question-arguments")[0].open, true);
+  assert.equal(nodes(root, "question-arguments")[0].open, true);
   // A queued event from a detached old tree cannot overwrite current state.
   first.isConnected = false;
   first.open = false;
@@ -99,6 +165,6 @@ test("source-derived prose remains text and is passed through anonymous text tra
   view.transform = (text) => text.replaceAll("@alice", "@Participant 1");
   const root = questionCards(topic, view);
   assert.equal(descendants(root).some((node) => node.tag === "img" || node.tag === "script"), false);
-  assert.equal(nodes(root, "question-description")[0].textContent, '<img src=x onerror="alert(1)"> @Participant 1');
+  assert.equal(nodes(root, "question-description")[0].children[0].textContent, '<img src=x onerror="alert(1)"> @Participant 1');
   assert.equal(descendants(root).filter((node) => node.tag === null && node.text.includes("onerror")).length, 2);
 });

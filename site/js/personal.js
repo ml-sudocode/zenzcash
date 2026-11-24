@@ -14,6 +14,7 @@ export const COMPANIONS = [
 export function parsePersonal(value) {
   if (!value || typeof value.label !== "string" || !COMPANIONS.some(([id]) => id === value.appearance) || !Number.isInteger(value.recovery_remaining) || value.recovery_remaining < 0 || value.recovery_remaining > 10 || !value.reading || typeof value.reading !== "object" || Array.isArray(value.reading)) throw new Error("invalid account state");
   for (const [key, entry] of Object.entries(value.reading)) if (!/^[1-9][0-9]*\/[1-9][0-9]*$/.test(key) || !entry || typeof entry.bookmarked !== "boolean" || typeof entry.read !== "boolean") throw new Error(`invalid saved reading state for ${key}`);
+  if (!Array.isArray(value.saved_topics) || value.saved_topics.length > 1000 || value.saved_topics.some(id => typeof id !== 'string' || !/^[a-z0-9-]{1,80}$/.test(id) || id === 'topics') || new Set(value.saved_topics).size !== value.saved_topics.length) throw new Error('invalid saved topics');
   for (const dimension of ["emotions", "head"]) if (!Number.isFinite(value.progress?.[dimension]) || Math.abs(value.progress[dimension]) > 1) throw new Error(`invalid companion ${dimension}`);
   if (!value.moods || typeof value.moods !== "object" || Array.isArray(value.moods)) throw new Error("invalid mood reactions");
   for (const [key, score] of Object.entries(value.moods)) if (!/^[1-9][0-9]*\/[1-9][0-9]*$/.test(key) || !Number.isInteger(score) || Math.abs(score) > 1) throw new Error(`invalid mood reaction for ${key}`);
@@ -70,7 +71,7 @@ export function accountPanel(account, actions, request = { phase: "idle", proble
     h("button", { class: "chip", disabled: !request.canRecover || unavailable, on: { click: () => actions.recover(code.value) } }, busy && request.canRecover ? "Cancel sign-in and recover" : "Recover and create a passkey"));
   const guest = h("div", {},
     account.sign_in_reason ? h("p", { class: "notice", role: "status" }, `Sign in to ${account.sign_in_reason}. This saves your choices to your account across devices. `, account.sign_in_return ? h("a", { href: account.sign_in_return }, "Back to reading") : null) : null,
-    h("p", {}, "Browse freely. Sign in with a passkey to save posts, read/unread choices, filters and your Zamagotchi across devices. No email or password reset."),
+    h("p", {}, "Browse freely. Sign in with a passkey to save topics, posts, read/unread choices, filters and your Zamagotchi across devices. No email or password reset."),
     authenticate("Create account with a passkey", "register"), authenticate("Sign in with a passkey", "login"), recovery,
     unavailable ? h("p", { class: "notice" }, account.auth_problem ?? "This browser does not support passkeys.") : null);
   const members = personal ? h("div", {},
