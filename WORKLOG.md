@@ -6344,3 +6344,8 @@ Implementation in progress; user verification remains pending.
   analysis/feedback and saved display preferences. Implement/test/deploy on
   sandlab-content-first only, preserving a current-image rollback. Check desktop
   and phone layouts, filter clearing, both navigation directions and boundaries.
+  User additionally requests colored source-tag names correspond to Tone filter
+  names. Use Good — restrained, Moderate — pointed and Bad — adversarial or
+  attacking in the legend, drawing Good/Moderate/Bad from the filter vocabulary.
+  Source colors and tooltips must use the same effective tone as the filter,
+  including a material harsh passage lowering the overall tone category.
