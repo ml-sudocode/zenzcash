@@ -6560,3 +6560,16 @@ Implementation in progress; user verification remains pending.
   The reviewed application passes 64 Rust and 270 Node tests plus desktop/phone
   browser and authenticated staging checks. Verify the merged tree, identity,
   credential boundaries and required checks before updating main and pushing.
+
+Historical entry from origin/main commit 98d6e6d, retained during D-233's merge.
+Its original D-181 identifier overlaps the independently maintained server log.
+
+- **D-181 — Push the complete current repository to GitHub.** Following the
+  migration, user explicitly requests that the Zforum repository be fully pushed.
+  Publish all current main commits with a normal fast-forward push; retain the
+  intentionally local-only identity backup branch under D-163's privacy decision.
+  Existing research-prototype-final tag already matches GitHub. Worktree is clean;
+  main is 30 commits ahead and zero behind after fetching origin. Diff whitespace
+  and common credential-pattern checks pass. Private ignored development data and
+  credentials remain on the migrated server. Synchronize the server checkout with
+  the published main afterward; no production deployment is requested.
