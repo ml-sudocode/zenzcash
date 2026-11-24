@@ -6418,3 +6418,15 @@ Implementation in progress; user verification remains pending.
   touch clicks, pointer departure, keyboard use and reachable underlying options;
   implement and deploy the fix to staging while the summary-layout clarification
   is pending.
+
+- **D-230 — Responsive paired questions and arguments.**
+  User prefers side-by-side desktop but asks for a phone recommendation. Proceed
+  with paired rows: question/context on the left, existing short attributed
+  positions on the right; stack each question immediately above its arguments on
+  phones and narrow layouts. Show these short summaries by default, with the
+  whole section collapsible. Keep question context and supporting evidence in
+  separate native disclosures, retaining their stored state and all existing
+  citations, related-question links and detailed fields. Explore the arguments
+  should expose the concise overview rather than expand every detailed analysis.
+  This updates the earlier initially-collapsed main-questions layout to the new
+  requested quick comparison. No new summaries, source imports or AI spending.
