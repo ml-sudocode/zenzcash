@@ -6499,4 +6499,13 @@ Implementation in progress; user verification remains pending.
   Evidence: work/compact-summary-browser.log, work/compact-summary-gate.log,
   work/screenshots/compact-summary-{light,dark}-{1280,390}.png. Preserved the
   current staging image as before-compact-summary-20261124 for rollback.
-  Staging deployment and user visual review follow.
+  Deployed 791973b to staging only. HTTPS verification at
+  2026-11-24T03:36:54Z passed compact typography in both themes and folded evidence,
+  paired/stacked layouts without overflow at 1440/1100/1099/800/390/320px, and
+  existing filter, help, citation, Previous/Next and history checks. Inspected
+  deployed desktop/light and phone/dark screenshots. App healthy; Basic Auth
+  remains required, catalog still 332 topics, no runtime exceptions. Evidence:
+  work/compact-summary-staging.json, matching PNGs and compact-summary-deploy.log.
+  Post-commit security review found no new issues or committed secrets; identity
+  and signing match configuration. Production unchanged; user visual review
+  remains pending.
