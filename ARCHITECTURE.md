@@ -151,7 +151,18 @@ below the description, including counts, dates, account statistics and tags.
 Version selection uses labeled tabs and a subtle blue rewrite background without
 vertical rails; originals use the normal post background. Mixed-thread views name
 each post's source thread. Explore the main questions is collapsed by default;
-its disclosure state survives control changes. Reading controls keep a minimum
+its disclosure state survives control changes. A visible Explore the arguments
+action opens all question and argument disclosures in one step. A legend explains
+that source-tag colors represent AI-rated original-post tone, not truth or argument
+quality. What's new filters stored points by the first listed citation's post date;
+later replies can increase post counts without making an existing point new.
+Hidden-age profiles are included in fresh settings; explicit saved exclusions
+remain honored. Filter labels and help icons share compact rows. Bulk-selection
+buttons distinguish empty, partial and full selection. Login detours preserve
+scroll position, open post details and sidebar scroll when returning to the same
+published topic. Standalone reframing notes and their toggle are removed; the raw
+assessment and stored preference field remain part of the existing data contract.
+Reading controls keep a minimum
 240px sidebar above phone widths, with an open pinned panel at 700px and below.
 On mobile, Next post and post scroll offsets account for both the measured header
 height and the controls panel, including signed-in layouts.

@@ -101,7 +101,7 @@ test("rewrite and age selections combine, unknown ages remain available", () => 
   assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 36, postVersions: ["original"] }, SNAPSHOT), ["41 days on the forum · outside your account-age selection", "has a re-write"]);
   assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 36, anonymous: true }, SNAPSHOT), ["account age outside your selection"]);
   post.account.created_at = null;
-  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 1200 }, SNAPSHOT), ["profile age hidden · excluded by your account-age selection"]);
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 1200, includeHiddenAge: false }, SNAPSHOT), ["profile age hidden · excluded by your account-age selection"]);
 });
 test("merged and per-thread ordering is stable across equal timestamps and does not mutate the topic", () => {
   const post = (key, created_at) => ({ key, created_at });
@@ -113,7 +113,7 @@ test("merged and per-thread ordering is stable across equal timestamps and does 
   assert.deepEqual(topic, original);
 });
 
-test("calendar age boundaries clamp month ends; unknown ages require explicit inclusion", () => {
+test("calendar age boundaries clamp month ends; hidden-age inclusion is independent of the minimum", () => {
   for (const [snapshot, months, cutoff] of [
     ["2024-03-31T12:00:00Z", 1, "2024-02-29T12:00:00Z"],
     ["2025-03-31T12:00:00Z", 1, "2025-02-28T12:00:00Z"],
@@ -124,7 +124,7 @@ test("calendar age boundaries clamp month ends; unknown ages require explicit in
       const post = { hidden: false, analysis: goodMarks().posts[0], account: { created_at: new Date(Date.parse(cutoff) + offset * 1000).toISOString(), status: "ok" } };
       assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot).length > 0, offset > 0);
       post.account.created_at = null;
-      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot), ["profile age hidden · excluded by your account-age selection"]);
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months, includeHiddenAge: false }, snapshot), ["profile age hidden · excluded by your account-age selection"]);
       assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months, includeHiddenAge: true }, snapshot), []);
     }
   }
@@ -144,15 +144,19 @@ test("What's new uses only 1/3/7 days ending at the pull, excludes hidden/future
   assert.deepEqual(whatsNew(topic, pulledAt, pulledAt), {posts:new Set(), threads:[], points:[]});
 });
 
-test("hidden ages require opt-in at every minimum, in anonymous mode too", () => {
+test("hidden ages are included by default and explicit exclusion works at every minimum, in anonymous mode too", () => {
   const post={hidden:false,analysis:goodMarks().posts[0],account:{created_at:null,status:"profile hidden"}};
+  assert.equal(DEFAULT_SETTINGS.includeHiddenAge,true);
   for(let months=0;months<=1200;months++) for(const anonymous of [false,true]) {
-    assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,minAccountMonths:months,anonymous},SNAPSHOT),["profile age hidden · excluded by your account-age selection"]);
-    assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,minAccountMonths:months,anonymous,includeHiddenAge:true},SNAPSHOT),[]);
+    assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,minAccountMonths:months,anonymous,includeHiddenAge:false},SNAPSHOT),["profile age hidden · excluded by your account-age selection"]);
+    assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,minAccountMonths:months,anonymous},SNAPSHOT),[]);
   }
   const {includeHiddenAge,...v6}=DEFAULT_SETTINGS;
   assert.deepEqual(migrateSettings({...v6,version:6,minAccountMonths:12}),{...DEFAULT_SETTINGS,minAccountMonths:12});
-  for(const includeHiddenAge of [true,false]) assert.equal(parseSettings(JSON.stringify({...DEFAULT_SETTINGS,includeHiddenAge})).includeHiddenAge,includeHiddenAge);
+  for(const includeHiddenAge of [true,false]) {
+    assert.equal(parseSettings(JSON.stringify({...DEFAULT_SETTINGS,includeHiddenAge})).includeHiddenAge,includeHiddenAge);
+    assert.equal(migrateSettings({...DEFAULT_SETTINGS,includeHiddenAge}).includeHiddenAge,includeHiddenAge);
+  }
 });
 
 test("rating summaries: counts per level, average on the −1…+2 scale", () => {

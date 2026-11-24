@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { orientation, questionCards } from "../site/js/summary.js";
+import { orientation, questionCards, exploreArguments } from "../site/js/summary.js";
+import { citationLegend, cites } from '../site/js/citations.js';
 
 import { installDom, descendants, nodes, findId, click } from "./recorded-dom.mjs";
 
@@ -66,6 +67,38 @@ test("Next opens and focuses each next heading without closing other questions",
     assert.deepEqual(next.children[0].scrollOptions, { block: "start", behavior: "auto" });
     assert.equal(previous.open, true);
   }
+});
+
+test('summary action exposes every question and its arguments in one click', t => {
+  const { topic, view } = setup(t);
+  const root = questionCards(topic, view);
+  const button = exploreArguments(topic, view, root);
+  assert.equal(button.attributes.get('aria-controls'), root.id);
+  click(button);
+  assert.equal(root.open, true);
+  assert.equal(view.state.open.summary, true);
+  for (const kind of ['questions', 'arguments']) assert.deepEqual([...view.state.open[kind]], topic.issues.map(issue => issue.id));
+  assert.deepEqual(nodes(root, 'question-card').map(card => card.open), topic.issues.map(() => true));
+  assert.deepEqual(nodes(root, 'question-arguments').map(card => card.open), topic.issues.map(() => true));
+  assert.equal(document.activeElement, root.children[0]);
+  assert.deepEqual(root.children[0].scrollOptions, { block: 'start', behavior: 'instant' });
+});
+
+test('visible legend matches citation colors for every tone score and unassessed posts', t => {
+  const { view } = setup(t);
+  const legend = citationLegend();
+  assert.deepEqual(nodes(legend, 'cite').map(node => [node.className, node.textContent]), [
+    ['cite band-high', 'Green · restrained (3)'], ['cite band-mid', 'Yellow · pointed (2)'],
+    ['cite band-low', 'Red · adversarial or attacking (0–1)'], ['cite band-unassessed', 'Gray · unassessed'],
+  ]);
+  assert.match(legend.textContent, /Tone is not truth, argument quality or agreement/);
+  const post = [...view.posts.values()][0];
+  for (const [score, band] of [[0,'low'],[1,'low'],[2,'mid'],[3,'high'],[null,'unassessed']]) {
+    post.analysis.dimensions.tone.score = score;
+    assert.equal(cites([post.key], view).children[0].className, `cite band-${band}`);
+  }
+  post.analysis = null;
+  assert.equal(cites([post.key], view).children[0].className, 'cite band-unassessed');
 });
 
 test("related questions, sources and retained disclosure state use the existing actions", (t) => {

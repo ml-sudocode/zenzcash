@@ -4,15 +4,15 @@ import { renderPost, postElementId } from "./post.js";
 import { selectionBar } from "./selection-controls.js";
 import { readingControls } from "./reading-controls.js";
 import { filterInfo } from "./filter-info.js";
-import { cites } from "./citations.js";
-import { orientation, questionCards } from "./summary.js";
+import { cites, citationLegend } from "./citations.js";
+import { orientation, questionCards, exploreArguments } from "./summary.js";
 export const THREAD_TABS_ID = "thread-tabs";
 
 function sinceRow(view) {
   const { since } = view.state.settings;
   return h("div", { class: "since-row", role: "group", "aria-label": "Days ending at the last forum pull" },
     PULL_DAYS.map(days => h("button", { id: `since-${days}`, class: "chip", "aria-pressed": String(since.days === days), on: { click: () => view.actions.setSettings({ since: { kind: "pull-days", days } }) } }, `${days} day${days === 1 ? "" : "s"}`)),
-    filterInfo("pullWindow", "What’s new time window", "Look back 1, 3 or 7 days from the last successful forum pull, using forum post timestamps. New points are checked summary points first introduced in that window, not every new reply. Changing this window does not change your selected posts.", view));
+    filterInfo("pullWindow", "What’s new time window", "Look back 1, 3 or 7 days from the last forum pull (or the published snapshot when no pull time is recorded). A summary point’s date is the date of its first listed source post. Later replies about that point do not reset its date. Changing this window does not generate a new summary or change your selected posts.", view));
 }
 
 export function whatsNewSummary(topic, view, data) {
@@ -35,6 +35,7 @@ export function whatsNewSummary(topic, view, data) {
     points.length ? list : h("p", { class: "small muted" }, "No new summary points in this window."),
     points.length > 3 ? toggle : null,
     h("p", { class: "small muted" }, `${countLabel(view.news.posts.size, "new post")} · ${view.state.settings.since.days} days through ${shortDate(view.pulledAt)}. Based on forum timestamps, not your last visit.`),
+    h('p', { class: 'small muted newness-explanation' }, 'Shows existing summary points whose first cited post falls in this window. Later replies count as new posts but do not make an older point new. This is not a separate summary of every recent reply.'),
     data.grouped_sources ? h("details", { class: "small muted" }, h("summary", {}, "Source refresh times"), h("p", {}, "The window ends at the earliest included pull."), h("ul", {}, data.grouped_sources.map(({thread,pulled_at}) => h("li", {}, `${thread}: ${shortDate(pulled_at)}`)))) : null,
     data.analysis_pending ? h("p", { class: "notice small" }, `Newer forum data is awaiting analysis. This summary covers the checked snapshot from ${shortDate(data.snapshot_at)}.`) : null);
 }
@@ -103,12 +104,14 @@ export function renderTopic(data, state, actions) {
       " · ", link(thread.url, "On the forum ↗")))));
   if (data.visibility_pending) return h("div", { class: "topic originals-only" }, heading,
     h("p", { class: "notice", role: "status" }, "Some forum posts are no longer public. The remaining originals are available below. AI summaries, re-writes and filters will return with the checked update."), sources, discussion(topic, view));
+  const questions = questionCards(topic, view);
   return h("div", { class: "topic" }, heading,
     h("div", { class: "reading-layout" }, h("div", { class: "reading-content" },
       h("section", { class: "topic-summary card" }, h("h2", {}, "Topic summary"), orientation(topic, view),
-        h("div", { class: "summary-actions" }, h("button", { class: "linkish small", on: { click: () => actions.listenOverview() } }, "Listen to summary"),
+        citationLegend(),
+        h("div", { class: "summary-actions" }, exploreArguments(topic, view, questions), h("button", { class: "linkish small", on: { click: () => actions.listenOverview() } }, "Listen to summary"),
           h("button", { class: "linkish small", on: { click: () => document.getElementById('discussion').scrollIntoView({block:'start',behavior:'instant'}) } }, "Read posts ↓")),
-        questionCards(topic, view)),
+        questions),
       whatsNewSummary(topic, view, data),
       state.ratings.status === "error" ? h("p", { class: "notice" }, `Mind-change ratings unavailable: ${state.ratings.problem}`) : null,
       state.feedback.status === "error" ? h("p", { class: "notice" }, `Re-write feedback unavailable: ${state.feedback.problem}`) : null,

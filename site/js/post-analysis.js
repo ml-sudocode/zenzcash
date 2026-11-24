@@ -32,9 +32,9 @@ export function postAssessment(post, view) {
 }
 export function highlightedNotes(post, view) {
   if(post.analysis===null)return [];
-  return post.analysis.flags.filter((flag) => (view.state.settings.flagAssumptions && flag.code === "disputed_premise_presented_as_settled") || (view.state.settings.showReframing && flag.code === "useful_reframing"))
+  return post.analysis.flags.filter((flag) => view.state.settings.flagAssumptions && flag.code === "disputed_premise_presented_as_settled")
     .map((flag) => h("details", { class: "highlighted-flag" },
-      h("summary", {}, flag.code === "useful_reframing" ? "View AI note on reframing" : "View AI note on a disputed assumption"),
+      h("summary", {}, "View AI note on a disputed assumption"),
       h("p", { class: "small muted" }, "AI-generated interpretation of the quoted original passage, not additional words from its author."),
       h("p", {}, view.transform(flag.explanation)), evidence([flag.exact_span], view)));
 }

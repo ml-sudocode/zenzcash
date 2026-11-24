@@ -11,6 +11,21 @@ export function orientation(topic, view) {
   return h("div", { class: "overview" }, topic.overview.map((sentence) => h("p", {}, statement(sentence, view))));
 }
 
+export function exploreArguments(topic, view, section) {
+  return h('button', { class: 'chip explore-arguments', 'aria-controls': 'main-questions', on: { click: () => {
+    view.actions.setOpen('summary', null, true);
+    section.open = true;
+    topic.issues.forEach(issue => {
+      view.actions.setOpen('questions', issue.id, true);
+      view.actions.setOpen('arguments', issue.id, true);
+    });
+    section.querySelectorAll('details').forEach(detail => { detail.open = true; });
+    const heading = section.querySelector('summary');
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ block: 'start', behavior: 'instant' });
+  } } }, 'Explore the arguments ↓');
+}
+
 export function questionCards(topic, view) {
   const points = new Map(topic.points.map((point) => [point.id, point]));
   const issues = new Map(topic.issues.map((issue) => [issue.id, issue]));
@@ -63,7 +78,7 @@ export function questionCards(topic, view) {
     cards.set(issue.id, card);
     return card;
   });
-  const section = h("details", { class: "question-summary", open: view.state.open.summary, on: { toggle: event => {
+  const section = h("details", { id: 'main-questions', class: "question-summary", open: view.state.open.summary, on: { toggle: event => {
     if (event.target === section && section.isConnected) view.actions.setOpen('summary', null, section.open);
   } } },
     h("summary", { class: 'question-summary-heading' }, "Explore the main questions"),

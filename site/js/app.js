@@ -17,6 +17,7 @@ import { accountPanel, accountOriginLink, companionView, guestVisit, parsePerson
 import { passkeyRequest } from "./passkey-request.js";
 import { ReadingHistory } from "./reading-history.js";
 import { closeCitationPreview } from "./citation-preview.js";
+import { captureReadingPosition, restoreReadingPosition } from './reading-return.js';
 
 const SETTINGS_KEY = "zforum.design.settings.v7";
 const LAST_VISIT_KEY = "zforum.visit.v2";
@@ -37,6 +38,7 @@ history.scrollRestoration = "manual";
 let renderedHash = null;
 let directoryPosition = { x: 0, y: 0, focusedId: "" };
 let navigationSequence = 0;
+let readingReturn = null;
 const listening = document.createElement("aside");
 document.body.append(listening);
 const companion = document.createElement("aside");
@@ -451,6 +453,9 @@ async function navigate() {
   closeCitationPreview();
   const sequence = ++navigationSequence;
   const requestedHash = location.hash;
+  if (renderedHash !== null && !['#/profile', '#/saved'].includes(renderedHash) && ['#/profile', '#/saved'].includes(requestedHash)) {
+    readingReturn = { hash: renderedHash, release: main.querySelector('.topic') === null ? null : state.data.release_id, position: captureReadingPosition(main) };
+  }
   if (renderedHash === '#/topics' && requestedHash !== renderedHash) {
     directoryPosition = { x: window.scrollX, y: window.scrollY, focusedId: document.activeElement.closest('.topic-card')?.id ?? '' };
   }
@@ -480,7 +485,12 @@ async function navigate() {
   } catch (error) { if (sequence === navigationSequence) replaceContent(main, h("p", { class: "notice" }, error.message)); return; }
   if (route.kind === 'topic') await refreshAnswers();
   if (sequence !== navigationSequence || location.hash !== requestedHash) return;
-  if (route.kind === "topic" && route.post !== null && topicRoute(postRoute(state.data.topic.id, route.post), state.data.topic).kind === 'topic') actions.openPost(route.post);
+  if (readingReturn?.hash === requestedHash && (route.kind !== 'topic' || readingReturn.release === state.data.release_id)) {
+    render({ keepScroll: false });
+    restoreReadingPosition(main, readingReturn.position);
+    readingReturn = null;
+  }
+  else if (route.kind === "topic" && route.post !== null && topicRoute(postRoute(state.data.topic.id, route.post), state.data.topic).kind === 'topic') actions.openPost(route.post);
   else render({ keepScroll: false });
 }
 

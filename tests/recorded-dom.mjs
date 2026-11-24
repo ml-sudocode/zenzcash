@@ -36,6 +36,7 @@ export class RecordedNode extends EventTarget {
   get id() { return this.attributes.get("id"); }
   set id(value) { this.attributes.set("id", value); }
   querySelector(tag) { return descendants(this).find((node) => node.tag === tag) ?? null; }
+  querySelectorAll(tag) { return descendants(this).filter((node) => node.tag === tag); }
   focus(options) { document.activeElement = this; this.focusOptions = options; }
   scrollIntoView(options) { this.scrollOptions = options; }
 }

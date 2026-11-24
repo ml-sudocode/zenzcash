@@ -170,19 +170,20 @@ test("source-derived summaries and analysis render as text with mention masking"
   assert.equal(nodes(root, "why-marks")[0].textContent.includes('@Participant 1'), true);
 });
 
-test("assumption and reframing highlights are optional, while all evidence remains inspectable", (t) => {
+test("only disputed-assumption notes remain highlighted, with underlying analysis still inspectable", (t) => {
   const { posts, view, state, opened } = fixture(t);
   const post = posts[0];
   post.analysis.flags = ["disputed_premise_presented_as_settled", "useful_reframing"].map((code) => ({ code, exact_span: "ZCG should end.", explanation: "An illustrative passage explanation.", target: "Funding", severity: "material", scope: "isolated", confidence: "medium" }));
   let root = renderPost(post, view);
-  assert.equal(nodes(root, "highlighted-flag").length, 2);
+  assert.equal(nodes(root, "highlighted-flag").length, 1);
+  assert.equal(nodes(root, 'highlighted-flag')[0].querySelector('summary').textContent, 'View AI note on a disputed assumption');
+  assert.equal(nodes(root, "highlighted-flag")[0].open, false);
+  assert.match(nodes(root, "highlighted-flag")[0].textContent, /not additional words from its author/);
   assert.deepEqual(opened, []);
   state.settings.flagAssumptions = false;
   root = renderPost(post, view);
-  assert.equal(nodes(root, "highlighted-flag").length, 1);
-  assert.equal(nodes(root, "highlighted-flag")[0].textContent.startsWith("View AI note on reframing"), true);
-  assert.equal(nodes(root, "highlighted-flag")[0].open, false);
-  assert.match(nodes(root, "highlighted-flag")[0].textContent, /not additional words from its author/);
+  assert.equal(nodes(root, "highlighted-flag").length, 0);
+  assert.equal(nodes(root, 'passage-flags')[0].children.length, 2);
   state.settings.showReframing = false;
   root = renderPost(post, view);
   assert.equal(nodes(root, "highlighted-flag").length, 0);
@@ -197,7 +198,8 @@ test("monthly slider and hidden-age choice render; highlights stay visible acros
   slider.value="6"; slider.setCustomValidity=(message)=>assert.equal(message,"");
   slider.dispatchEvent(new Event("change"));
   assert.deepEqual(patches,[{minAccountMonths:6}]);
-  for (const key of ["toneBands","supportBands","accountAge","postVersions","preferredVersion","flagAssumptions","showReframing","highlightNew","anonymous","showRatings","pullWindow","threadView","postOrder"]) {
+  assert.equal(findId(root,'setting-showReframing'),undefined);
+  for (const key of ["toneBands","supportBands","accountAge","postVersions","preferredVersion","flagAssumptions","highlightNew","anonymous","showRatings","pullWindow","threadView","postOrder"]) {
     const button=findId(root,`info-${key}-button`);
     assert.equal(button.attributes.get("aria-controls"),`info-${key}`);
     assert.equal(button.attributes.get("aria-expanded"),"false");

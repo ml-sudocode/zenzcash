@@ -162,7 +162,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   toneBands: ids(TONE_BANDS),
   supportBands: ids(SUPPORT_BANDS),
   minAccountMonths: 0,
-  includeHiddenAge: false,
+  includeHiddenAge: true,
   postVersions: ids(POST_VERSIONS),
   threadView: "all",
   postOrder: "newest",
@@ -225,12 +225,12 @@ function migrateWindow(since) {
 }
 export function migrateSettings(value) {
   if (value?.version === 7) return parseSettings(JSON.stringify(value));
-  if (value?.version === 6) return parseSettings(JSON.stringify({ ...parseSettingsVersion(JSON.stringify(value), 6), version: 7, includeHiddenAge: false }));
+  if (value?.version === 6) return parseSettings(JSON.stringify({ ...parseSettingsVersion(JSON.stringify(value), 6), version: 7, includeHiddenAge: true }));
   if (value?.version === 5) {
     const old = parseSettingsVersion(JSON.stringify(value), 5);
     const { ageBands, customAge, ...rest } = old;
     const minimums = ageBands.map((id) => id === "custom" ? customAge.min : AGE_BANDS.find((band) => band.id === id).min);
-    return parseSettings(JSON.stringify({ ...rest, version: 7, includeHiddenAge: false, minAccountMonths: minimums.length ? Math.min(...minimums) : 0, since: migrateWindow(old.since) }));
+    return parseSettings(JSON.stringify({ ...rest, version: 7, includeHiddenAge: true, minAccountMonths: minimums.length ? Math.min(...minimums) : 0, since: migrateWindow(old.since) }));
   }
   const legacyKeys = ["anonymous", "tonePreset", "supportPreset", "unassessed", "includedFunctions", "minAccountMonths", "filteredFlags", "preferredVersion", "flagAssumptions", "showReframing", "highlightNew", "showRatings", "since", "interests"].sort();
   if (!value || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(legacyKeys)) throw new Error("Unrecognized saved reading settings");

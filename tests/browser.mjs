@@ -19,6 +19,7 @@ import { fileReviewInput } from '../tools/review-publication.mjs';
 import { corpusData } from './corpus-fixture.mjs';
 import { checkCachedDeployment } from './cached-deployment.mjs';
 import { checkReadingFlow } from './reading-flow-browser.mjs';
+import { checkSummaryUsability } from './summary-usability-browser.mjs';
 import { buildRuntime } from '../tools/build-runtime.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -243,12 +244,18 @@ try {
   const route=`#/topic/zcg/post/${rewritten.key}`;
   await evaluate("location.hash='#/topic/zcg'");
   await waitFor("document.querySelector('#setting-includeHiddenAge') !== null");
-  assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),false);
+  assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),true);
   assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
   assert.match(await evaluate("document.querySelector('[aria-label=\"Save post · sign-in required\"]').getAttribute('aria-label')"),/sign-in required/);
   await evaluate("document.querySelector('#setting-includeHiddenAge').click()");
+  assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),false);
+  await send('Page.reload');
+  await waitFor("document.querySelector('#setting-includeHiddenAge') !== null");
+  assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),false,'Explicit hidden-age exclusion survives reload');
+  await evaluate("document.querySelector('#setting-includeHiddenAge').click()");
   assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),true);
   await checkReadingFlow({send,evaluate,waitFor,capture});
+  await checkSummaryUsability({send,evaluate,waitFor,capture});
   await evaluate("document.querySelector('[aria-label=\"Save post · sign-in required\"]').click()");
   await waitFor("document.querySelector('#account-panel') !== null");
   assert.match(await evaluate("document.querySelector('#account-panel').textContent"),/Sign in to save posts/);
@@ -294,7 +301,7 @@ try {
   assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
   for (const [width,height] of [[1280,900],[390,844]]) {
     await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
-    for (const key of ["flagAssumptions","showReframing","highlightNew","anonymous","showRatings"]) {
+    for (const key of ["flagAssumptions","highlightNew","anonymous","showRatings"]) {
       for (let toggle=0;toggle<2;toggle++) {
         const selector=JSON.stringify(`#setting-${key}`);
         await evaluate(`document.querySelector(${selector}).scrollIntoView({block:'center'}); document.querySelector(${selector}).focus({preventScroll:true})`);
@@ -530,7 +537,7 @@ try {
     assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);await capture('privacy-original-mobile.png');
     assert.deepEqual(errors,[]);
   }
-  console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
+  console.log(`Browser passed (${catalog.topics.length} topics): discovery, directory return, login return scroll and disclosures, summary legend and direct argument access, selection colors, compact filter labels/help, hidden-age defaults and saved exclusion, highlight toggle position, 1/3/7-day point counts, lazy loading, citation previews, info hover/click/focus/Escape, reactions, bookmarks/read, account saving/logout, export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
   }
   await send("Browser.close", {}, true);
 } catch(error) {

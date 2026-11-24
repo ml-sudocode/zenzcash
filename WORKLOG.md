@@ -6203,3 +6203,43 @@ Implementation in progress; user verification remains pending.
   navigation, and compact reading-control label/help layouts. Preserve other
   analysis and the existing stored-settings API. All implementation and
   deployment stays on sandlab-content-first; production remains unchanged.
+
+- **F-270 — Audit thread-58906 summary windows and improve reading usability.**
+  Read the existing staging publication without fetching forum data or running
+  AI jobs. thread-58906 uses snapshot fallback 2026-11-21T02:33:14.033Z as its
+  window endpoint. The 1/3/7-day windows contain 8/32/85 public posts and 0/0/2
+  existing summary points. The two qualifying points are p22 (first_at
+  2026-11-14T05:28:04.657Z) and p25 (2026-11-17T11:58:14.191Z). The build assigns
+  first_at from the first listed citation's forum timestamp, and whatsNew
+  filters that timestamp, not later supporting citations or analysis time.
+  No window-specific summary is generated. Explain this rule visibly in
+  What's new and its help text; retain published content and counting semantics.
+  Audit evidence: work/thread-58906-newness-audit.json.
+  Fresh defaults and legacy migrations include hidden-age profiles; explicit
+  saved v7 choices still round-trip unchanged. Add the summary's tone-color
+  legend and one-click argument access, retaining collapsed questions on entry.
+  Bulk controls show full/partial/empty selection and update after individual
+  checkbox changes or clearing. Remove the standalone reframing disclosure and
+  its toggle, preserving raw analysis and the stored settings contract. Compact
+  filter headings place help beside labels and options in two columns.
+  Login detours capture page/sidebar position and open post details; returning
+  through browser history or Back to reading restores these for the same
+  release, including direct post routes. Match disclosure labels so changed
+  account filters do not transfer state to another kind of note.
+  Focused tests initially exposed two remaining assertions of the old hidden-age
+  default; updated those cases to explicitly request exclusion, retaining their
+  expected exclusion messages. Focused tests and final browser suite pass.
+  Browser coverage includes desktop/phone login return with exact coordinates,
+  open footers, history forward/back, explicit saved age exclusion, label/help
+  alignment, argument access and persistence, and light/dark selection colors.
+  Inspected desktop summary, compact sidebar, phone layout, dark selection
+  states and restored phone post footer. Full gate and staging verification
+  follow. Evidence: work/summary-usability-{focused,browser-final}.log,
+  work/reading-return-unit.log and work/screenshots.
+  Extend return capture to non-topic pages and their disclosures, covering the
+  How to use page's Zamagotchi sign-in detour as well. Full gate passes (61 Rust,
+  258 Node, clippy/builds); Node suite passes again after this extension. A browser
+  rerun exposed a pre-existing cache-test race reading document.body before it
+  exists. Made its polling predicate tolerate the loading document while still
+  requiring the same exact expected error text; browser verification reruns.
+  Final browser rerun passes, including non-topic return and the cache check.

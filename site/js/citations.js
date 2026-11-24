@@ -4,6 +4,14 @@ import { postBrief } from './analysis-state.js';
 import { postRoute } from './selection.js';
 import { showCitationPreview } from './citation-preview.js';
 
+export function citationLegend() {
+  return h('aside', { class: 'citation-legend small', 'aria-label': 'Citation color legend' },
+    h('p', {}, 'Source tags show AI-rated tone of the original post:'),
+    h('ul', {}, [[3, 'Green · restrained (3)'], [2, 'Yellow · pointed (2)'], [0, 'Red · adversarial or attacking (0–1)'], [null, 'Gray · unassessed']].map(([score, label]) =>
+      h('li', { class: `cite band-${toneBand(score)}` }, label))),
+    h('p', { class: 'muted' }, 'Tone is not truth, argument quality or agreement. Click a source tag to read the original.'));
+}
+
 export function cites(keys, view) {
   return h("span", { class: "cites" }, keys.map((key) => {
     const post = view.posts.get(key);

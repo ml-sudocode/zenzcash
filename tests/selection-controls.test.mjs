@@ -65,6 +65,36 @@ test("copy exports the shared prompt and exact original sources; links are separ
   }
 });
 
+test('bulk controls reflect all, partial and empty selections after individual changes and clearing', t => {
+  const { view, button } = setup(t, []);
+  const cases = [
+    [[], ['false','false','false','false']],
+    [['7/1'], ['mixed','true','false','true']],
+    [['8/1'], ['mixed','false','true','false']],
+    [['7/1','8/1'], ['true','true','true','true']],
+  ];
+  const labels = ['Select all in this topic','Select thread A · Thread 7','Select thread B · Thread 8','Select posts in this time window (1)'];
+  for (const [keys, expected] of cases) {
+    view.state.selected = new Set(keys);
+    view.syncSelection();
+    assert.deepEqual(labels.map(label => button(label).attributes.get('aria-pressed')), expected);
+    assert.equal(button(labels[0]).attributes.get('title'), `${keys.length} of 2 posts selected`);
+  }
+  click(button('Clear selection'));
+  assert.deepEqual(labels.map(label => button(label).attributes.get('aria-pressed')), ['false','false','false','false']);
+  view.actions.selectScope = selected => { view.state.selected = selected; view.syncSelection(); };
+  click(button(labels[1]));
+  assert.deepEqual([...view.state.selected], ['7/1']);
+  click(button(labels[2]));
+  assert.deepEqual([...view.state.selected], ['7/1','8/1']);
+  assert.equal(button(labels[0]).attributes.get('aria-pressed'), 'true');
+  view.news.posts = new Set();
+  const empty = selectionBar(view);
+  const timeButton = descendants(empty).find(node => node.tag === 'button' && node.textContent === 'Select posts in this time window (0)');
+  assert.equal(timeButton.attributes.get('disabled'), '');
+  assert.equal(timeButton.attributes.get('aria-pressed'), 'false');
+});
+
 test("download contains the shared prompt and exact sources and releases its temporary URL", async (t) => {
   const { view, root, button, status } = setup(t);
   document.body = new RecordedNode("body");
