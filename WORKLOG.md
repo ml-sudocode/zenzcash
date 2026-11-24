@@ -6477,6 +6477,19 @@ Implementation in progress; user verification remains pending.
   and signing match configuration; production unchanged. User visual review
   remains pending.
 
+- **D-232 — Compact the whole topic page and clarify included filters.**
+  User extends D-231 to the rest of the topic page, including supporting evidence
+  and individual posts. Use 14px evidence/summary copy and 15px post text with
+  tighter line height and spacing, compact headers and footers, while retaining
+  avatars, attribution, rewrite backgrounds, all content and reachable controls.
+  Empty v8 category lists already mean unrestricted, not excluded. Display an
+  unrestricted group with every option checked, and toggle from that effective
+  selection. Narrow saved selections remain honored; clearing the last choice
+  resets a group to all, retaining the earlier clear-means-no-filter behavior.
+  Explain that behavior in help. No settings format or server change is needed.
+  Verify default full inclusion, exclusion/reinclusion, saved subsets, desktop/
+  phone rendering and open evidence. Commit and deploy staging only with rollback.
+
 - **D-231 — More compact question/argument overview.**
   User wants supporting points/evidence folded by default and smaller dark-gray
   argument explanations so more questions fit on screen. Fresh topic views
