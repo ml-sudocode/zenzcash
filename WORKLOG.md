@@ -6330,3 +6330,17 @@ Implementation in progress; user verification remains pending.
   screenshot reviews, not physical-device testing. User visual review remains
   pending. Collaborator summary should lead with the reading/navigation benefit
   and follow with concrete examples, using plain language and a short paragraph.
+
+- **D-227 — Previous post and simpler reading filters.**
+  Add Previous post beside Next, following the visible reading order and skipping
+  hidden/nonmatching posts, with clear first/last boundary feedback. Replace Any
+  chips with checkbox-only filters: an empty Tone, Argument support or Posts
+  selection means unrestricted; selecting options narrows that group. Settings
+  version 8 makes the changed empty-selection meaning explicit. Migrate prior
+  all-selected groups to empty and preserve narrower selections, account-age
+  choices and other saved preferences. Old empty groups become unrestricted as
+  requested. Remove the Highlights and author identities group and its other
+  controls, leaving a simple Hide author names checkbox; retain existing post
+  analysis/feedback and saved display preferences. Implement/test/deploy on
+  sandlab-content-first only, preserving a current-image rollback. Check desktop
+  and phone layouts, filter clearing, both navigation directions and boundaries.
