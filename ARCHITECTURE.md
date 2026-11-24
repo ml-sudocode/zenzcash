@@ -154,7 +154,9 @@ each post's source thread. Main questions and arguments start visible in paired
 rows: question/context left and short attributed positions right at 1100px and
 wider; each question stacks immediately above its arguments on narrower screens.
 The whole overview can collapse, and each question's context and supporting
-evidence expand separately. Disclosure state survives control changes and Back.
+evidence expand separately and start folded on fresh visits. Compact 14px gray
+explanations and tighter spacing keep the overview scannable; forum post type
+sizes are independent. Disclosure state survives control changes and Back.
 Explore the arguments opens/scrolls to the concise overview without expanding
 every detailed analysis. All published question fields, points and citations
 remain available. A legend explains

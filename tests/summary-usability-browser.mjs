@@ -12,6 +12,14 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
     await send('Page.navigate', {url:`${await evaluate('location.origin')}/?summary-usability=${width}#/topic/zcg`});
     await waitFor("document.querySelector('.explore-arguments') !== null");
     assert.equal(await evaluate("document.querySelector('.question-summary').open"), true);
+    assert.equal(await evaluate("[...document.querySelectorAll('.question-arguments')].every(detail=>!detail.open)"),true,'Supporting evidence starts folded before any overview action');
+    for(const theme of ['light','dark']) {
+      await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
+      assert.deepEqual(await evaluate("(()=>{const text=getComputedStyle(document.querySelector('.question-positions dd')),title=getComputedStyle(document.querySelector('.question-positions dt'));return {size:text.fontSize,line:text.lineHeight,color:text.color,titleSize:title.fontSize}})()"),{size:'14px',line:'19.6px',color:theme==='light'?'rgb(100, 106, 115)':'rgb(154, 160, 168)',titleSize:'15px'});
+      await evaluate("document.querySelector('.question-row').scrollIntoView({block:'start',behavior:'instant'})");
+      await capture(`compact-summary-${theme}-${width}.png`);
+    }
+    await evaluate("document.documentElement.dataset.theme='light'");
     assert.equal(await evaluate("document.querySelectorAll('.citation-legend li').length"), 4);
     assert.equal(await evaluate("document.querySelector('#setting-showReframing')"), null);
     assert.equal(await evaluate("document.body.textContent.includes('View AI note on reframing')"), false);

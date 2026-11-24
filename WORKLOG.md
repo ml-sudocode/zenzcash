@@ -6487,3 +6487,16 @@ Implementation in progress; user verification remains pending.
   citations. Use a readable gray in light mode and its lighter counterpart in
   dark mode. Scope typography changes to the overview, not forum post text.
   Test desktop/phone sizes and deploy on staging only with a rollback image.
+
+- **F-276 — Compact question and argument explanations.**
+  Overview explanations now use 14px gray text with 1.4 line height, smaller
+  argument headings and tighter row padding/spacing. Full explanations and
+  citations remain; forum post typography is unchanged. Supporting evidence
+  already starts folded on fresh visits; browser checks now explicitly verify
+  that before any overview action. Intentional disclosure state still survives
+  Back. Desktop/phone browser regression and the full gate pass (64 Rust,
+  270 Node); inspected light/dark screenshots at 1280px and 390px.
+  Evidence: work/compact-summary-browser.log, work/compact-summary-gate.log,
+  work/screenshots/compact-summary-{light,dark}-{1280,390}.png. Preserved the
+  current staging image as before-compact-summary-20261124 for rollback.
+  Staging deployment and user visual review follow.
