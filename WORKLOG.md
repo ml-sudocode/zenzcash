@@ -6463,3 +6463,16 @@ Implementation in progress; user verification remains pending.
   ARCHITECTURE now describes the layout and where browser checks are specified.
   Preserved c389727's deployed image as before-paired-layout-20261124 for rollback
   while retaining the help fix and settings v8. Final staging verification follows.
+  Separate Saved/history browser suite passes after the layout change, including
+  repeated URLs, deep loaded posts, reloads and leaving/returning to the site.
+  Deployed ab39221 to staging only. HTTPS verification at
+  2026-11-24T03:26:17Z passes pairing/visibility at 1440/1100/1099/800/390/320px,
+  help-icon second-click/tap dismissal, keyboard operation, filter/navigation
+  behavior and all previous summary/citation/login/history checks. No runtime
+  exceptions; Basic Auth remains required, app healthy and catalog still 332
+  topics. Inspected deployed desktop and 320px screenshots. Evidence:
+  work/summary-pairs-history-browser.log, work/summary-pairs-staging.json,
+  matching PNGs and work/summary-pairs-deploy.log. Post-commit security review
+  found no new untrusted HTML, identity bypass or committed secrets. Identity
+  and signing match configuration; production unchanged. User visual review
+  remains pending.
