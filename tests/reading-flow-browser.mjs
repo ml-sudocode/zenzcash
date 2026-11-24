@@ -20,14 +20,16 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     await waitFor("document.querySelector('.topic-summary .cite') !== null && document.querySelector('.post-content') !== null");
     await evaluate(`document.querySelector('#setting-postOrder').value=${JSON.stringify(width===390?'oldest':'newest')};document.querySelector('#setting-postOrder').dispatchEvent(new Event('change'))`);
     const noFilterCount=await evaluate("document.querySelector('.match-count').textContent");
-    assert.equal(await evaluate("document.querySelectorAll('.filter-options input:checked').length"),0);
+    assert.equal(await evaluate("document.querySelectorAll('.filter-options input:checked').length"),8);
+    assert.equal(await evaluate("document.querySelectorAll('.compact-post').length"),0,'Default filters include every post');
     assert.equal(await evaluate("[...document.querySelectorAll('.settings-panel button')].some(button=>button.textContent==='Any')"),false);
     for (const [group,option] of [['toneBands','good'],['supportBands','high'],['postVersions','rewritten']]) {
       const selector=`#setting-${group}-${option}`;
       await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
-      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).checked`),true);
+      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).checked`),false);
       assert.notEqual(await evaluate("document.querySelector('.match-count').textContent"),noFilterCount);
       await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).checked`),true);
       assert.equal(await evaluate("document.querySelector('.match-count').textContent"),noFilterCount);
       assert.equal(await evaluate("document.querySelectorAll('.compact-post').length"),0);
     }
@@ -78,6 +80,8 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     const savedTheme=await evaluate('document.documentElement.dataset.theme');
     for(const theme of ['light','dark']) {
       await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
+      assert.equal(await evaluate("[...document.querySelectorAll('.post-body')].every(n=>{const s=getComputedStyle(n);return s.fontSize==='15px'&&s.lineHeight==='22.5px'})"),true,'Originals and rewrites use compact, readable post text');
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('.post:not(.compact-post)')).paddingTop`),width===390?'12px':'14px');
       assert.equal(await evaluate("(()=>{const posts=[...document.querySelectorAll('.forum-posts > .post')];return posts.every((post,index)=>{const style=getComputedStyle(post),rect=post.getBoundingClientRect(),footer=post.querySelector('.post-actions');return style.boxShadow==='none'&&style.borderLeftWidth==='1px'&&style.borderRightWidth==='1px'&&(!footer||(footer.closest('.post')===post&&footer.getBoundingClientRect().bottom<=rect.bottom))&&(index===0||rect.top-posts[index-1].getBoundingClientRect().bottom>=15);})})()"),true,`Distinct post boundaries and contained footers at ${width}px in ${theme}`);
       assert.equal(await evaluate("[...document.querySelectorAll('.version')].every(n=>getComputedStyle(n).borderLeftWidth==='0px')"),true,'Text versions do not look like nested post sections');
       assert.equal(await evaluate("getComputedStyle(document.querySelector('.version-neutral')).backgroundColor"),theme==='light'?'rgb(238, 245, 252)':'rgb(27, 43, 61)','Rewrites have a subtle blue background');

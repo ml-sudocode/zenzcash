@@ -3,6 +3,7 @@ import test from "node:test";
 import { renderPost } from "../site/js/post.js";
 import { renderTopic, whatsNewSummary } from "../site/js/topic.js";
 import { DEFAULT_SETTINGS, participantNumbers } from "../site/js/logic.js";
+import { TONE_BANDS, SUPPORT_BANDS, POST_VERSIONS, ids } from "../site/js/reader-options.js";
 import { buildSiteData } from "../tools/build.mjs";
 import { goodMarks } from "./marks-fixture.mjs";
 import { sampleThread } from "./helpers.mjs";
@@ -219,19 +220,25 @@ test("monthly slider and hidden-age choice render; highlights stay visible acros
   assert.deepEqual(nodes(root,"since-row")[0].children.filter(n=>n.tag==="button").map(n=>n.textContent),["1 day","3 days","7 days"]);
 });
 
-test('filter checkboxes start clear, narrow on selection and clear without an Any control', t => {
+test('filter checkboxes show included categories for every saved subset and toggle from that inclusion', t => {
   const {data,state,actions,patches}=fixture(t);
-  for (const [key,id] of [['toneBands','good'],['supportBands','high'],['postVersions','rewritten']]) {
-    let root=renderTopic(data,state,actions);
-    assert.equal(findId(root,`setting-${key}-any`),undefined);
-    const input=findId(root,`setting-${key}-${id}`);
-    assert.equal(input.attributes.has('checked'),false);
-    input.dispatchEvent(new Event('change'));
-    assert.deepEqual(patches.at(-1),{[key]:[id]});
-    root=renderTopic(data,state,actions);
-    assert.equal(findId(root,`setting-${key}-${id}`).attributes.has('checked'),true);
-    findId(root,`setting-${key}-${id}`).dispatchEvent(new Event('change'));
-    assert.deepEqual(patches.at(-1),{[key]:[]});
+  assert.equal(nodes(renderTopic(data,state,actions),'match-count')[0].textContent,'All 3 posts included.');
+  for (const [key,options] of [['toneBands',TONE_BANDS],['supportBands',SUPPORT_BANDS],['postVersions',POST_VERSIONS]]) {
+    const all=ids(options);
+    for(let mask=0;mask<2**all.length;mask++) for(const id of all) {
+      const saved=all.filter((_,index)=>mask & 2**index);
+      const included=saved.length?saved:all;
+      state.settings[key]=saved;
+      let root=renderTopic(data,state,actions);
+      assert.equal(findId(root,`setting-${key}-any`),undefined);
+      for(const option of all) assert.equal(findId(root,`setting-${key}-${option}`).attributes.has('checked'),included.includes(option));
+      findId(root,`setting-${key}-${id}`).dispatchEvent(new Event('change'));
+      const expected=included.includes(id)?included.filter(option=>option!==id):[...included,id];
+      assert.deepEqual(patches.at(-1),{[key]:expected});
+      root=renderTopic(data,state,actions);
+      for(const option of all) assert.equal(findId(root,`setting-${key}-${option}`).attributes.has('checked'),expected.length===0||expected.includes(option));
+    }
+    state.settings[key]=[];
   }
 });
 

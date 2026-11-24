@@ -6522,3 +6522,23 @@ Implementation in progress; user verification remains pending.
   Post-commit security review found no new issues or committed secrets; identity
   and signing match configuration. Production unchanged; user visual review
   remains pending.
+
+- **F-277 — Compact topic content and visibly inclusive filter defaults.**
+  Summary, What's new and expanded supporting evidence use 14px copy; original
+  and rewritten post bodies use 15px/1.5. Reduced card, header, quote and footer
+  padding while preserving avatars, dates, author tenure, all text/citations,
+  blue rewrite backgrounds, distinct post boundaries and sticky navigation.
+  Unrestricted category groups display all checkboxes checked. Unchecking removes
+  that category; rechecking restores it; clearing the last resets the group to all.
+  Existing v8 empty lists and saved subsets keep their meanings. Matching status
+  explicitly says “All N posts included” when all posts match. Updated help text.
+  Exhaustive render checks cover every category subset and toggle; desktop/phone
+  browser checks verify defaults include all posts, category exclusion/reinclusion,
+  compact typography, open evidence and retained navigation. Inspected light/dark
+  desktop/phone evidence and post screenshots. Full gate passes (64 Rust, 270 Node).
+  The first browser run hit the existing 60-second watchdog without an assertion
+  failure; the expanded suite passes with a bounded 90-second watchdog, with no
+  assertions removed. Evidence: work/compact-topic-{focused,browser,gate}.log and
+  work/screenshots/{compact-evidence,rewrite-blue,post-boundaries}-*.png.
+  Rollback image: zenzcash-sandlab:before-compact-topic-20261124. Staging deployment
+  and user visual review follow.

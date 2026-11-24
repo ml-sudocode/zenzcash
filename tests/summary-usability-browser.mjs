@@ -37,6 +37,15 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
     await evaluate("document.querySelector('.question-row').scrollIntoView({block:'start',behavior:'instant'})");
     await capture(`summary-pairs-${width}.png`);
     await evaluate("document.querySelector('.question-card > summary').click(); document.querySelector('.question-arguments > summary').click()");
+    for (const theme of ['light','dark']) {
+      await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
+      for(const selector of ['.overview p','.question-content','.question-arguments .points li','.issue-detail li','.whats-new']) {
+        assert.deepEqual(await evaluate(`(()=>{const s=getComputedStyle(document.querySelector(${JSON.stringify(selector)}));return [s.fontSize,s.lineHeight]})()`),['14px','20.3px'],`Compact summary and expanded evidence: ${selector}`);
+      }
+      await evaluate("document.querySelector('.question-arguments').scrollIntoView({block:'center',behavior:'instant'})");
+      await capture(`compact-evidence-${theme}-${width}.png`);
+    }
+    await evaluate("document.documentElement.dataset.theme='light'");
     await evaluate("document.querySelector('#setting-anonymous').click()");
     assert.equal(await evaluate("document.querySelector('.question-summary').open && document.querySelector('.question-card').open && document.querySelector('.question-arguments').open"), true, 'Open question context and evidence survive a settings redraw');
     await evaluate("document.querySelector('#setting-anonymous').click(); document.querySelector('.question-summary > summary').click(); document.querySelector('.selection-bar > summary').click()");

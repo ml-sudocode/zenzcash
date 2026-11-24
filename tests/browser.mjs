@@ -54,7 +54,7 @@ const cleanup = async () => {
   })));
   await rm(scratch, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 };
-const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 60 seconds"); process.exit(1); }); }, 60000);
+const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 90 seconds"); process.exit(1); }); }, 90000);
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
 const passkeyMode = process.argv[2] === "--passkeys";
 const catalogMode = process.argv[2] === "--catalog";

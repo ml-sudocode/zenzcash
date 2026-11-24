@@ -155,8 +155,10 @@ rows: question/context left and short attributed positions right at 1100px and
 wider; each question stacks immediately above its arguments on narrower screens.
 The whole overview can collapse, and each question's context and supporting
 evidence expand separately and start folded on fresh visits. Compact 14px gray
-explanations and tighter spacing keep the overview scannable; forum post type
-sizes are independent. Disclosure state survives control changes and Back.
+explanations and tighter spacing keep the overview scannable. Summary and expanded
+evidence use 14px text, while original/rewrite post bodies use 15px text with 1.5
+line height. Compact card padding and footers retain distinct post boundaries.
+Disclosure state survives control changes and Back.
 Explore the arguments opens/scrolls to the concise overview without expanding
 every detailed analysis. All published question fields, points and citations
 remain available. A legend explains
@@ -168,8 +170,11 @@ What's new filters stored points by the first listed citation's post date;
 later replies can increase post counts without making an existing point new.
 Hidden-age profiles are included in fresh settings; explicit saved exclusions
 remain honored. Filter labels and help icons share compact rows. Tone, argument
-support and post-type checkboxes start clear; an empty group means no restriction.
-Settings v8 records this meaning explicitly; older all-selected groups migrate to
+support and post-type checkboxes start checked to show every category is included.
+Unchecking excludes a category; rechecking includes it again. Clearing the last
+choice resets a group to all. Empty stored v8 lists mean no restriction and display
+as all checked; saved narrower groups retain their selections.
+Settings v8 records the empty-list meaning; older all-selected groups migrate to
 empty, narrower choices remain selected, and old empty groups become unrestricted.
 Account preferences and history snapshots migrate through the same settings parser.
 Hide author names is the sole identity/display toggle in the sidebar; existing
