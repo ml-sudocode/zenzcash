@@ -6187,3 +6187,19 @@ Implementation in progress; user verification remains pending.
   UI-only changes retain text rendering and identity masking; no new input
   boundaries, dependencies or credentials. Commit identity matches repository
   configuration. Production unchanged; user visual review remains pending.
+
+- **D-225 — Clarify summary cues, selections and navigation on staging.**
+  User requests hidden-age profiles included by default, a visible explanation
+  of summary citation colors, and more direct access to Explore the arguments.
+  Use an explicit summary action opening the question/argument disclosures;
+  retain collapsed main questions on entry. Explain original-text AI tone
+  bands with labeled swatches, including unassessed, separately from truth or
+  argument quality. Change fresh defaults and pre-hidden-age migrations to
+  include hidden ages while honoring explicit saved include/exclude choices.
+  Investigate the 1/3/7-day summary discrepancy for thread-58906 and explain the
+  existing timestamp rules without running analysis or changing published data.
+  Show bulk selection state based on selected posts, remove the standalone
+  reframing note and its UI toggle, restore reading position after login-page
+  navigation, and compact reading-control label/help layouts. Preserve other
+  analysis and the existing stored-settings API. All implementation and
+  deployment stays on sandlab-content-first; production remains unchanged.
