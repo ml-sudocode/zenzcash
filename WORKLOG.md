@@ -6311,3 +6311,22 @@ Implementation in progress; user verification remains pending.
   The backend-only revision cd21511 is the compatible UI rollback baseline;
   ARCHITECTURE documents migration backup and the preserved rollback image.
   Deployment and HTTPS verification follow; production remains unchanged.
+  Deployed UI revision 03720fb to staging only. Preserved schema-12-compatible
+  rollback image zenzcash-sandlab:before-saved-navigation-20261124 from cd21511.
+  Server-local before/after migration backups pass SQLite quick_check. Counts
+  remain 2 accounts, 1 saved/read post, 15024 current posts and 332 published
+  topics; schema 12 adds an initially empty saved_topics table. Evidence:
+  work/saved-history-{before,after}-migration.json and protected local backups.
+  HTTPS verification at 2026-11-24T02:34:18Z passes general Back restoration,
+  reload restoration, guest Save topic sign-in and rejected unauthenticated
+  writes, plus prior summary/filter/selection/citation behavior. Layout checks
+  pass at 1440/800/390/320px; return checks pass at desktop/phone widths with
+  exact scroll coordinates. Basic Auth remains required and the app is healthy.
+  No browser runtime exceptions. Inspected the deployed phone screenshot.
+  Evidence: work/saved-history-staging.json, matching PNGs and deployment log.
+  Post-commit UI security review found no untrusted HTML, account data persisted
+  in navigation snapshots, auth bypass or committed secrets. Commit identity and
+  signing match configuration. These are automated Chrome viewport checks and
+  screenshot reviews, not physical-device testing. User visual review remains
+  pending. Collaborator summary should lead with the reading/navigation benefit
+  and follow with concrete examples, using plain language and a short paragraph.
