@@ -6,7 +6,7 @@ import { installDom, nodes, descendants, click } from './recorded-dom.mjs';
 
 function fixture(t) {
   installDom(t);
-  const post={key:'7/1',number:1,author:'alice',created_at:'2026-10-31T12:00:00Z',hidden:false,segments:[{kind:'text',text:'Original @alice <img src=x onerror=alert(1)>'}],analysis:{summary:'A short summary',dimensions:{tone:{score:2}}}};
+  const post={key:'7/1',number:1,author:'alice',created_at:'2026-10-31T12:00:00Z',hidden:false,segments:[{kind:'text',text:'Original @alice <img src=x onerror=alert(1)>'}],analysis:{summary:'A short summary',dimensions:{tone:{score:2}},tone_peak:null}};
   const opened=[];
   const view={state:{data:{topic:{id:'funding'}},settings:{anonymous:false}},posts:new Map([['7/1',post]]),threadOf:new Map([['7/1',{id:7,title:'Discussion',url:'https://forum.example/t/discussion/7'}]]),letterOf:new Map([[7,'A']]),numbers:new Map([['alice',1]]),transform:text=>text,actions:{openPost:key=>opened.push(key)}};
   return {post,view,opened};

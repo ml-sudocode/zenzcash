@@ -49,23 +49,25 @@ function postStream(topic, view) {
   const readable = posts.filter(post => !post.hidden && (view.state.data.visibility_pending || view.state.shownFiltered.has(post.key) || greyReasons(post, view.state.settings, view.snapshotAt).length === 0));
   const list = h("div", { class: "forum-posts" });
   const more = h("button", { class: "load-more zf" });
-  const status = h("span", { class: "small muted", "aria-live": "polite" });
+  const status = h("span", { class: "post-navigation-status small muted", "aria-live": "polite" });
+  const move = direction => {
+    const edge = Math.max(navigation.getBoundingClientRect().bottom, parseFloat(getComputedStyle(list.firstElementChild).scrollMarginTop));
+    const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    // The final short post cannot align below the sticky bar at the page end.
+    const current = atBottom ? readable.findLastIndex(post => document.getElementById(postElementId(post.key)) !== null) : readable.findIndex(post => {
+      const element = document.getElementById(postElementId(post.key));
+      return element !== null && element.getBoundingClientRect().bottom > edge + 1;
+    });
+    const target = current === -1 ? null : readable[current + direction];
+    if (target) view.actions.goToPost(target.key);
+    else status.textContent = direction === -1 ? 'You’re at the first post.' : 'You’re at the last post.';
+  };
   const navigation = h("nav", { class: "post-navigation", "aria-label": "Move through posts" },
-    h("button", { class: "linkish small", on: { click: () => document.querySelector('.topic-head').scrollIntoView({block:'start',behavior:'instant'}) } }, "Back to summary"),
+    h("button", { class: "linkish small", 'aria-label': 'Back to summary', on: { click: () => document.querySelector('.topic-head').scrollIntoView({block:'start',behavior:'instant'}) } }, "Summary ↑"),
     status,
-    h("button", { class: "chip next-post", disabled: readable.length < 2, on: { click: () => {
-      const edge = Math.max(navigation.getBoundingClientRect().bottom, parseFloat(getComputedStyle(list.firstElementChild).scrollMarginTop));
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-      // A short final post cannot align below the sticky bar when scrolling is
-      // clamped at the page end. Advance beyond that post instead of selecting it again.
-      const current = atBottom ? readable.findLastIndex(post => document.getElementById(postElementId(post.key)) !== null) : readable.findIndex(post => {
-        const element = document.getElementById(postElementId(post.key));
-        return element !== null && element.getBoundingClientRect().bottom > edge + 1;
-      });
-      const next = current === -1 ? null : readable[current + 1];
-      if (next) view.actions.nextPost(next.key);
-      else status.textContent = 'You’re at the last post.';
-    } } }, "Next post ↓"));
+    h('div', { class: 'post-step-buttons' },
+      h('button', { class: 'chip previous-post', 'aria-label': 'Previous post', disabled: readable.length < 2, on: { click: () => move(-1) } }, '↑ Previous', h('span', { class: 'post-word' }, ' post')),
+      h('button', { class: 'chip next-post', 'aria-label': 'Next post', disabled: readable.length < 2, on: { click: () => move(1) } }, 'Next', h('span', { class: 'post-word' }, ' post'), ' ↓')));
   let rendered = 0;
   const fill = () => {
     const target = Math.min(view.state.shown.get(stream) ?? POSTS_PER_LOAD, posts.length);

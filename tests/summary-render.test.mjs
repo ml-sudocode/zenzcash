@@ -21,7 +21,7 @@ function setup(t) {
   const ids = [...new Set([...keys].map((key) => Number(key.split("/")[0])))];
   const opened = [];
   const view = {
-    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), author:'alice', created_at:'2026-10-31T12:00:00Z', hidden:false, segments:[{kind:'text',text:'Original text'}], analysis: { dimensions: { tone: { score: 2 } }, summary: "Original text" } }])),
+    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), author:'alice', created_at:'2026-10-31T12:00:00Z', hidden:false, segments:[{kind:'text',text:'Original text'}], analysis: { dimensions: { tone: { score: 2 } }, tone_peak: null, summary: "Original text" } }])),
     threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread", url:'https://forum.example/t/thread/7' }])),
     letterOf: new Map(ids.map((id, index) => [id, String.fromCharCode(65 + index)])),
     news: { points: ["p17"] }, transform: (text) => text,
@@ -88,14 +88,25 @@ test('visible legend matches citation colors for every tone score and unassessed
   const { view } = setup(t);
   const legend = citationLegend();
   assert.deepEqual(nodes(legend, 'cite').map(node => [node.className, node.textContent]), [
-    ['cite band-high', 'Green · restrained (3)'], ['cite band-mid', 'Yellow · pointed (2)'],
-    ['cite band-low', 'Red · adversarial or attacking (0–1)'], ['cite band-unassessed', 'Gray · unassessed'],
+    ['cite band-high', 'Green · Good — restrained (3)'], ['cite band-mid', 'Yellow · Moderate — pointed (2)'],
+    ['cite band-low', 'Red · Bad — adversarial or attacking (0–1)'], ['cite band-unassessed', 'Gray · Unassessed'],
   ]);
   assert.match(legend.textContent, /Tone is not truth, argument quality or agreement/);
   const post = [...view.posts.values()][0];
   for (const [score, band] of [[0,'low'],[1,'low'],[2,'mid'],[3,'high'],[null,'unassessed']]) {
     post.analysis.dimensions.tone.score = score;
+    post.analysis.tone_peak = null;
     assert.equal(cites([post.key], view).children[0].className, `cite band-${band}`);
+  }
+  for (const overall of [0,1,2,3,null]) for (const peak of [0,1,2,3]) for (const severity of ['minor','material','severe']) {
+    post.analysis.dimensions.tone.score=overall;
+    post.analysis.tone_peak={score:peak,severity,scope:'isolated'};
+    const effective=overall===null?null:severity==='minor'?overall:Math.min(overall,peak);
+    const band=effective===null?'unassessed':effective<2?'low':effective===2?'mid':'high';
+    const name=effective===null?'Unassessed':effective<2?'Bad':effective===2?'Moderate':'Good';
+    const tag=cites([post.key],view).children[0];
+    assert.equal(tag.className,`cite band-${band}`);
+    assert.ok(tag.attributes.get('title').includes(`tone ${name}`));
   }
   post.analysis = null;
   assert.equal(cites([post.key], view).children[0].className, 'cite band-unassessed');

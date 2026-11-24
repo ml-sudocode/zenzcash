@@ -6349,3 +6349,30 @@ Implementation in progress; user verification remains pending.
   attacking in the legend, drawing Good/Moderate/Bad from the filter vocabulary.
   Source colors and tooltips must use the same effective tone as the filter,
   including a material harsh passage lowering the overall tone category.
+
+- **F-273 — Previous post, checkbox filters and consistent tone tags.**
+  Previous/Next share the same current-post detection and matching-post order;
+  both remain visible at phone widths and announce first/last boundaries.
+  Removed Any chips. Empty tone/support/post-type selections now impose no
+  restriction; settings v8 and the authenticated preferences API record this
+  changed meaning explicitly. Old all-selected groups migrate to empty and
+  specific selections, hidden-age exclusion and other preferences remain intact.
+  History snapshots use the same migration. Removed the highlights group and
+  its extra toggles, retaining Hide author names and existing post features.
+  Legend names are shared with Tone filters; source colors/tooltips and filtering
+  now share effective tone including material harsh passages. No AI reruns.
+  Full gate passes: 64 Rust, 269 Node, builds and clippy. Tests enumerate filter
+  subsets/migrations and overall/peak tone combinations. Initial failures came
+  from incomplete citation fixtures, the lightweight DOM's missing checked
+  property, and shared age-fixture mutation; corrected those inputs/assertions
+  without weakening behavior expectations. Browser click detection now accepts
+  the button's child text span while retaining viewport/occlusion checks.
+  Broad browser and separate Saved/history suites pass. Previous/Next work in
+  both reading orders and at boundaries; clearing each group restores the exact
+  matching count. Inspected desktop controls/legend and phone post navigation.
+  Evidence: work/reader-simplify-gate-final.log, work/reader-simplify-browser.log,
+  work/reader-simplify-history-browser.log and work/screenshots.
+  Preserved the previous image as before-reader-simplify-20261124 and created
+  /data/before-reader-simplify-20261124.sqlite in the staging data volume.
+  ARCHITECTURE documents preference conversion for rollback without discarding
+  account/bookmark data. Staging deployment and HTTPS verification follow.

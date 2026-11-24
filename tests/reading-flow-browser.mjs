@@ -11,11 +11,25 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     await evaluate("document.querySelector('.post:not(.compact-post):not(.hidden-post)').scrollIntoView({block:'start',behavior:'instant'})");
     assert.equal(await evaluate("(()=>{const panel=document.querySelector('.settings-panel'),r=panel.getBoundingClientRect();return r.width>=240&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.settings-panel')===panel})()"),true,`Reading controls stay visible and at least 240px wide at ${width}px`);
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true,`No overflow at ${width}px`);
+    assert.equal(await evaluate("['.previous-post','.next-post'].every(selector=>{const button=document.querySelector(selector),r=button.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===button})"),true,`Both post navigation buttons are visible and clickable at ${width}px`);
   }
   for (const [width,height] of [[1280,900],[390,844]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     await send('Page.navigate', {url:`${await evaluate('location.origin')}/?reading-flow=${width}#/topic/zcg`});
     await waitFor("document.querySelector('.topic-summary .cite') !== null && document.querySelector('.post-content') !== null");
+    await evaluate(`document.querySelector('#setting-postOrder').value=${JSON.stringify(width===390?'oldest':'newest')};document.querySelector('#setting-postOrder').dispatchEvent(new Event('change'))`);
+    const noFilterCount=await evaluate("document.querySelector('.match-count').textContent");
+    assert.equal(await evaluate("document.querySelectorAll('.filter-options input:checked').length"),0);
+    assert.equal(await evaluate("[...document.querySelectorAll('.settings-panel button')].some(button=>button.textContent==='Any')"),false);
+    for (const [group,option] of [['toneBands','good'],['supportBands','high'],['postVersions','rewritten']]) {
+      const selector=`#setting-${group}-${option}`;
+      await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).checked`),true);
+      assert.notEqual(await evaluate("document.querySelector('.match-count').textContent"),noFilterCount);
+      await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+      assert.equal(await evaluate("document.querySelector('.match-count').textContent"),noFilterCount);
+      assert.equal(await evaluate("document.querySelectorAll('.compact-post').length"),0);
+    }
     assert.equal(await evaluate("[...document.querySelectorAll('.post:not(.compact-post)')].every(post=>{const avatar=post.querySelector('.avatar'),badge=post.querySelector('.age-badge'),relative=post.querySelector('.post-relative-date');return avatar&&badge&&relative&&getComputedStyle(avatar).borderRadius==='50%'&&avatar.getBoundingClientRect().width===44&&getComputedStyle(badge).display!=='none'&&relative.textContent.length>0})"),true,'Author context stays visible on desktop and mobile');
     assert.equal(await evaluate("document.querySelector('.question-summary').open"),false,'Main questions start collapsed');
     assert.equal(await evaluate("document.querySelector('.question-summary > summary').textContent"),'Explore the main questions');
@@ -52,8 +66,13 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     const nextId = await evaluate("[...document.querySelectorAll('.post')].filter(p=>p.querySelector('.post-content')&&!p.querySelector('.post-content').hidden)[1].id");
     await mouse('.next-post');
     await waitFor(`document.activeElement.id === ${JSON.stringify(nextId)}`);
+    const firstId=await evaluate("document.querySelector('.post:not(.hidden-post):not(.compact-post)').id");
+    await mouse('.previous-post');await waitFor(`document.activeElement.id === ${JSON.stringify(firstId)}`);
+    await mouse('.previous-post');
+    assert.equal(await evaluate("document.querySelector('.post-navigation [aria-live]').textContent"),'You’re at the first post.');
+    await mouse('.next-post');await waitFor(`document.activeElement.id === ${JSON.stringify(nextId)}`);
     assert.equal(await evaluate(`document.querySelector('#${nextId} .post-content').hidden`),false);
-    assert.equal(await evaluate("(()=>{const r=document.querySelector('.next-post').getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===document.querySelector('.next-post')})()"),true,'Next stays visible and clickable after skipping');
+    assert.equal(await evaluate("(()=>{const r=document.querySelector('.next-post').getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===document.querySelector('.next-post')})()"),true,'Next stays visible and clickable after skipping');
     await capture(`content-first-posts-${width}.png`);
     const savedTheme=await evaluate('document.documentElement.dataset.theme');
     for(const theme of ['light','dark']) {
@@ -82,7 +101,10 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     const lastId=await evaluate("(()=>{for(let batch=0;batch<30&&!document.querySelector('.load-more').hidden;batch++)document.querySelector('.load-more').click();const last=[...document.querySelectorAll('.post')].filter(p=>p.querySelector('.post-content')&&!p.querySelector('.post-content').hidden).at(-1);last.scrollIntoView({block:'start',behavior:'instant'});document.querySelector('.next-post').click();return last.id})()");
     assert.equal(await evaluate("document.querySelector('.post-navigation [aria-live]').textContent"),'You’re at the last post.');
     assert.equal(await evaluate(`document.querySelector('#${lastId} .post-content').hidden`),false);
+    const beforeLast=await evaluate("[...document.querySelectorAll('.post:not(.hidden-post):not(.compact-post)')].at(-2).id");
+    await mouse('.previous-post');await waitFor(`document.activeElement.id === ${JSON.stringify(beforeLast)}`);
     await evaluate('window.scrollTo(0,0)');
   }
   await send('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+  await evaluate("document.querySelector('#setting-postOrder').value='newest';document.querySelector('#setting-postOrder').dispatchEvent(new Event('change'))");
 }

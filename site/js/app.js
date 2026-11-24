@@ -21,7 +21,7 @@ import { captureReadingPosition, restoreReadingPosition } from './reading-return
 import { savedItems } from './saved.js';
 import { NavigationHistory, captureReader, restoreReader } from './navigation-history.js';
 
-const SETTINGS_KEY = "zforum.design.settings.v7";
+const SETTINGS_KEY = "zforum.design.settings.v8";
 const LAST_VISIT_KEY = "zforum.visit.v2";
 const DEVICE_KEY = "zforum.device.v1";
 
@@ -73,7 +73,7 @@ function storageSet(key, value) {
 function loadSettings() {
   let stored = storageGet(SETTINGS_KEY);
   if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
-  for (const key of ["zforum.design.settings.v6", "zforum.design.settings.v5", "zforum.design.settings.v4"]) {
+  for (const key of ["zforum.design.settings.v7", "zforum.design.settings.v6", "zforum.design.settings.v5", "zforum.design.settings.v4"]) {
     if (stored.value !== null) break;
     stored = storageGet(key);
     if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
@@ -260,8 +260,8 @@ const actions = {
   },
   // Opens a cited post in its thread's tab with its original showing, scrolls to it, and
   // highlights it.
-  openPost(key) { actions.nextPost(key, true); },
-  nextPost(key, original = false) {
+  openPost(key) { actions.goToPost(key, true); },
+  goToPost(key, original = false) {
     const thread = threadOfPost(key);
     state.thread = thread.id;
     const stream = state.settings.threadView === "all" ? "all" : thread.id;

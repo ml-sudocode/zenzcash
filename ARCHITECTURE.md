@@ -137,8 +137,8 @@ storage but no off-host backup; it is for disposable testing accounts.
 
 The content-first redesign is isolated on `sandlab-content-first`; `sandlab`
 retains the pre-redesign revision `611fd8a`. Posts open with their chosen text
-version, and the sticky Next post button advances through matching public posts,
-loading the next batch when necessary. Topic summaries precede new points and
+version, and sticky Previous/Next buttons move through matching public posts in
+the selected order, loading the next batch when necessary. Topic summaries precede new points and
 posts. Search, sorting and filters remain visible in a distinct controls area;
 post feedback and AI notes are optional disclosures below the text. Citation
 links preview originals in a native dialog and support normal new-tab navigation.
@@ -154,10 +154,20 @@ each post's source thread. Explore the main questions is collapsed by default;
 its disclosure state survives control changes. A visible Explore the arguments
 action opens all question and argument disclosures in one step. A legend explains
 that source-tag colors represent AI-rated original-post tone, not truth or argument
-quality. What's new filters stored points by the first listed citation's post date;
+quality. It uses the filter names Good (restrained), Moderate (pointed) and Bad
+(adversarial or attacking). Both source colors and tone filtering use the same
+effective score, including a material harsh passage lowering the rating.
+What's new filters stored points by the first listed citation's post date;
 later replies can increase post counts without making an existing point new.
 Hidden-age profiles are included in fresh settings; explicit saved exclusions
-remain honored. Filter labels and help icons share compact rows. Bulk-selection
+remain honored. Filter labels and help icons share compact rows. Tone, argument
+support and post-type checkboxes start clear; an empty group means no restriction.
+Settings v8 records this meaning explicitly; older all-selected groups migrate to
+empty, narrower choices remain selected, and old empty groups become unrestricted.
+Account preferences and history snapshots migrate through the same settings parser.
+Hide author names is the sole identity/display toggle in the sidebar; existing
+assumption/newness/feedback display preferences and post features remain intact.
+Bulk-selection
 buttons distinguish empty, partial and full selection. Each browser history entry
 retains its page position, filters, loaded post batches, text versions, open
 details and sidebar scroll. Tab-scoped session storage preserves these through
@@ -167,7 +177,7 @@ visibility state. Standalone reframing notes and their toggle are removed; the r
 assessment and stored preference field remain part of the existing data contract.
 Reading controls keep a minimum
 240px sidebar above phone widths, with an open pinned panel at 700px and below.
-On mobile, Next post and post scroll offsets account for both the measured header
+On mobile, both navigation buttons and post scroll offsets account for the measured header
 height and the controls panel, including signed-in layouts.
 Stored citations remain attached to their supported claim units; no historical
 analysis was regenerated for this layout change.
@@ -181,7 +191,13 @@ save up to 1000 topics; unavailable topics can still be removed from Saved.
 
 Before the schema-12 migration, create a server-local backup with the app's
 `backup --db /data/zforum.sqlite --to /data/UNIQUE_NAME.sqlite` command. Old
-schema-11 images cannot open the migrated database. To roll back the Saved and
+schema-11 images cannot open the migrated database. Older images also require
+settings v7: before rolling back from v8, convert account preferences in a backed-up,
+stopped staging database from v8 to v7, replacing empty tone/support/post-type lists
+with their complete allowed lists and retaining every other field. Do not restore
+the whole database merely to change preference representation. Browser-local v7
+settings remain under their old key; v8 uses a separate key.
+To roll back the Saved and
 general-navigation UI while retaining accounts and saved data, use the preserved
 schema-12-compatible image from backend revision `cd21511` (do not add `--build`):
 
@@ -195,3 +211,9 @@ rollback of these UI changes, build revision `cd21511`. Do not rebuild `sandlab`
 or use the older pre-redesign image against schema 12; those require a separate
 restore of the pre-migration backup and would discard subsequent account changes.
 Keep the compatible rollback image until the changes have been reviewed.
+
+The baseline immediately before Previous/Next and simplified filters is source
+`5a33587`, image `zenzcash-sandlab:before-reader-simplify-20261124`. It retains
+Saved topics and general history restoration. The same v8-to-v7 preference
+conversion above is required before using that image; no database schema change
+is involved in this UI update.

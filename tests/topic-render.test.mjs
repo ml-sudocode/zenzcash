@@ -131,6 +131,7 @@ test("summary precedes new points; sorting is directly available and bulk contro
   assert.equal(nodes(root, "settings-panel")[0].tag, 'aside');
   assert.equal(nodes(root, "post-content").every((n) => !n.hidden), true);
   assert.equal(nodes(root, 'next-post').length, 1);
+  assert.equal(nodes(root, 'previous-post').length, 1);
   const news = nodes(root, "whats-new")[0];
   click(descendants(news).find((n) => n.tag === "button" && n.textContent === "3 days"));
   assert.deepEqual(patches, [{ since: { kind: "pull-days", days: 3 } }]);
@@ -199,7 +200,7 @@ test("monthly slider and hidden-age choice render; highlights stay visible acros
   slider.dispatchEvent(new Event("change"));
   assert.deepEqual(patches,[{minAccountMonths:6}]);
   assert.equal(findId(root,'setting-showReframing'),undefined);
-  for (const key of ["toneBands","supportBands","accountAge","postVersions","preferredVersion","flagAssumptions","highlightNew","anonymous","showRatings","pullWindow","threadView","postOrder"]) {
+  for (const key of ["toneBands","supportBands","accountAge","postVersions","preferredVersion","anonymous","pullWindow","threadView","postOrder"]) {
     const button=findId(root,`info-${key}-button`);
     assert.equal(button.attributes.get("aria-controls"),`info-${key}`);
     assert.equal(button.attributes.get("aria-expanded"),"false");
@@ -211,9 +212,27 @@ test("monthly slider and hidden-age choice render; highlights stay visible acros
   actions.setOpen('newPoints',null,true);
   actions.setSettings({since:{kind:"pull-days",days:7},anonymous:true});
   root=renderTopic(data,state,actions);
-  assert.equal(nodes(root,"highlight-settings")[0].tag,"fieldset");
+  assert.equal(nodes(root,"highlight-settings").length,0);
+  for (const key of ['flagAssumptions','highlightNew','showRatings']) assert.equal(findId(root,`setting-${key}`),undefined);
+  assert.equal(findId(root,'setting-anonymous').parentNode.textContent,'Hide author names');
   assert.equal(state.open.newPoints,true);
   assert.deepEqual(nodes(root,"since-row")[0].children.filter(n=>n.tag==="button").map(n=>n.textContent),["1 day","3 days","7 days"]);
+});
+
+test('filter checkboxes start clear, narrow on selection and clear without an Any control', t => {
+  const {data,state,actions,patches}=fixture(t);
+  for (const [key,id] of [['toneBands','good'],['supportBands','high'],['postVersions','rewritten']]) {
+    let root=renderTopic(data,state,actions);
+    assert.equal(findId(root,`setting-${key}-any`),undefined);
+    const input=findId(root,`setting-${key}-${id}`);
+    assert.equal(input.attributes.has('checked'),false);
+    input.dispatchEvent(new Event('change'));
+    assert.deepEqual(patches.at(-1),{[key]:[id]});
+    root=renderTopic(data,state,actions);
+    assert.equal(findId(root,`setting-${key}-${id}`).attributes.has('checked'),true);
+    findId(root,`setting-${key}-${id}`).dispatchEvent(new Event('change'));
+    assert.deepEqual(patches.at(-1),{[key]:[]});
+  }
 });
 
 test("rewrite audits group identical operations once without losing distinct quoted evidence", async (t) => {

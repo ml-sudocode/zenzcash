@@ -55,3 +55,15 @@ test('invalid and unavailable storage is reported while in-memory navigation sti
     assert.throws(()=>parseNavigationView(invalid),{message:'Invalid saved navigation state'});
   }
 });
+
+test('old navigation snapshots migrate unrestricted filters without losing reading position',()=>{
+  const saved=view('#/topic/zcg',1234);
+  saved.settings={...saved.settings,version:7,toneBands:['bad','moderate','good'],supportBands:['high'],postVersions:['rewritten','original'],includeHiddenAge:false};
+  const restored=parseNavigationView(saved);
+  assert.equal(restored.position.y,1234);
+  assert.equal(restored.settings.version,8);
+  assert.deepEqual(restored.settings.toneBands,[]);
+  assert.deepEqual(restored.settings.supportBands,['high']);
+  assert.deepEqual(restored.settings.postVersions,[]);
+  assert.equal(restored.settings.includeHiddenAge,false);
+});

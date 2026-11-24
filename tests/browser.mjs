@@ -272,7 +272,7 @@ try {
   await evaluate("location.hash='#/topic/zcg'");
   await waitFor("document.querySelector('#setting-includeHiddenAge') !== null");
   assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),true);
-  assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+  assert.equal(await evaluate("document.querySelector('.highlight-settings')"),null);
   assert.match(await evaluate("document.querySelector('[aria-label=\"Save post · sign-in required\"]').getAttribute('aria-label')"),/sign-in required/);
   await evaluate("document.querySelector('#setting-includeHiddenAge').click()");
   assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),false);
@@ -288,20 +288,20 @@ try {
   assert.match(await evaluate("document.querySelector('#account-panel').textContent"),/Sign in to save posts/);
   await capture("reading-guest-signin.png");
   await evaluate("document.querySelector('#account-panel a').click()");
-  await waitFor("document.querySelector('.highlight-settings') !== null");
+  await waitFor("document.querySelector('#setting-anonymous') !== null");
   await evaluate("document.querySelector('.companion').click()");
   await waitFor("document.querySelector('#account-panel') !== null");
   assert.match(await evaluate("document.querySelector('#account-panel').textContent"),/Sign in to choose your Zamagotchi/);
   await evaluate("document.querySelector('#account-panel a').click()");
-  await waitFor("document.querySelector('.highlight-settings') !== null");
+  await waitFor("document.querySelector('#setting-anonymous') !== null");
   for(const [width,height] of [[1280,900],[390,844]]) {
     await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
     await evaluate("document.querySelector('#setting-includeHiddenAge').scrollIntoView({block:'center'})");
-    assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+    assert.equal(await evaluate("document.querySelector('.highlight-settings')"),null);
     assert.equal(await evaluate("document.documentElement.scrollWidth<=innerWidth"),true);
     await capture(`reading-controls-${width}.png`);
-    await evaluate("document.querySelector('#setting-highlightNew').scrollIntoView({block:'center'})");
-    await capture(`reading-highlights-${width}.png`);
+    await evaluate("document.querySelector('#setting-anonymous').scrollIntoView({block:'center'})");
+    await capture(`reading-author-option-${width}.png`);
   }
   await send("Emulation.setDeviceMetricsOverride",{width:1280,height:900,deviceScaleFactor:1,mobile:false});
   // A synthetic account/session is confined to this temporary test database; no passkey UI is bypassed in the application.
@@ -322,27 +322,26 @@ try {
   assert.equal(await evaluate("document.querySelector('.post:not(.hidden-post)').id"),`post-${newest.key.replace('/','-')}`);
   await capture("batch004-topic-desktop.png");
   assert.equal(await evaluate("document.querySelector('#header-logout').textContent"),"Log out");
-  assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+  assert.equal(await evaluate("document.querySelector('.highlight-settings')"),null);
   assert.equal(await evaluate("document.querySelector('.settings-panel').tagName"),'ASIDE');
-  await evaluate("document.querySelector('#setting-flagAssumptions').click()");
-  assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+  for (const key of ['flagAssumptions','highlightNew','showRatings']) assert.equal(await evaluate(`document.querySelector('#setting-${key}')`),null);
   for (const [width,height] of [[1280,900],[390,844]]) {
     await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
-    for (const key of ["flagAssumptions","highlightNew","anonymous","showRatings"]) {
+    for (const key of ["anonymous"]) {
       for (let toggle=0;toggle<2;toggle++) {
         const selector=JSON.stringify(`#setting-${key}`);
         await evaluate(`document.querySelector(${selector}).scrollIntoView({block:'center'}); document.querySelector(${selector}).focus({preventScroll:true})`);
-        const measure=`(()=>{const input=document.querySelector(${selector});const r=input.getBoundingClientRect();return {y:scrollY,panel:document.querySelector('.settings-panel').scrollTop,top:r.top,x:r.x+r.width/2,clickY:r.y+r.height/2,focus:document.activeElement.id,section:document.querySelector('.highlight-settings').tagName,checked:input.checked};})()`;
+        const measure=`(()=>{const input=document.querySelector(${selector});const r=input.getBoundingClientRect();return {y:scrollY,panel:document.querySelector('.settings-panel').scrollTop,top:r.top,x:r.x+r.width/2,clickY:r.y+r.height/2,focus:document.activeElement.id,checked:input.checked};})()`;
         const before=await evaluate(measure);
         assert.ok(before.clickY>0 && before.clickY<height,"Checkbox must be visible for a real click");
-        if(width===1280) assert.ok(before.panel>0,"Exercise the sidebar's internal scroll");
+        if(width===390) assert.ok(before.panel>0,"Exercise the sidebar's internal scroll");
         await send("Input.dispatchMouseEvent",{type:"mousePressed",x:before.x,y:before.clickY,button:"left",clickCount:1});
         await send("Input.dispatchMouseEvent",{type:"mouseReleased",x:before.x,y:before.clickY,button:"left",clickCount:1});
         await delay();
         assert.deepEqual(await evaluate(measure),{...before,checked:!before.checked},`${key} toggle ${toggle} keeps reading context at ${width}px`);
       }
     }
-    await capture(`batch006-highlights-${width}.png`);
+    await capture(`author-toggle-${width}.png`);
   }
   await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
   const expectedPoints=days=>data.topic.points.filter(p=>Date.parse(p.first_at)>Date.parse(data.last_pulled_at??data.snapshot_at)-days*86400000 && Date.parse(p.first_at)<=Date.parse(data.last_pulled_at??data.snapshot_at) && p.cites.some(key=>available.some(post=>post.key===key))).length;
@@ -385,7 +384,7 @@ try {
   await send("Input.dispatchKeyEvent",{type:"keyDown",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
   await send("Input.dispatchKeyEvent",{type:"keyUp",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
   assert.equal(await evaluate("getComputedStyle(document.querySelector('#info-toneBands')).display"),"none");
-  await evaluate("document.querySelector('#setting-toneBands-any').click()");
+  await evaluate("document.querySelector('#setting-toneBands-good').click()");
   await waitFor("document.querySelector('#site-nav').textContent.includes('Profile')");
   await evaluate("document.querySelector('#setting-toneBands-bad').focus(); document.querySelector('#setting-toneBands-bad').click()");
   assert.equal(await evaluate("document.activeElement.id === 'setting-toneBands-bad'"),true);
@@ -499,7 +498,7 @@ try {
   await evaluate(`document.querySelector(${JSON.stringify(postSelector)}).scrollIntoView()`);
   assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
   await capture("batch004-post-mobile.png");
-  assert.equal(await evaluate("(()=>{const button=document.querySelector('.next-post'),r=button.getBoundingClientRect();return r.top>=document.querySelector('.site-header').getBoundingClientRect().bottom&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===button})()"),true,'Signed-in mobile header does not cover Next post');
+  assert.equal(await evaluate("(()=>{const button=document.querySelector('.next-post'),r=button.getBoundingClientRect();return r.top>=document.querySelector('.site-header').getBoundingClientRect().bottom&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===button})()"),true,'Signed-in mobile header does not cover Next post');
   assert.deepEqual(errors,[]);
   {
     // Retain native keyboard verification separately from scripted click coverage.

@@ -22,9 +22,9 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
     await capture(`summary-usability-${width}.png`);
     await evaluate("document.querySelector('.explore-arguments').click()");
     assert.equal(await evaluate("document.querySelector('.question-summary').open && [...document.querySelectorAll('.question-card,.question-arguments')].every(node=>node.open)"), true);
-    await evaluate("document.querySelector('#setting-highlightNew').click()");
+    await evaluate("document.querySelector('#setting-anonymous').click()");
     assert.equal(await evaluate("document.querySelector('.question-summary').open && [...document.querySelectorAll('.question-card,.question-arguments')].every(node=>node.open)"), true, 'Open arguments survive a settings redraw');
-    await evaluate("document.querySelector('#setting-highlightNew').click(); document.querySelector('.question-summary > summary').click(); document.querySelector('.selection-bar > summary').click()");
+    await evaluate("document.querySelector('#setting-anonymous').click(); document.querySelector('.question-summary > summary').click(); document.querySelector('.selection-bar > summary').click()");
     for (const theme of ['light','dark']) {
       await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}; ${clear}.click()`);
       const inactive = await evaluate(`getComputedStyle(${all}).backgroundColor`);

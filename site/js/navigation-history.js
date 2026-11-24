@@ -1,4 +1,4 @@
-import { parseSettings } from './logic.js';
+import { migrateSettings } from './logic.js';
 
 const KEY = 'zforum.navigation.v1';
 const sets = ['revealed','shownFiltered','collapsed','selected'];
@@ -29,7 +29,7 @@ export function restoreReader(state, reader) {
 export function parseNavigationView(view) {
   const fail = () => { throw new Error('Invalid saved navigation state'); };
   if (!keysEqual(view,['hash','release','visibilityPending','position','settings','directory','reader']) || typeof view.hash !== 'string' || !(view.hash === '' || view.hash.startsWith('#/')) || !(view.release === null || typeof view.release === 'string') || typeof view.visibilityPending !== 'boolean') fail();
-  parseSettings(JSON.stringify(view.settings));
+  view.settings = migrateSettings(view.settings);
   if (!keysEqual(view.directory,['query','sort']) || typeof view.directory.query !== 'string' || !['recent','posts'].includes(view.directory.sort)) fail();
   const p = view.position;
   if (!keysEqual(p,['x','y','panelScroll','focusedPost','focusedId','details','posts']) || ![p.x,p.y].every(Number.isFinite) || !(p.panelScroll === null || Number.isFinite(p.panelScroll)) || ![p.focusedPost,p.focusedId].every(id => id === null || typeof id === 'string') || !details(p.details) || !Array.isArray(p.posts) || !p.posts.every(post => keysEqual(post,['id','details']) && typeof post.id === 'string' && details(post.details))) fail();
