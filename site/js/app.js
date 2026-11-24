@@ -162,7 +162,7 @@ const state = {
   account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, sign_in_reason: null, sign_in_return: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
   shownFiltered: new Set(),
-  open: { summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+  open: { summary: true, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
@@ -488,7 +488,7 @@ async function navigate({ restoreOnly = false } = {}) {
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
     state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.collapsed.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
-    state.open = { summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+    state.open = { summary: true, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
     }
     if (returnView !== null && returnView.release === data.release_id && returnView.visibilityPending === (data.visibility_pending === true)) restoreReader(state, returnView.reader);
   }

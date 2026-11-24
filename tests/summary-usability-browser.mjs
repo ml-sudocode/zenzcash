@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 
 export async function checkSummaryUsability({ send, evaluate, waitFor, capture }) {
+  const checkPairLayout = async width => {
+    assert.equal(await evaluate(`(()=>{const rows=[...document.querySelectorAll('.question-row')];return rows.length>0&&rows.every(row=>{const q=row.querySelector('.question-card').getBoundingClientRect(),a=row.querySelector('.main-arguments').getBoundingClientRect(),positions=row.querySelector('.question-positions').getBoundingClientRect();return q.width>0&&positions.height>0&&row.scrollWidth<=row.clientWidth&&(${width>=1100?'Math.abs(q.top-a.top)<2&&a.left>=q.right':'a.top>=q.bottom&&Math.abs(a.left-q.left)<2'});})})()`),true,`Each question stays visibly paired with its arguments at ${width}px`);
+  };
   const button = label => `[...document.querySelectorAll('.selection-bar button')].find(button=>button.textContent===${JSON.stringify(label)})`;
   const all = button('Select all in this topic');
   const clear = button('Clear selection');
@@ -8,7 +11,7 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
     await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', {url:`${await evaluate('location.origin')}/?summary-usability=${width}#/topic/zcg`});
     await waitFor("document.querySelector('.explore-arguments') !== null");
-    assert.equal(await evaluate("document.querySelector('.question-summary').open"), false);
+    assert.equal(await evaluate("document.querySelector('.question-summary').open"), true);
     assert.equal(await evaluate("document.querySelectorAll('.citation-legend li').length"), 4);
     assert.equal(await evaluate("document.querySelector('#setting-showReframing')"), null);
     assert.equal(await evaluate("document.body.textContent.includes('View AI note on reframing')"), false);
@@ -20,10 +23,14 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
       });
     })()`), true, 'Help icons share the label row');
     await capture(`summary-usability-${width}.png`);
-    await evaluate("document.querySelector('.explore-arguments').click()");
-    assert.equal(await evaluate("document.querySelector('.question-summary').open && [...document.querySelectorAll('.question-card,.question-arguments')].every(node=>node.open)"), true);
+    await evaluate("document.querySelector('.question-summary > summary').click(); document.querySelector('.explore-arguments').click()");
+    assert.equal(await evaluate("document.querySelector('.question-summary').open && [...document.querySelectorAll('.question-card,.question-arguments')].every(node=>!node.open)"), true);
+    await checkPairLayout(width);
+    await evaluate("document.querySelector('.question-row').scrollIntoView({block:'start',behavior:'instant'})");
+    await capture(`summary-pairs-${width}.png`);
+    await evaluate("document.querySelector('.question-card > summary').click(); document.querySelector('.question-arguments > summary').click()");
     await evaluate("document.querySelector('#setting-anonymous').click()");
-    assert.equal(await evaluate("document.querySelector('.question-summary').open && [...document.querySelectorAll('.question-card,.question-arguments')].every(node=>node.open)"), true, 'Open arguments survive a settings redraw');
+    assert.equal(await evaluate("document.querySelector('.question-summary').open && document.querySelector('.question-card').open && document.querySelector('.question-arguments').open"), true, 'Open question context and evidence survive a settings redraw');
     await evaluate("document.querySelector('#setting-anonymous').click(); document.querySelector('.question-summary > summary').click(); document.querySelector('.selection-bar > summary').click()");
     for (const theme of ['light','dark']) {
       await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}; ${clear}.click()`);
@@ -86,5 +93,11 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
   assert.equal(await evaluate('scrollY'), helpY, 'Login return also preserves position on other pages');
   await evaluate("location.hash='#/topic/zcg'");
   await waitFor("document.querySelector('.settings-panel') !== null");
+  await evaluate("document.querySelector('.explore-arguments').click()");
+  for(const width of [1280,1100,1099,800,390,320]) {
+    await send('Emulation.setDeviceMetricsOverride', { width,height:900,deviceScaleFactor:1,mobile:false });
+    await checkPairLayout(width);
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+  }
   await send('Emulation.setDeviceMetricsOverride', { width:1280,height:900,deviceScaleFactor:1,mobile:false });
 }

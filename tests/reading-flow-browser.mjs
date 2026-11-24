@@ -32,8 +32,8 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
       assert.equal(await evaluate("document.querySelectorAll('.compact-post').length"),0);
     }
     assert.equal(await evaluate("[...document.querySelectorAll('.post:not(.compact-post)')].every(post=>{const avatar=post.querySelector('.avatar'),badge=post.querySelector('.age-badge'),relative=post.querySelector('.post-relative-date');return avatar&&badge&&relative&&getComputedStyle(avatar).borderRadius==='50%'&&avatar.getBoundingClientRect().width===44&&getComputedStyle(badge).display!=='none'&&relative.textContent.length>0})"),true,'Author context stays visible on desktop and mobile');
-    assert.equal(await evaluate("document.querySelector('.question-summary').open"),false,'Main questions start collapsed');
-    assert.equal(await evaluate("document.querySelector('.question-summary > summary').textContent"),'Explore the main questions');
+    assert.equal(await evaluate("document.querySelector('.question-summary').open"),true,'Question and argument summaries start visible');
+    assert.equal(await evaluate("document.querySelector('.question-summary > summary').textContent"),'Main questions and arguments');
     await evaluate("document.querySelector('.topic-summary .cite').scrollIntoView({block:'center'}); document.querySelector('.topic-summary .cite').focus({preventScroll:true})");
     const before = await evaluate("({y:scrollY,href:document.activeElement.href})");
     await mouse('.topic-summary .cite');

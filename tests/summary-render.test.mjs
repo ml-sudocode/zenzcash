@@ -25,7 +25,7 @@ function setup(t) {
     threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread", url:'https://forum.example/t/thread/7' }])),
     letterOf: new Map(ids.map((id, index) => [id, String.fromCharCode(65 + index)])),
     news: { points: ["p17"] }, transform: (text) => text,
-    state: { data:{topic:{id:'zcg'}}, settings: { highlightNew: true, anonymous:false }, open: { summary:false, questions: new Set(), arguments: new Set() } },
+    state: { data:{topic:{id:'zcg'}}, settings: { highlightNew: true, anonymous:false }, open: { summary:true, questions: new Set(), arguments: new Set() } },
     actions: {
       setOpen(kind, id, open) { if (kind==='summary')view.state.open.summary=open;else if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
       openPost(key) { opened.push(key); },
@@ -34,12 +34,22 @@ function setup(t) {
   return { topic, view, opened };
 }
 
-test("initial summary exposes six native disclosures, with all details inside their own cards", (t) => {
+test("paired summary exposes each question and its positions while keeping supporting detail collapsed", (t) => {
   const { topic, view } = setup(t);
   const root = questionCards(topic, view);
   assert.equal(root.tag,'details');
-  assert.equal(root.open,false);
-  assert.equal(root.children[0].textContent,'Explore the main questions');
+  assert.equal(root.open,true);
+  assert.equal(root.children[0].textContent,'Main questions and arguments');
+  assert.equal(nodes(root,'question-row').length,topic.issues.length);
+  for(const [index,row] of nodes(root,'question-row').entries()) {
+    assert.equal(row.children[0].className,'question-card');
+    assert.equal(row.children[1].className,'main-arguments');
+    const positions=nodes(row,'question-positions')[0];
+    assert.equal(positions.parentNode,row.children[1]);
+    assert.deepEqual(positions.children.filter(node=>node.tag==='dt').map(node=>node.textContent),topic.issues[index].positions_with_post_references.map(position=>position.label));
+    assert.deepEqual(positions.children.filter(node=>node.tag==='dd').map(node=>nodes(node,'cite').map(cite=>cite.attributes.get('href'))),topic.issues[index].positions_with_post_references.map(position=>position.cites.map(key=>`#/topic/zcg/post/${key}`)));
+    assert.equal(nodes(row,'question-arguments')[0].children[0].textContent,'Supporting points and evidence');
+  }
   assert.equal(nodes(root, "question-card").length, 6);
   assert.deepEqual(nodes(root, "question-card").map((card) => [card.tag, card.open, card.children[0].tag]), Array.from({ length: 6 }, () => ["details", false, "summary"]));
   assert.deepEqual(nodes(root, "question-description").map((node) => node.children[0].textContent), topic.issues.map((issue) => issue.description.text));
@@ -69,17 +79,18 @@ test("Next opens and focuses each next heading without closing other questions",
   }
 });
 
-test('summary action exposes every question and its arguments in one click', t => {
+test('summary action exposes the paired overview without expanding detailed analysis', t => {
   const { topic, view } = setup(t);
+  view.state.open.summary=false;
   const root = questionCards(topic, view);
-  const button = exploreArguments(topic, view, root);
+  const button = exploreArguments(view, root);
   assert.equal(button.attributes.get('aria-controls'), root.id);
   click(button);
   assert.equal(root.open, true);
   assert.equal(view.state.open.summary, true);
-  for (const kind of ['questions', 'arguments']) assert.deepEqual([...view.state.open[kind]], topic.issues.map(issue => issue.id));
-  assert.deepEqual(nodes(root, 'question-card').map(card => card.open), topic.issues.map(() => true));
-  assert.deepEqual(nodes(root, 'question-arguments').map(card => card.open), topic.issues.map(() => true));
+  for (const kind of ['questions', 'arguments']) assert.deepEqual([...view.state.open[kind]], []);
+  assert.deepEqual(nodes(root, 'question-card').map(card => card.open), topic.issues.map(() => false));
+  assert.deepEqual(nodes(root, 'question-arguments').map(card => card.open), topic.issues.map(() => false));
   assert.equal(document.activeElement, root.children[0]);
   assert.deepEqual(root.children[0].scrollOptions, { block: 'start', behavior: 'instant' });
 });
@@ -120,7 +131,7 @@ test("related questions, sources and retained disclosure state use the existing 
   const first = findId(root, "question-q1");
   first.open = true;
   first.dispatchEvent(new Event("toggle"));
-  const detail = nodes(first, "question-arguments")[0];
+  const detail = nodes(root, "question-arguments")[0];
   detail.open = true;
   detail.dispatchEvent(new Event("toggle"));
   click(nodes(first, "related-questions")[0].children[1]);
@@ -134,7 +145,7 @@ test("related questions, sources and retained disclosure state use the existing 
   root = questionCards(topic, view);
   assert.equal(root.open,true);
   assert.equal(findId(root, "question-q1").open, true);
-  assert.equal(nodes(findId(root, "question-q1"), "question-arguments")[0].open, true);
+  assert.equal(nodes(root, "question-arguments")[0].open, true);
   // A queued event from a detached old tree cannot overwrite current state.
   first.isConnected = false;
   first.open = false;

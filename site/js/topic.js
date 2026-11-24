@@ -113,7 +113,7 @@ export function renderTopic(data, state, actions) {
     h("div", { class: "reading-layout" }, h("div", { class: "reading-content" },
       h("section", { class: "topic-summary card" }, h("h2", {}, "Topic summary"), orientation(topic, view),
         citationLegend(),
-        h("div", { class: "summary-actions" }, exploreArguments(topic, view, questions), h("button", { class: "linkish small", on: { click: () => actions.listenOverview() } }, "Listen to summary"),
+        h("div", { class: "summary-actions" }, exploreArguments(view, questions), h("button", { class: "linkish small", on: { click: () => actions.listenOverview() } }, "Listen to summary"),
           h("button", { class: "linkish small", on: { click: () => document.getElementById('discussion').scrollIntoView({block:'start',behavior:'instant'}) } }, "Read posts ↓")),
         questions),
       whatsNewSummary(topic, view, data),

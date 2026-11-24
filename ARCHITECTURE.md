@@ -150,9 +150,14 @@ tenure together until the reader reveals that author. Topic-list metadata lives
 below the description, including counts, dates, account statistics and tags.
 Version selection uses labeled tabs and a subtle blue rewrite background without
 vertical rails; originals use the normal post background. Mixed-thread views name
-each post's source thread. Explore the main questions is collapsed by default;
-its disclosure state survives control changes. A visible Explore the arguments
-action opens all question and argument disclosures in one step. A legend explains
+each post's source thread. Main questions and arguments start visible in paired
+rows: question/context left and short attributed positions right at 1100px and
+wider; each question stacks immediately above its arguments on narrower screens.
+The whole overview can collapse, and each question's context and supporting
+evidence expand separately. Disclosure state survives control changes and Back.
+Explore the arguments opens/scrolls to the concise overview without expanding
+every detailed analysis. All published question fields, points and citations
+remain available. A legend explains
 that source-tag colors represent AI-rated original-post tone, not truth or argument
 quality. It uses the filter names Good (restrained), Moderate (pointed) and Bad
 (adversarial or attacking). Both source colors and tone filtering use the same
@@ -167,6 +172,9 @@ empty, narrower choices remain selected, and old empty groups become unrestricte
 Account preferences and history snapshots migrate through the same settings parser.
 Hide author names is the sole identity/display toggle in the sidebar; existing
 assumption/newness/feedback display preferences and post features remain intact.
+Clicking a help icon again explicitly dismisses both its pinned and hover/focus
+preview, including while the pointer or focus remains on the icon. A fresh hover,
+focus or click can reopen it; Escape dismisses it too.
 Bulk-selection
 buttons distinguish empty, partial and full selection. Each browser history entry
 retains its page position, filters, loaded post batches, text versions, open
@@ -217,3 +225,18 @@ The baseline immediately before Previous/Next and simplified filters is source
 Saved topics and general history restoration. The same v8-to-v7 preference
 conversion above is required before using that image; no database schema change
 is involved in this UI update.
+
+The image `zenzcash-sandlab:before-summary-pairs-20261124` retains settings v8,
+Previous/Next and simplified filters; it predates the paired summary and help-icon
+fix. It can replace the current image without a database/preference conversion.
+For a rollback of just the paired layout while retaining the help-icon fix, use
+source `c389727` or image `zenzcash-sandlab:before-paired-layout-20261124`.
+
+Browser UI checks run with `node tests/browser.mjs` after the normal build/check
+gate. The runner uses Chrome and delegates reading layout/navigation checks to
+`tests/reading-flow-browser.mjs`, summary/disclosure/selection checks to
+`tests/summary-usability-browser.mjs`, and mouse/touch/keyboard help dismissal to
+`tests/filter-info-browser.mjs`. `node tests/browser.mjs --saved-history` checks
+Saved and full browser-history restoration. The scripts assert explicit behavior
+and geometry at desktop/phone viewport sizes and save `work/screenshots` for
+separate visual inspection; they do not automatically judge overall design quality.

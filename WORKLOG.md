@@ -6440,3 +6440,26 @@ Implementation in progress; user verification remains pending.
   underlying options. Inspected the closed phone-help screenshot. Evidence:
   work/filter-help-unit.log, work/filter-help-browser.log and
   work/screenshots/filter-help-closed-{1280,390}.png. Staging deployment follows.
+  Deployed c389727 and verified HTTPS mouse/touch/keyboard dismissal at
+  2026-11-24T03:17:59Z. The app remains healthy and Basic Auth protected. Security
+  review found no new issues; commit identity/signing match configuration.
+
+- **F-275 — Paired question and argument overview.**
+  Existing question descriptions and attributed positions now form paired rows.
+  At 1100px and wider, question/context is left and arguments are right; narrower
+  layouts place each question immediately before its arguments. The concise
+  overview starts open on fresh topic visits and remains collapsible. Context
+  and supporting points/evidence retain separate native disclosures and stored
+  state; source citations, related/next-question navigation and every existing
+  detail field remain available. Explore the arguments opens the overview without
+  expanding all supporting analysis. No content regeneration or database change.
+  Full gate passes (64 Rust, 270 Node, builds/clippy); focused render checks and
+  broad browser regression pass. Geometry assertions include 1280/1100/1099/800/
+  390/320px with visible arguments, pairing, internal and page overflow checks.
+  Inspected desktop and phone screenshots. Help toggling remains covered with
+  actual mouse/touch/keyboard events. Evidence: work/summary-pairs-gate.log,
+  work/summary-pairs-focused.log, work/summary-pairs-browser-final.log and
+  work/screenshots/summary-pairs-{1280,390}.png.
+  ARCHITECTURE now describes the layout and where browser checks are specified.
+  Preserved c389727's deployed image as before-paired-layout-20261124 for rollback
+  while retaining the help fix and settings v8. Final staging verification follows.
