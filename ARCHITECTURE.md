@@ -96,7 +96,7 @@ on stdin, update the root-owned file on the host, then recreate the proxy with
 Recreation also refreshes the bind mount if the file was replaced atomically.
 
 Initialize from a verified local backup using Node 22.13+ (or Node 24). The seed
-tool only accepts schema 11, checks the supplied SHA-256, removes accounts and
+tool accepts schemas 11 and 12, checks the supplied SHA-256, removes accounts and
 personal/history records, compacts deleted data, and refuses existing targets:
 
 ```sh
@@ -158,9 +158,12 @@ quality. What's new filters stored points by the first listed citation's post da
 later replies can increase post counts without making an existing point new.
 Hidden-age profiles are included in fresh settings; explicit saved exclusions
 remain honored. Filter labels and help icons share compact rows. Bulk-selection
-buttons distinguish empty, partial and full selection. Login detours preserve
-scroll position, open post details and sidebar scroll when returning to the same
-published topic. Standalone reframing notes and their toggle are removed; the raw
+buttons distinguish empty, partial and full selection. Each browser history entry
+retains its page position, filters, loaded post batches, text versions, open
+details and sidebar scroll. Tab-scoped session storage preserves these through
+reloads and leaving the site; snapshots contain UI state, not credentials or
+account responses. Topic restoration requires the same published release and
+visibility state. Standalone reframing notes and their toggle are removed; the raw
 assessment and stored preference field remain part of the existing data contract.
 Reading controls keep a minimum
 240px sidebar above phone widths, with an open pinned panel at 700px and below.
@@ -169,14 +172,26 @@ height and the controls panel, including signed-in layouts.
 Stored citations remain attached to their supported claim units; no historical
 analysis was regenerated for this layout change.
 
-To restore the pre-redesign staging UI without changing accounts, certificates or
-Basic Auth, use the preserved local image (do not add `--build`):
+Saved contains separate topic and post lists. Save topic appears beside the topic
+title; both types of bookmark belong to the signed-in account and persist across
+devices. Schema 12 adds `saved_topics` with account-cascade deletion, independently
+of post reading state. `PUT /api/account/topics/{topic}` accepts only `{saved:
+boolean}` under the existing session, CSRF and origin checks. Each account may
+save up to 1000 topics; unavailable topics can still be removed from Saved.
+
+Before the schema-12 migration, create a server-local backup with the app's
+`backup --db /data/zforum.sqlite --to /data/UNIQUE_NAME.sqlite` command. Old
+schema-11 images cannot open the migrated database. To roll back the Saved and
+general-navigation UI while retaining accounts and saved data, use the preserved
+schema-12-compatible image from backend revision `cd21511` (do not add `--build`):
 
 ```sh
-docker tag zenzcash-sandlab:before-content-first-20261123 zenzcash-sandlab:dev
+docker tag zenzcash-sandlab:before-saved-navigation-20261124 zenzcash-sandlab:dev
 docker compose -f compose.sandlab.yaml up -d --no-build --force-recreate --wait app
 ```
 
-The next build from `sandlab-content-first` restores the redesign. For a source
-rollback, switch the clean staging checkout to `sandlab` and rebuild the app.
-Keep the rollback image until the redesign has been reviewed.
+The next build from `sandlab-content-first` restores the current UI. For a source
+rollback of these UI changes, build revision `cd21511`. Do not rebuild `sandlab`
+or use the older pre-redesign image against schema 12; those require a separate
+restore of the pre-migration backup and would discard subsequent account changes.
+Keep the compatible rollback image until the changes have been reviewed.

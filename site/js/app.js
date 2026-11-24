@@ -18,6 +18,8 @@ import { passkeyRequest } from "./passkey-request.js";
 import { ReadingHistory } from "./reading-history.js";
 import { closeCitationPreview } from "./citation-preview.js";
 import { captureReadingPosition, restoreReadingPosition } from './reading-return.js';
+import { savedItems } from './saved.js';
+import { NavigationHistory, captureReader, restoreReader } from './navigation-history.js';
 
 const SETTINGS_KEY = "zforum.design.settings.v7";
 const LAST_VISIT_KEY = "zforum.visit.v2";
@@ -36,9 +38,7 @@ new ResizeObserver(syncHeaderHeight).observe(header);
 // Hash navigation is rendered here, so browser history must not also restore scroll.
 history.scrollRestoration = "manual";
 let renderedHash = null;
-let directoryPosition = { x: 0, y: 0, focusedId: "" };
 let navigationSequence = 0;
-let readingReturn = null;
 const listening = document.createElement("aside");
 document.body.append(listening);
 const companion = document.createElement("aside");
@@ -175,6 +175,20 @@ const state = {
 };
 
 const threadOfPost = (key) => state.data.topic.threads.find((thread) => thread.posts.some((post) => post.key === key));
+const navigationHistory = new NavigationHistory(history, {
+  getItem: key => sessionStorage.getItem(key), setItem: (key,value) => sessionStorage.setItem(key,value),
+}, problem => { state.settingsProblem = problem; });
+function rememberPage() {
+  if (renderedHash === null || navigationHistory.currentHash !== renderedHash) return;
+  navigationHistory.remember({ hash: renderedHash,
+    release: main.querySelector('.topic') === null ? null : state.data.release_id,
+    visibilityPending: state.data?.visibility_pending === true,
+    position: captureReadingPosition(main), settings: state.settings,
+    directory: state.directory, reader: captureReader(state),
+  });
+}
+window.addEventListener('pagehide', () => { if (renderedHash === location.hash && !state.contentUnavailable) rememberPage(); });
+window.addEventListener('pageshow', event => { if (event.persisted) void navigate({ restoreOnly: true }); });
 
 const actions = {
   openAccount(reason = "choose your Zamagotchi") {
@@ -323,20 +337,22 @@ function animateCompanion() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   companion.querySelector(".companion-creature")?.animate([{ rotate: "0deg", translate: "0 0" }, { rotate: "-12deg", translate: "0 -4px" }, { rotate: "12deg", translate: "0 -4px" }, { rotate: "-8deg", translate: "0 0" }, { rotate: "0deg", translate: "0 0" }], { duration: 650 });
 }
-function savedPosts() {
-  if (!state.account.personal) return null;
-  const selected = Object.entries(state.account.personal.reading).filter(([,entry]) => entry.bookmarked);
-  return h("section", { class: "saved-posts card" }, h("h1", {}, `Saved posts (${selected.length})`),
-    selected.length ? h("ul", {}, selected.map(([key]) => {
-      const data = state.catalog.topics.find((data) => data.topic.threads.some((thread) => String(thread.id) === key.split('/')[0]));
-      return h("li", {}, data ? h("a", { href: postRoute(data.topic.id, key) }, `${key} · ${data.topic.card.title}`) : `${key} · unavailable`,
-        h("button", { class: "chip", on: { click: () => actions.setReading(key, { bookmarked: false }) } }, "Remove bookmark"));
-    })) : h("p", {}, "Use Save post on any available post."),
-    state.readingHistory.bookmarksNext !== null ? h("button", { class: "chip", on: { click: async () => {
-      try { await state.readingHistory.loadBookmarks(); render({ keepScroll: true }); }
-      catch (error) { state.account.problem = error.message; render({ keepScroll: true }); }
-    } } }, "Load more saved posts") : null);
-}
+actions.loadSavedPosts = async () => {
+  try { await state.readingHistory.loadBookmarks(); render({ keepScroll: true }); }
+  catch (error) { state.account.problem = error.message; render({ keepScroll: true }); }
+};
+actions.saveTopic = async (topic, saved) => {
+  const session = state.account.csrf;
+  try {
+    const result = await inOrder(`topic ${topic}`, () => putJson(`api/account/topics/${encodeURIComponent(topic)}`, { saved }, 'saving topic'));
+    if (result.topic !== topic || result.saved !== saved || Object.keys(result).sort().join(',') !== 'saved,topic') throw new Error(`Invalid saved topic response for ${topic}`);
+    if (state.account.csrf !== session) return;
+    const topics = new Set(state.account.personal.saved_topics);
+    if (saved) topics.add(topic); else topics.delete(topic);
+    state.account.personal.saved_topics = [...topics].sort();
+    render({ keepScroll: true });
+  } catch (error) { state.account.problem = error.message; render({ keepScroll: true }); }
+};
 function saveCodes() {
   const text = `Zenzcash recovery codes for ${location.origin}\nEach code works once. Keep these private.\n\n${state.account.recovery_codes.join("\n")}\n`;
   const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
@@ -421,11 +437,9 @@ function render({ keepScroll }) {
   disposePostStream();
   const samePage = renderedHash === location.hash;
   const preserve = keepScroll && samePage;
-  const scroll = { x: window.scrollX, y: window.scrollY };
-  const panelScroll = preserve ? document.querySelector(".settings-panel")?.scrollTop : undefined;
+  const readingPosition = preserve ? captureReadingPosition(main) : null;
   const focused = document.activeElement;
-  const returningToDirectory = !samePage && location.hash === "#/topics";
-  const focusedId = preserve ? focused.id : returningToDirectory ? directoryPosition.focusedId : "";
+  const focusedId = preserve ? focused.id : "";
   const selection = focusedId === "topic-search" ? [focused.selectionStart, focused.selectionEnd] : null;
   const route = catalogRoute(location.hash, state.catalog);
   let page;
@@ -433,32 +447,30 @@ function render({ keepScroll }) {
   else if (route.kind === "topics") page = renderTopics(state.catalog, state.settings, actions, state.curation, state.directory);
   else if (route.kind === "how-to-use") page = renderHowToUse();
   else if (route.kind === "profile") page = accountPanel(state.account, personalActions, passkeys.state);
-  else if (route.kind === "saved") page = savedPosts() ?? accountPanel(state.account, personalActions, passkeys.state);
+  else if (route.kind === "saved") page = savedItems(state, actions) ?? accountPanel(state.account, personalActions, passkeys.state);
   else if (route.kind === "topic" && state.data?.topic.id === route.data.topic.id && (route.post === null || topicRoute(postRoute(state.data.topic.id, route.post), state.data.topic).kind === 'topic')) page = renderTopic(state.data, state, actions);
   else if (route.kind === "unavailable") page = h("p", { class: "notice" }, "This topic is temporarily unavailable while forum visibility changes are reviewed. ", h("a", {href:"#/"}, "Back to all topics"));
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), state.account.problem && route.kind !== "profile" ? h("p", { class: "notice" }, state.account.problem) : null, page]);
-  const nav = [["#/", "Home"], ["#/topics", "Topics"], ["#/how-to-use", "How to use"], ...(state.account.authenticated ? [["#/profile", "Profile"], ["#/saved", "Saved Posts"]] : [["#/profile", "Sign in"]])];
+  const nav = [["#/", "Home"], ["#/topics", "Topics"], ["#/how-to-use", "How to use"], ...(state.account.authenticated ? [["#/profile", "Profile"], ["#/saved", "Saved"]] : [["#/profile", "Sign in"]])];
   replaceContent(document.getElementById("site-nav"), [nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)), state.account.authenticated ? h("button", { id: "header-logout", class: "linkish", disabled: passkeys.state.phase !== "idle", on: { click: () => personalActions.control("logout").catch((error) => { state.account.problem = error.message; render({ keepScroll: true }); }) } }, "Log out") : null]);
   updateCompanion();
-  if (panelScroll !== undefined) document.querySelector(".settings-panel").scrollTop = panelScroll;
+  if (readingPosition !== null) restoreReadingPosition(main, readingPosition);
+  else window.scrollTo(0,0);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
   if (selection) document.getElementById(focusedId)?.setSelectionRange(...selection);
-  const position = preserve ? scroll : returningToDirectory ? directoryPosition : { x: 0, y: 0 };
-  window.scrollTo(position.x, position.y);
   renderedHash = location.hash;
 }
 
-async function navigate() {
+async function navigate({ restoreOnly = false } = {}) {
   closeCitationPreview();
   const sequence = ++navigationSequence;
   const requestedHash = location.hash;
-  if (renderedHash !== null && !['#/profile', '#/saved'].includes(renderedHash) && ['#/profile', '#/saved'].includes(requestedHash)) {
-    readingReturn = { hash: renderedHash, release: main.querySelector('.topic') === null ? null : state.data.release_id, position: captureReadingPosition(main) };
-  }
-  if (renderedHash === '#/topics' && requestedHash !== renderedHash) {
-    directoryPosition = { x: window.scrollX, y: window.scrollY, focusedId: document.activeElement.closest('.topic-card')?.id ?? '' };
-  }
+  if (!restoreOnly) rememberPage();
+  const returningFromAccount = ['#/profile', '#/saved'].includes(renderedHash);
+  const returnView = navigationHistory.enter(requestedHash)
+    ?? (requestedHash === '#/topics' || returningFromAccount ? navigationHistory.last(requestedHash) : null);
+  if (returnView !== null) { state.settings = returnView.settings; state.directory = returnView.directory; }
   passkeys.cancel();
   const route = catalogRoute(location.hash, state.catalog);
   state.contentUnavailable = route.kind === "unavailable";
@@ -478,17 +490,19 @@ async function navigate() {
     state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.collapsed.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
     state.open = { summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
     }
+    if (returnView !== null && returnView.release === data.release_id && returnView.visibilityPending === (data.visibility_pending === true)) restoreReader(state, returnView.reader);
   }
   try {
     if (state.readingHistory && route.kind === "topic") await state.readingHistory.loadTopic(route.data.topic.id);
-    if (state.readingHistory && route.kind === "saved" && !state.readingHistory.bookmarksLoaded) await state.readingHistory.loadBookmarks();
+    if (state.readingHistory && route.kind === 'saved') {
+      while (state.readingHistory.bookmarksNext !== null && state.readingHistory.bookmarkPages < Math.max(1,returnView?.reader.savedPages ?? 1)) await state.readingHistory.loadBookmarks();
+    }
   } catch (error) { if (sequence === navigationSequence) replaceContent(main, h("p", { class: "notice" }, error.message)); return; }
   if (route.kind === 'topic') await refreshAnswers();
   if (sequence !== navigationSequence || location.hash !== requestedHash) return;
-  if (readingReturn?.hash === requestedHash && (route.kind !== 'topic' || readingReturn.release === state.data.release_id)) {
+  if (returnView !== null && (route.kind !== 'topic' || returnView.release === state.data.release_id && returnView.visibilityPending === (state.data.visibility_pending === true))) {
     render({ keepScroll: false });
-    restoreReadingPosition(main, readingReturn.position);
-    readingReturn = null;
+    restoreReadingPosition(main, returnView.position);
   }
   else if (route.kind === "topic" && route.post !== null && topicRoute(postRoute(state.data.topic.id, route.post), state.data.topic).kind === 'topic') actions.openPost(route.post);
   else render({ keepScroll: false });

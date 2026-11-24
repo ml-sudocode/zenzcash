@@ -15,7 +15,7 @@ test('login return retains matching disclosure states when saved account prefere
   globalThis.document = { activeElement: { closest: selector => { assert.equal(selector,'.post'); return post; } }, getElementById: id => { assert.equal(id,post.id); return post; } };
   globalThis.window = { scrollX:0, scrollY:3456, scrollTo:(...args) => scrollCalls.push(args) };
   const saved = captureReadingPosition(root);
-  assert.deepEqual(saved, { x:0,y:3456,panelScroll:73,focusedPost:'post-7-1',details:[],posts:[{id:'post-7-1',details:[{label:'Give feedback',open:true},{label:'Disputed assumption',open:false},{label:'Disputed assumption',open:true},{label:'AI analysis and sources',open:true}]}] });
+  assert.deepEqual(saved, { x:0,y:3456,panelScroll:73,focusedPost:'post-7-1',focusedId:null,details:[],posts:[{id:'post-7-1',details:[{label:'Give feedback',open:true},{label:'Disputed assumption',open:false},{label:'Disputed assumption',open:true},{label:'AI analysis and sources',open:true}]}] });
   for (const includeNotes of [false,true]) {
     details = includeNotes ? all.map(item => detail(item.querySelector('summary').textContent,false)) : [detail('Give feedback',false),detail('AI analysis and sources',false)];
     panel.scrollTop = 0;

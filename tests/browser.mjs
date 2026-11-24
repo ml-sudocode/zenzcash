@@ -20,6 +20,7 @@ import { corpusData } from './corpus-fixture.mjs';
 import { checkCachedDeployment } from './cached-deployment.mjs';
 import { checkReadingFlow } from './reading-flow-browser.mjs';
 import { checkSummaryUsability } from './summary-usability-browser.mjs';
+import { checkSavedHistory } from './saved-history-browser.mjs';
 import { buildRuntime } from '../tools/build-runtime.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -56,6 +57,7 @@ const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("B
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
 const passkeyMode = process.argv[2] === "--passkeys";
 const catalogMode = process.argv[2] === "--catalog";
+const savedHistoryMode = process.argv[2] === '--saved-history';
 // Test fixtures are explicit; normal server startup must keep an empty DB empty.
 async function publishFixture(file) {
   const directory=join(scratch,'fixture-review'),input=fileReviewInput(file),scan=scanReview(directory,input);
@@ -66,6 +68,20 @@ async function publishFixture(file) {
 const fixtureFile=join(scratch,'zcg.json');
 writeFileSync(fixtureFile,JSON.stringify(corpusData()));
 await publishFixture(fixtureFile);
+if (savedHistoryMode) {
+  const remap = value => {
+    if (typeof value === 'string' && /^[1-9][0-9]*\/[1-9][0-9]*$/.test(value)) { const [thread,post]=value.split('/');return `${Number(thread)+100000}/${post}`; }
+    if (Array.isArray(value)) return value.map(remap);
+    if (value !== null && typeof value === 'object') {
+      const result=Object.fromEntries(Object.entries(value).map(([key,item])=>[key,remap(item)]));
+      if (Array.isArray(value.posts) && Number.isInteger(value.id)) result.id=value.id+100000;
+      return result;
+    }
+    return value;
+  };
+  const other=remap(corpusData());other.topic.id='history-other';other.topic.headline='History test discussion';other.topic.card.title='History test discussion';
+  const file=join(scratch,'history-other.json');writeFileSync(file,JSON.stringify(other));await publishFixture(file);
+}
 if (catalogMode) {
   const [run,candidate]=process.argv.slice(3);
   if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");
@@ -128,6 +144,17 @@ try {
   if (passkeyMode) {
     await checkPasskeys({send, evaluate, waitFor, click, capture, downloads});
     assert.deepEqual(errors, []);
+  } else if (savedHistoryMode) {
+    await checkSavedHistory({send,evaluate,waitFor,capture,authenticate:async()=>{
+      const db=new DatabaseSync(join(scratch,'zforum.sqlite'));
+      const account='11111111-1111-4111-8111-111111111111',token='a'.repeat(64),csrf='b'.repeat(64),now=Math.floor(Date.now()/1000);
+      try {
+        db.prepare("INSERT INTO accounts(id,label,appearance) VALUES(?,?,'cat')").run(account,'Saved history test');
+        db.prepare('INSERT INTO sessions(hash,account,csrf,verified,expires) VALUES(?,?,?,?,?)').run(createHash('sha256').update(token).digest('hex'),account,csrf,now,now+3600);
+      } finally { db.close(); }
+      await send('Storage.setCookies',{cookies:[{name:'zforum_session',value:token,domain:'localhost',path:'/',httpOnly:true,sameSite:'Lax'}]},true);
+    }});
+    assert.deepEqual(errors,[]);
   } else {
   await checkCachedDeployment({send,evaluate,waitFor,capture});
   contentRequests.length=0;
@@ -412,21 +439,21 @@ try {
   await capture("batch004-post-desktop.png");
   await evaluate("location.hash='#/saved'");
   await waitFor("document.querySelector('.saved-posts') !== null");
-  assert.equal(await evaluate("document.querySelector('.saved-posts h1').textContent"),"Saved posts (1)");
+  assert.equal(await evaluate("document.querySelector('.saved-posts h2').textContent"),"Saved posts (1)");
   const historyDb = new DatabaseSync(join(scratch,"zforum.sqlite"));
   historyDb.prepare("WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<220) INSERT INTO reading SELECT ?,'999999/'||x,1,0 FROM n").run(account);
   await send("Page.reload");
-  await waitFor("document.querySelector('.saved-posts h1')?.textContent === 'Saved posts (200)'");
+  await waitFor("document.querySelector('.saved-posts h2')?.textContent === 'Saved posts (200)'");
   assert.equal(await evaluate("document.querySelectorAll('.saved-posts li').length"),200);
   await evaluate("[...document.querySelectorAll('button')].find(n=>n.textContent==='Load more saved posts').scrollIntoView({block:'center'})");
   await capture("reading-history-pagination.png");
   await click("Load more saved posts");
-  await waitFor("document.querySelector('.saved-posts h1')?.textContent === 'Saved posts (221)'");
+  await waitFor("document.querySelector('.saved-posts h2')?.textContent === 'Saved posts (221)'");
   assert.equal(await evaluate("[...document.querySelectorAll('button')].some(n=>n.textContent==='Load more saved posts')"),false);
   historyDb.prepare("DELETE FROM reading WHERE account=? AND post LIKE '999999/%'").run(account);
   historyDb.close();
   await send("Page.reload");
-  await waitFor("document.querySelector('.saved-posts h1')?.textContent === 'Saved posts (1)'");
+  await waitFor("document.querySelector('.saved-posts h2')?.textContent === 'Saved posts (1)'");
   await evaluate("location.hash='#/profile'");
   await waitFor("document.querySelector('.companion-options') !== null");
   assert.equal(await evaluate("document.querySelectorAll('.companion-options button').length"),10);

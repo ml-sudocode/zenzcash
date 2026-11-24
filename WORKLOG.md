@@ -6286,3 +6286,28 @@ Implementation in progress; user verification remains pending.
   staging privacy. Evidence: work/saved-history-gate.log. Keep this backend
   revision as a schema-12-compatible UI rollback baseline; older schema-11
   images cannot open the migrated database. Back up staging before deployment.
+  Backend commit cd21511 security review found no auth bypass, interpolated SQL
+  or committed secrets. Identity/signing match the checkout configuration.
+
+- **F-272 — Unified Saved UI and per-entry browser return state.**
+  Saved now contains distinct topic and post lists with independent removal;
+  topic headings expose Save topic with a clear sign-in route for guests.
+  Browser Back/Forward restores each history entry separately, including repeated
+  visits to the same URL, loaded post batches, chosen versions, filters,
+  disclosures and sidebar position. Tab-scoped session storage preserves UI
+  state through reloads and cross-origin departures; account responses and
+  credentials are excluded. Invalid/unavailable storage produces an explicit
+  notice. Published-release and visibility checks prevent restoring stale topic
+  state. Existing directory and Back to reading links retain their behavior.
+  Full repository gate passes (64 Rust, 265 Node). Broad browser regression and
+  the dedicated Saved/history suite pass, including authenticated save/remove,
+  reload persistence, guest sign-in, topic-to-topic and non-topic navigation,
+  repeated URLs and leaving the site at desktop/phone widths. Older browser tests
+  now create fresh visits where they intentionally require initial pagination;
+  reload preservation is tested independently. Inspected Saved phone layout and
+  restored desktop reading screenshots. Evidence: work/saved-history-gate.log,
+  work/saved-history-regression-browser.log,
+  work/saved-history-browser-final.log and work/screenshots.
+  The backend-only revision cd21511 is the compatible UI rollback baseline;
+  ARCHITECTURE documents migration backup and the preserved rollback image.
+  Deployment and HTTPS verification follow; production remains unchanged.

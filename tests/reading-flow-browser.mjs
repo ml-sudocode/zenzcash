@@ -14,7 +14,7 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
   }
   for (const [width,height] of [[1280,900],[390,844]]) {
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
-    await send('Page.reload');
+    await send('Page.navigate', {url:`${await evaluate('location.origin')}/?reading-flow=${width}#/topic/zcg`});
     await waitFor("document.querySelector('.topic-summary .cite') !== null && document.querySelector('.post-content') !== null");
     assert.equal(await evaluate("[...document.querySelectorAll('.post:not(.compact-post)')].every(post=>{const avatar=post.querySelector('.avatar'),badge=post.querySelector('.age-badge'),relative=post.querySelector('.post-relative-date');return avatar&&badge&&relative&&getComputedStyle(avatar).borderRadius==='50%'&&avatar.getBoundingClientRect().width===44&&getComputedStyle(badge).display!=='none'&&relative.textContent.length>0})"),true,'Author context stays visible on desktop and mobile');
     assert.equal(await evaluate("document.querySelector('.question-summary').open"),false,'Main questions start collapsed');

@@ -6,6 +6,7 @@ import { readingControls } from "./reading-controls.js";
 import { filterInfo } from "./filter-info.js";
 import { cites, citationLegend } from "./citations.js";
 import { orientation, questionCards, exploreArguments } from "./summary.js";
+import { topicSaveButton } from './saved.js';
 export const THREAD_TABS_ID = "thread-tabs";
 
 function sinceRow(view) {
@@ -97,7 +98,8 @@ export function renderTopic(data, state, actions) {
     posts: new Map(allPosts.map(post => [post.key, post])), threadOf: new Map(topic.threads.flatMap(thread => thread.posts.map(post => [post.key, thread]))),
     letterOf: new Map(topic.threads.map((thread, index) => [thread.id, String.fromCharCode(65 + index)])),
     transform: state.settings.anonymous ? text => maskMentions(text, numbers) : text => text, cutoff, pulledAt, news: whatsNew(topic, cutoff, pulledAt) };
-  const heading = h("header", { class: "topic-head" }, h("p", { class: "back" }, h("a", { href: "#/topics" }, "← Topics")), h("h1", {}, topic.headline));
+  const heading = h("header", { class: "topic-head" }, h("p", { class: "back" }, h("a", { href: "#/topics" }, "← Topics")),
+    h('div', { class: 'topic-title-row' }, h("h1", {}, topic.headline), topicSaveButton(topic, state, actions)));
   const sources = h("details", { class: "topic-sources small muted" }, h("summary", {}, `Source threads (${topic.threads.length})`),
     h("ul", { class: "included-threads" }, topic.threads.map(thread => h("li", {},
       h('button', { class: 'linkish', on: { click: () => actions.setThread(thread.id) } }, `${view.letterOf.get(thread.id)} · ${thread.title} (${countLabel(thread.posts.length, 'post')})`),

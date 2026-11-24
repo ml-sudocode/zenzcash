@@ -6,7 +6,7 @@ export async function checkSummaryUsability({ send, evaluate, waitFor, capture }
   const clear = button('Clear selection');
   for (const width of [1280,390]) {
     await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
-    await send('Page.reload');
+    await send('Page.navigate', {url:`${await evaluate('location.origin')}/?summary-usability=${width}#/topic/zcg`});
     await waitFor("document.querySelector('.explore-arguments') !== null");
     assert.equal(await evaluate("document.querySelector('.question-summary').open"), false);
     assert.equal(await evaluate("document.querySelectorAll('.citation-legend li').length"), 4);

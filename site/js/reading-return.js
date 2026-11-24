@@ -1,5 +1,4 @@
-// Login replaces the page DOM, but its loaded posts and reader settings remain
-// in memory. Preserve open post details as well as scroll so their height survives.
+// Preserve disclosure height and focus along with viewport and sidebar position.
 const captureDetails = details => [...details].map(detail => ({ label: detail.querySelector('summary').textContent, open: detail.open }));
 const pageDetails = root => [...root.querySelectorAll('details')].filter(detail => detail.closest('.post') === null);
 function restoreDetails(details, saved) {
@@ -21,11 +20,12 @@ export function captureReadingPosition(root) {
     y: window.scrollY,
     panelScroll: panel === null ? null : panel.scrollTop,
     focusedPost: document.activeElement.closest('.post')?.id ?? null,
+    focusedId: document.activeElement.id || null,
     details: captureDetails(pageDetails(root)),
     posts: [...root.querySelectorAll('.post')].map(post => ({
       id: post.id,
       details: captureDetails(post.querySelectorAll('details')),
-    })),
+    })).filter(post => post.details.some(detail => detail.open)),
   };
 }
 
@@ -38,6 +38,8 @@ export function restoreReadingPosition(root, position) {
   }
   const panel = root.querySelector('.settings-panel');
   if (panel !== null && position.panelScroll !== null) panel.scrollTop = position.panelScroll;
-  if (position.focusedPost !== null) document.getElementById(position.focusedPost)?.focus({ preventScroll: true });
+  const focused = position.focusedId === null ? null : document.getElementById(position.focusedId);
+  if (focused !== null) focused.focus({ preventScroll: true });
+  else if (position.focusedPost !== null) document.getElementById(position.focusedPost)?.focus({ preventScroll: true });
   window.scrollTo(position.x, position.y);
 }

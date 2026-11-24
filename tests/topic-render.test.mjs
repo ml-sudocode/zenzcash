@@ -20,7 +20,7 @@ function fixture(t) {
     data, settings: { ...structuredClone(DEFAULT_SETTINGS), includeHiddenAge: true }, lastVisit: null, thread: 7, shown: new Map([[7, 20]]),
     open: { settings: false, summary: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
     shownFiltered: new Set(), collapsed: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
-    ratings: { status: "ready", posts: {}, mine: {} }, feedback: { status: "ready", mine: {} }, reader: { problem: null },
+    ratings: { status: "ready", posts: {}, mine: {} }, feedback: { status: "ready", mine: {} }, reader: { problem: null }, account: {authenticated:false,personal:null},
   };
   const opened = [];
   const patches = [];

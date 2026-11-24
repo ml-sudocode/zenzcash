@@ -96,6 +96,12 @@ a.topic-card:hover h3, a.topic-card:focus-visible h3 { color: var(--accent); tex
 
 /* Topic page: reading bar (D-47) */
 .back { margin: 0 0 8px; }
+.topic-title-row { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; margin-bottom: 20px; }
+.topic-title-row h1 { flex: 1 1 400px; margin: 0; }
+.topic-title-row .save-topic { flex: 0 0 auto; }
+.saved-page ul { list-style: none; padding: 0; }
+.saved-page li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.saved-page li > a { flex: 1 1 260px; }
 .reading-choice select { display: block; max-width: 100%; width: 100%; font: inherit; padding: 6px; margin-top: 4px; }
 .collapse-all { margin-bottom: 8px; }
 .since-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
