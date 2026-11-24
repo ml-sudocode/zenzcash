@@ -6540,5 +6540,13 @@ Implementation in progress; user verification remains pending.
   failure; the expanded suite passes with a bounded 90-second watchdog, with no
   assertions removed. Evidence: work/compact-topic-{focused,browser,gate}.log and
   work/screenshots/{compact-evidence,rewrite-blue,post-boundaries}-*.png.
-  Rollback image: zenzcash-sandlab:before-compact-topic-20261124. Staging deployment
-  and user visual review follow.
+  Rollback image: zenzcash-sandlab:before-compact-topic-20261124.
+  Deployed 1898ce4 to staging only. HTTPS verification at
+  2026-11-24T03:48:43Z passes all-checked defaults/full inclusion, compact posts and
+  expanded evidence, light/dark typography, 1440/1100/1099/800/390/320px layout,
+  filters, help, citations and history/navigation. Inspected deployed desktop
+  evidence and phone rewrite screenshots. App healthy, Basic Auth required,
+  332 topics and no runtime exceptions. Evidence: work/compact-topic-staging.json,
+  matching PNGs and work/compact-topic-deploy.log. Post-commit security review
+  found no new issues or committed secrets; identity/signing match configuration.
+  Production unchanged. User visual review remains pending.
