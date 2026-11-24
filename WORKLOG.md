@@ -6400,3 +6400,21 @@ Implementation in progress; user verification remains pending.
   findings; identity/signing match configuration. Database remains schema 12;
   the verified pre-update backup is intact. Production remains unchanged.
   User visual review is pending.
+
+- **D-228 — Peer access to main questions and main arguments.**
+  User proposes placing Main Questions and Main Arguments side by side so each
+  side's arguments are easy to scan. Clarification is pending on two content
+  columns versus two adjacent section buttons. Preserve existing published
+  question/argument text, citations and detail; no new analysis. Also explained
+  where browser checks live, that the agent writes/extends them using the existing
+  Chrome harness, and that screenshots are separately inspected under CLAUDE.md.
+
+- **D-229 — Information icons must close on a second click.**
+  User reports that filter help remains over the options after clicking its icon
+  again. Pinning currently closes but hover/focus CSS immediately keeps the text
+  visible. Make click-close explicitly dismiss hover/focus preview until a fresh
+  intentional hover/focus or another click. Retain keyboard/Escape behavior and
+  pinned help across redraws. Add actual browser coverage of repeated mouse and
+  touch clicks, pointer departure, keyboard use and reachable underlying options;
+  implement and deploy the fix to staging while the summary-layout clarification
+  is pending.
