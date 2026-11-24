@@ -6476,3 +6476,14 @@ Implementation in progress; user verification remains pending.
   found no new untrusted HTML, identity bypass or committed secrets. Identity
   and signing match configuration; production unchanged. User visual review
   remains pending.
+
+- **D-231 — More compact question/argument overview.**
+  User wants supporting points/evidence folded by default and smaller dark-gray
+  argument explanations so more questions fit on screen. Fresh topic views
+  already initialize evidence disclosures closed; explicitly verify this before
+  any overview action. Preserve intentional open sections when using Back, as
+  previously requested. Reduce explanation text and spacing within the paired
+  overview, keep argument/question titles distinct, and retain the full text and
+  citations. Use a readable gray in light mode and its lighter counterpart in
+  dark mode. Scope typography changes to the overview, not forum post text.
+  Test desktop/phone sizes and deploy on staging only with a rollback image.
