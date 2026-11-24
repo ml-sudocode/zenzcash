@@ -6243,3 +6243,16 @@ Implementation in progress; user verification remains pending.
   exists. Made its polling predicate tolerate the loading document while still
   requiring the same exact expected error text; browser verification reruns.
   Final browser rerun passes, including non-topic return and the cache check.
+  Deployed 3d3021a to staging only. HTTPS browser verification at
+  2026-11-24T02:03:42Z passes hidden-age default, visible legend, direct argument
+  access, selection states, login return, existing citation previews, retained
+  full posts and author context, and overflow checks at 1440/800/390/320px.
+  Reconfirmed thread-58906's exact 8/32/85 post and 0/0/2 point counts in the UI.
+  Basic Auth remains required; the authenticated app is healthy, 332 topics are
+  present and no runtime exceptions occurred. Inspected deployed desktop/phone
+  summary screenshots. Evidence: work/summary-usability-staging.json, matching
+  PNGs and work/summary-usability-deploy.log. Security review found no new
+  untrusted HTML, selector interpolation, authentication changes or committed
+  secrets. Reading-return state stays in browser memory and requires matching
+  topic release before restoration. Commit identity matches configuration.
+  Production is unchanged; user visual review remains pending.
