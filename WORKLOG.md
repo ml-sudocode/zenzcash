@@ -6387,3 +6387,16 @@ Implementation in progress; user verification remains pending.
   options vertically at phone widths and assert panel scrollWidth <= clientWidth
   across 1280/1024/800/701/700/390/320px. Broad browser rerun passes with that
   stronger assertion. Evidence: work/reader-simplify-browser-final.log.
+  Deployed phone-layout follow-up 004535b. Final HTTPS verification at
+  2026-11-24T03:09:17Z passes all requested changes at 1440/800/390/320px,
+  including internal controls-panel overflow, Previous/Next under each applied
+  filter, exact match-count restoration on clearing, and matching legend names.
+  Prior Saved/login/history/reload/citation behavior still passes; no runtime
+  exceptions, Basic Auth still required, app healthy with 332 published topics.
+  Inspected final 320px deployed screenshot: no clipped filter labels or inner
+  horizontal scrollbar, both post navigation buttons visible. Evidence:
+  work/reader-simplify-staging.json, matching PNGs and
+  work/reader-simplify-deploy-final.log. CSS follow-up security review has no new
+  findings; identity/signing match configuration. Database remains schema 12;
+  the verified pre-update backup is intact. Production remains unchanged.
+  User visual review is pending.
