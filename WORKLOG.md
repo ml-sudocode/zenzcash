@@ -6256,3 +6256,18 @@ Implementation in progress; user verification remains pending.
   secrets. Reading-return state stays in browser memory and requires matching
   topic release before restoration. Commit identity matches configuration.
   Production is unchanged; user visual review remains pending.
+
+- **D-226 — Unified Saved and browser-wide return positions.**
+  User requests Saved contain both saved topics and saved posts, and clarifies
+  that Back must restore position on every Zenzcash page, not only login detours.
+  Add account-owned topic bookmarks with save/remove controls and separate
+  Topics/Posts sections under Saved. Use the existing authenticated, CSRF-checked
+  API patterns and an additive schema migration; preserve existing account and
+  post data, back up staging before migration, and document schema-aware rollback.
+  Replace the login-only return slot with per-history-entry snapshots, including
+  loaded post counts, selected text versions, disclosures and filter/view state.
+  Preserve return state across reload/external navigation within the tab without
+  persisting credentials or account responses. Keep directory/back-to-reading
+  convenience links working. Implement, test and deploy only on the staging
+  branch. User also requests a short collaborator summary and explanation of
+  desktop/mobile checks; include both in the final response.
