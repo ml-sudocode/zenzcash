@@ -11,6 +11,7 @@ export async function checkReadingFlow({send,evaluate,waitFor,capture}) {
     await evaluate("document.querySelector('.post:not(.compact-post):not(.hidden-post)').scrollIntoView({block:'start',behavior:'instant'})");
     assert.equal(await evaluate("(()=>{const panel=document.querySelector('.settings-panel'),r=panel.getBoundingClientRect();return r.width>=240&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.settings-panel')===panel})()"),true,`Reading controls stay visible and at least 240px wide at ${width}px`);
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true,`No overflow at ${width}px`);
+    assert.equal(await evaluate("document.querySelector('.settings-panel').scrollWidth<=document.querySelector('.settings-panel').clientWidth"),true,`No horizontal scrolling inside reading controls at ${width}px`);
     assert.equal(await evaluate("['.previous-post','.next-post'].every(selector=>{const button=document.querySelector(selector),r=button.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===button})"),true,`Both post navigation buttons are visible and clickable at ${width}px`);
   }
   for (const [width,height] of [[1280,900],[390,844]]) {

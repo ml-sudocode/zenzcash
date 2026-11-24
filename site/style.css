@@ -377,6 +377,7 @@ main { max-width: 1440px; padding-right: 130px; }
   .settings-panel { grid-row: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; position: sticky; top: var(--header-height); z-index: 24; height: var(--controls-height); max-height: none; }
   .settings-panel > h2, .settings-panel > .match-count, .settings-panel > .filter-hint { grid-column: 1 / -1; margin: 0; }
   .settings-panel fieldset, .settings-panel .reading-choice { min-width: 0; }
+  .settings-panel .filter-options { grid-template-columns: minmax(0, 1fr); }
   .site-header { position: sticky; top: 0; z-index: 35; min-height: 94px; align-content: center; gap: 4px; padding-right: 92px; }
   #site-nav { gap: 4px 12px; font-size: .85rem; order: 2; flex-basis: 100%; }
   .companion { z-index: 36; top: 5px; right: 5px; width: 76px; min-height: 0; height: 82px; padding: 0; border-radius: 14px; }

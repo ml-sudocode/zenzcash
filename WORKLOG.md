@@ -6376,3 +6376,14 @@ Implementation in progress; user verification remains pending.
   /data/before-reader-simplify-20261124.sqlite in the staging data volume.
   ARCHITECTURE documents preference conversion for rollback without discarding
   account/bookmark data. Staging deployment and HTTPS verification follow.
+  Commit bcdac57 security review found no new untrusted HTML, authentication
+  bypass, unvalidated settings acceptance or committed secrets. Identity/signing
+  match configuration. The first container build exited 143 before deployment;
+  the existing app stayed healthy. A bounded retry succeeded. Initial deployed
+  HTTPS checks passed at 2026-11-24T03:07:10Z, including filtered Previous/Next,
+  clearing groups, matching tone names and existing Saved/Back behavior.
+  Screenshot inspection caught horizontal overflow inside the controls panel
+  at 320px even though the page-wide overflow check passed. Stack each group's
+  options vertically at phone widths and assert panel scrollWidth <= clientWidth
+  across 1280/1024/800/701/700/390/320px. Broad browser rerun passes with that
+  stronger assertion. Evidence: work/reader-simplify-browser-final.log.
